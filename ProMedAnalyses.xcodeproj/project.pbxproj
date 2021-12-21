@@ -1,0 +1,534 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6269CD0E61A0FD2664908FB1 /* Pods_getCRPfromProMed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */; };
+		FF610CEE276E2D72007DD625 /* MyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */; };
+		FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF610CF0276E3065007DD625 /* CollectionCellView.xib */; };
+		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
+		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
+		FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */; };
+		FF77BF9B27674EEC005E9A66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BF9927674EEC005E9A66 /* Main.storyboard */; };
+		FF77BF9E27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9C27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld */; };
+		FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF77BF9F27674EED005E9A66 /* Assets.xcassets */; };
+		FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */; };
+		FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */; };
+		FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA152772134A003AB648 /* ResultsTableData.swift */; };
+		FF87FA1827721EE2003AB648 /* PatientsTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* PatientsTableData.swift */; };
+		FF87FA1A277222B8003AB648 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA19277222B8003AB648 /* Constants.swift */; };
+		FFF087EA276900840054443B /* riams.html in Resources */ = {isa = PBXBuildFile; fileRef = FFF087E9276900840054443B /* riams.html */; };
+		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
+		FFF087EE276935490054443B /* tableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* tableCell.xib */; };
+		FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getCRPfromProMed.debug.xcconfig"; path = "Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed.debug.xcconfig"; sourceTree = "<group>"; };
+		71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getCRPfromProMed.release.xcconfig"; path = "Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed.release.xcconfig"; sourceTree = "<group>"; };
+		7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_getCRPfromProMed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCollectionViewCell.swift; sourceTree = "<group>"; };
+		FF610CF0276E3065007DD625 /* CollectionCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CollectionCellView.xib; sourceTree = "<group>"; };
+		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientsViewController.swift; sourceTree = "<group>"; };
+		FF77BF9A27674EEC005E9A66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FF77BF9D27674EEC005E9A66 /* getCRPfromProMed.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = getCRPfromProMed.xcdatamodel; sourceTree = "<group>"; };
+		FF77BF9F27674EED005E9A66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FF77BFA227674EED005E9A66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		FF77BFA427674EED005E9A66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewLayout.swift; sourceTree = "<group>"; };
+		FF87FA152772134A003AB648 /* ResultsTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsTableData.swift; sourceTree = "<group>"; };
+		FF87FA1727721EE2003AB648 /* PatientsTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientsTableData.swift; sourceTree = "<group>"; };
+		FF87FA19277222B8003AB648 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		FFF087E9276900840054443B /* riams.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = riams.html; sourceTree = "<group>"; };
+		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
+		FFF087ED276935490054443B /* tableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tableCell.xib; sourceTree = "<group>"; };
+		FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableCellForResultsTableView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF77BF8D27674EEC005E9A66 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6269CD0E61A0FD2664908FB1 /* Pods_getCRPfromProMed.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		69CD6877EAAB80A97FDBC0E3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA9C3AE411E623522A864973 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */,
+				71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		FF610CE8276E2D10007DD625 /* TableViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				FF610CEF276E2D76007DD625 /* CollectionView */,
+				FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */,
+				FFF087EB276933640054443B /* ResultsViewController.swift */,
+				FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */,
+			);
+			path = TableViewControllers;
+			sourceTree = "<group>";
+		};
+		FF610CE9276E2D25007DD625 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FFF087E9276900840054443B /* riams.html */,
+				FF77BF9327674EEC005E9A66 /* AppDelegate.swift */,
+				FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */,
+				FF77BF9F27674EED005E9A66 /* Assets.xcassets */,
+				FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FF610CEA276E2D3C007DD625 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FF77BF9C27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld */,
+				FF87FA152772134A003AB648 /* ResultsTableData.swift */,
+				FF87FA1727721EE2003AB648 /* PatientsTableData.swift */,
+				FF87FA19277222B8003AB648 /* Constants.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		FF610CEF276E2D76007DD625 /* CollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */,
+				FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */,
+			);
+			path = CollectionView;
+			sourceTree = "<group>";
+		};
+		FF77BF8727674EEC005E9A66 = {
+			isa = PBXGroup;
+			children = (
+				FF77BF9227674EEC005E9A66 /* ProMedAnalyses */,
+				FF77BF9127674EEC005E9A66 /* Products */,
+				DA9C3AE411E623522A864973 /* Pods */,
+				69CD6877EAAB80A97FDBC0E3 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		FF77BF9127674EEC005E9A66 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF77BF9227674EEC005E9A66 /* ProMedAnalyses */ = {
+			isa = PBXGroup;
+			children = (
+				FF610CEA276E2D3C007DD625 /* Model */,
+				FF87FA1B2772270B003AB648 /* View */,
+				FF610CE8276E2D10007DD625 /* TableViewControllers */,
+				FF610CE9276E2D25007DD625 /* Supporting Files */,
+				FF77BFA427674EED005E9A66 /* Info.plist */,
+			);
+			path = ProMedAnalyses;
+			sourceTree = "<group>";
+		};
+		FF87FA1B2772270B003AB648 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				FF610CF0276E3065007DD625 /* CollectionCellView.xib */,
+				FFF087ED276935490054443B /* tableCell.xib */,
+				FF77BF9927674EEC005E9A66 /* Main.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FF77BF8F27674EEC005E9A66 /* ProMedAnalyses */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF77BFA727674EED005E9A66 /* Build configuration list for PBXNativeTarget "ProMedAnalyses" */;
+			buildPhases = (
+				7290C209384903A53C40938D /* [CP] Check Pods Manifest.lock */,
+				FF77BF8C27674EEC005E9A66 /* Sources */,
+				FF77BF8D27674EEC005E9A66 /* Frameworks */,
+				FF77BF8E27674EEC005E9A66 /* Resources */,
+				29F805B116D4E5DE44C75606 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ProMedAnalyses;
+			productName = getCRPfromProMed;
+			productReference = FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF77BF8827674EEC005E9A66 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1310;
+				LastUpgradeCheck = 1310;
+				TargetAttributes = {
+					FF77BF8F27674EEC005E9A66 = {
+						CreatedOnToolsVersion = 13.1;
+					};
+				};
+			};
+			buildConfigurationList = FF77BF8B27674EEC005E9A66 /* Build configuration list for PBXProject "ProMedAnalyses" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF77BF8727674EEC005E9A66;
+			productRefGroup = FF77BF9127674EEC005E9A66 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF77BF8F27674EEC005E9A66 /* ProMedAnalyses */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FF77BF8E27674EEC005E9A66 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */,
+				FFF087EE276935490054443B /* tableCell.xib in Resources */,
+				FFF087EA276900840054443B /* riams.html in Resources */,
+				FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */,
+				FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */,
+				FF77BF9B27674EEC005E9A66 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		29F805B116D4E5DE44C75606 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7290C209384903A53C40938D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-getCRPfromProMed-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF77BF8C27674EEC005E9A66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */,
+				FF87FA1A277222B8003AB648 /* Constants.swift in Sources */,
+				FF77BF9E27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld in Sources */,
+				FF610CEE276E2D72007DD625 /* MyCollectionViewCell.swift in Sources */,
+				FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */,
+				FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */,
+				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
+				FF87FA1827721EE2003AB648 /* PatientsTableData.swift in Sources */,
+				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
+				FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */,
+				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		FF77BF9927674EEC005E9A66 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FF77BF9A27674EEC005E9A66 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FF77BFA227674EED005E9A66 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FF77BFA527674EED005E9A66 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FF77BFA627674EED005E9A66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FF77BFA827674EED005E9A66 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A2JRL4D922;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProMedAnalyses/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GetPromedAnalyses;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = VAndreyev.ProMedAnalyses;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FF77BFA927674EED005E9A66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A2JRL4D922;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProMedAnalyses/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GetPromedAnalyses;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = VAndreyev.ProMedAnalyses;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF77BF8B27674EEC005E9A66 /* Build configuration list for PBXProject "ProMedAnalyses" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF77BFA527674EED005E9A66 /* Debug */,
+				FF77BFA627674EED005E9A66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF77BFA727674EED005E9A66 /* Build configuration list for PBXNativeTarget "ProMedAnalyses" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF77BFA827674EED005E9A66 /* Debug */,
+				FF77BFA927674EED005E9A66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FF77BF9C27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FF77BF9D27674EEC005E9A66 /* getCRPfromProMed.xcdatamodel */,
+			);
+			currentVersion = FF77BF9D27674EEC005E9A66 /* getCRPfromProMed.xcdatamodel */;
+			path = ProMedAnalyses.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = FF77BF8827674EEC005E9A66 /* Project object */;
+}

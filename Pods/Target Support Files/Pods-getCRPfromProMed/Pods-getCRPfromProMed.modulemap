@@ -1,0 +1,6 @@
+framework module Pods_getCRPfromProMed {
+  umbrella header "Pods-getCRPfromProMed-umbrella.h"
+
+  export *
+  module * { export * }
+}
