@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6269CD0E61A0FD2664908FB1 /* Pods_getCRPfromProMed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */; };
+		B3C76274A46C3725FB9BF65F /* Pods_ProMedAnalyses.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0095DF90FFB2BEF33EA9F955 /* Pods_ProMedAnalyses.framework */; };
 		FF610CEE276E2D72007DD625 /* MyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */; };
 		FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF610CF0276E3065007DD625 /* CollectionCellView.xib */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
@@ -19,18 +19,20 @@
 		FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */; };
 		FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */; };
 		FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA152772134A003AB648 /* ResultsTableData.swift */; };
-		FF87FA1827721EE2003AB648 /* PatientsTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* PatientsTableData.swift */; };
+		FF87FA1827721EE2003AB648 /* Patient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* Patient.swift */; };
 		FF87FA1A277222B8003AB648 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA19277222B8003AB648 /* Constants.swift */; };
 		FFF087EA276900840054443B /* riams.html in Resources */ = {isa = PBXBuildFile; fileRef = FFF087E9276900840054443B /* riams.html */; };
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
-		FFF087EE276935490054443B /* tableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* tableCell.xib */; };
+		FFF087EE276935490054443B /* ResultsTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsTableCell.xib */; };
 		FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0095DF90FFB2BEF33EA9F955 /* Pods_ProMedAnalyses.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProMedAnalyses.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getCRPfromProMed.debug.xcconfig"; path = "Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed.debug.xcconfig"; sourceTree = "<group>"; };
+		46974C817A69809795AAB258 /* Pods-ProMedAnalyses.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMedAnalyses.release.xcconfig"; path = "Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses.release.xcconfig"; sourceTree = "<group>"; };
 		71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getCRPfromProMed.release.xcconfig"; path = "Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed.release.xcconfig"; sourceTree = "<group>"; };
-		7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_getCRPfromProMed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		73C5B45675C1F3261B93CCE3 /* Pods-ProMedAnalyses.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMedAnalyses.debug.xcconfig"; path = "Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses.debug.xcconfig"; sourceTree = "<group>"; };
 		FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCollectionViewCell.swift; sourceTree = "<group>"; };
 		FF610CF0276E3065007DD625 /* CollectionCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CollectionCellView.xib; sourceTree = "<group>"; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,11 +46,11 @@
 		FF77BFA427674EED005E9A66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewLayout.swift; sourceTree = "<group>"; };
 		FF87FA152772134A003AB648 /* ResultsTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsTableData.swift; sourceTree = "<group>"; };
-		FF87FA1727721EE2003AB648 /* PatientsTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientsTableData.swift; sourceTree = "<group>"; };
+		FF87FA1727721EE2003AB648 /* Patient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Patient.swift; sourceTree = "<group>"; };
 		FF87FA19277222B8003AB648 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		FFF087E9276900840054443B /* riams.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = riams.html; sourceTree = "<group>"; };
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
-		FFF087ED276935490054443B /* tableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tableCell.xib; sourceTree = "<group>"; };
+		FFF087ED276935490054443B /* ResultsTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsTableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableCellForResultsTableView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6269CD0E61A0FD2664908FB1 /* Pods_getCRPfromProMed.framework in Frameworks */,
+				B3C76274A46C3725FB9BF65F /* Pods_ProMedAnalyses.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,7 +69,7 @@
 		69CD6877EAAB80A97FDBC0E3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7933BF650074CA7BB090C5CB /* Pods_getCRPfromProMed.framework */,
+				0095DF90FFB2BEF33EA9F955 /* Pods_ProMedAnalyses.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -77,6 +79,8 @@
 			children = (
 				219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */,
 				71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */,
+				73C5B45675C1F3261B93CCE3 /* Pods-ProMedAnalyses.debug.xcconfig */,
+				46974C817A69809795AAB258 /* Pods-ProMedAnalyses.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -109,7 +113,7 @@
 			children = (
 				FF77BF9C27674EEC005E9A66 /* ProMedAnalyses.xcdatamodeld */,
 				FF87FA152772134A003AB648 /* ResultsTableData.swift */,
-				FF87FA1727721EE2003AB648 /* PatientsTableData.swift */,
+				FF87FA1727721EE2003AB648 /* Patient.swift */,
 				FF87FA19277222B8003AB648 /* Constants.swift */,
 			);
 			path = Model;
@@ -158,7 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				FF610CF0276E3065007DD625 /* CollectionCellView.xib */,
-				FFF087ED276935490054443B /* tableCell.xib */,
+				FFF087ED276935490054443B /* ResultsTableCell.xib */,
 				FF77BF9927674EEC005E9A66 /* Main.storyboard */,
 			);
 			path = View;
@@ -225,7 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */,
-				FFF087EE276935490054443B /* tableCell.xib in Resources */,
+				FFF087EE276935490054443B /* ResultsTableCell.xib in Resources */,
 				FFF087EA276900840054443B /* riams.html in Resources */,
 				FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */,
 				FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */,
@@ -242,15 +246,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-getCRPfromProMed/Pods-getCRPfromProMed-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		7290C209384903A53C40938D /* [CP] Check Pods Manifest.lock */ = {
@@ -268,7 +272,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-getCRPfromProMed-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ProMedAnalyses-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -289,7 +293,7 @@
 				FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */,
 				FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
-				FF87FA1827721EE2003AB648 /* PatientsTableData.swift in Sources */,
+				FF87FA1827721EE2003AB648 /* Patient.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
 				FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
@@ -436,7 +440,7 @@
 		};
 		FF77BFA827674EED005E9A66 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 219CEAE1FFA07856E8D2FA8C /* Pods-getCRPfromProMed.debug.xcconfig */;
+			baseConfigurationReference = 73C5B45675C1F3261B93CCE3 /* Pods-ProMedAnalyses.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -466,7 +470,7 @@
 		};
 		FF77BFA927674EED005E9A66 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 71CDFE1BA03282D6AA05775A /* Pods-getCRPfromProMed.release.xcconfig */;
+			baseConfigurationReference = 46974C817A69809795AAB258 /* Pods-ProMedAnalyses.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

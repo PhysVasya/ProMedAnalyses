@@ -30,7 +30,7 @@ class ResultsViewController: UIViewController, TableForDataDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView = UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-        tableView.register(UINib(nibName: "tableCell", bundle: nil), forCellReuseIdentifier: "tableCell")
+        tableView.register(UINib(nibName: "ResultsTableCell", bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.layer.zPosition = 1
@@ -79,7 +79,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath) as! ReusableCellForResultsTableView
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ReusableCellForResultsTableView
         cell.scrollDelegate = self
         
         if indexPath.row == 0 {

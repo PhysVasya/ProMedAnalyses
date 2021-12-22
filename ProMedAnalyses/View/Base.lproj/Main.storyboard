@@ -28,7 +28,7 @@
         <!--Список пациентов-->
         <scene sceneID="KSy-9g-Kjd">
             <objects>
-                <viewController id="rQZ-Xb-Fai" customClass="PatientsViewController" customModule="getCRPfromProMed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="rQZ-Xb-Fai" customClass="PatientsViewController" customModule="ProMedAnalyses" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Kjv-V1-20S">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -57,13 +57,7 @@
                             <constraint firstItem="zK0-09-nBK" firstAttribute="trailing" secondItem="lan-ZV-qin" secondAttribute="trailing" id="xN8-zT-KHR"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Список пациентов" id="eVS-FH-1Qn">
-                        <barButtonItem key="rightBarButtonItem" title="Показать" id="DVV-ZW-XzR">
-                            <connections>
-                                <action selector="showTableVC:" destination="rQZ-Xb-Fai" id="pSb-fD-CZg"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Список пациентов" id="eVS-FH-1Qn"/>
                     <connections>
                         <outlet property="patientsTableView" destination="lan-ZV-qin" id="pOa-Iz-eef"/>
                     </connections>
