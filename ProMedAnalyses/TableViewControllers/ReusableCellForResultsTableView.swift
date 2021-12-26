@@ -21,20 +21,20 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
         super.awakeFromNib()
         collectionView.delegate = self
         collectionView.dataSource = self        
-        collectionView.register(UINib(nibName: "CollectionCellView", bundle: nil), forCellWithReuseIdentifier: "CWCell")
+        collectionView.register(UINib(nibName: "CollectionCellView", bundle: nil), forCellWithReuseIdentifier: K.collectionViewCellForResultsData)
         
     }
 
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return textStrings.count - 1
+        return textStrings.count
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CWCell", for: indexPath) as! MyCollectionViewCell
-        cell.configure(with: textStrings[indexPath.row + 1])
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.collectionViewCellForResultsData, for: indexPath) as! MyCollectionViewCell
+        cell.configure(with: textStrings[indexPath.row])
         return cell
     }
     

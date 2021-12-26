@@ -11,4 +11,5 @@ import Foundation
 struct K {
     static let patientTableCell = "patientCell"
     static let resultsTableCell = "resultsTableCell"
+    static let collectionViewCellForResultsData = "CWCell"
 }

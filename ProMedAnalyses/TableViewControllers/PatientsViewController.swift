@@ -28,11 +28,10 @@ class PatientsViewController: UIViewController, URLSessionDelegate {
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
         
-        analysesData.append("Ферритин")
-        analysesData.append("CРБ")
-        analysesData.append("Лейкоциты")
-        analysesData.append("Моноциты")
-        analysesData.append("АЛТ")
+        analysesData.append("С-реактивный \n белок")
+        analysesData.append("1,0-10,0")
+        analysesData.append("Более 40")
+        analysesData.append("")
         
         collectionViewHeaderItems.append("Название услуги")
         collectionViewHeaderItems.append("Норма")
@@ -120,6 +119,8 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        
         let destinationTableVC = ResultsViewController()
         destinationTableVC.modalPresentationStyle = .fullScreen
         destinationTableVC.title = "Результаты"
@@ -127,5 +128,8 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         destinationTableVC.headerForSection.append("Дата взятия биоматериала: 21/12/2021")
         destinationTableVC.headerForCollectionView = collectionViewHeaderItems
         
-        navigationController?.pushViewController(destinationTableVC, animated: true)    }
+        navigationController?.pushViewController(destinationTableVC, animated: true)
+        tableView.cellForRow(at: indexPath)?.isSelected = false
+        
+    }
 }

@@ -18,37 +18,42 @@ class ResultsViewController: UIViewController, TableForDataDelegate {
     var headerForCollectionView = [String]()
     
     let maximumHeight : CGFloat = 250
-    let minimumHeight : CGFloat = 50
-    var previousScrollOffset : CGFloat = 0
+    let minimumHeight : CGFloat = 0
     
-    @IBOutlet var header : UIView!
-    @IBOutlet var tableView : UITableView!
-    @IBOutlet weak var headerViewHeight : NSLayoutConstraint!
-    
-    var myLabel : UILabel!
+    var tableView = UITableView()
+    var myLabel = UILabel()
+    var headerHeight : NSLayoutConstraint?
+    var headerTopAnchor : NSLayoutConstraint?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        let header = HeaderView(dataForTable: headerForCollectionView)
+        view.addSubview(tableView)
+        view.addSubview(header)
+
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.register(UINib(nibName: "ResultsTableCell", bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.layer.zPosition = 1
-        view.addSubview(tableView)
         
-        header = UIView(frame: CGRect(x: 0, y: 140, width: view.frame.width, height: 50))
+        header.translatesAutoresizingMaskIntoConstraints = false
+        header.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+        headerHeight = header.heightAnchor.constraint(equalToConstant: 50)
+        headerHeight?.isActive = true
+        header.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        headerTopAnchor = header.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 140)
+        headerTopAnchor?.isActive = true
         header.backgroundColor = .blue
-        header.layer.zPosition = 200
-        view.addSubview(header)
         view.bringSubviewToFront(header)
-        
-        myLabel = UILabel(frame: CGRect(x: 0, y: 0, width: header.frame.width, height: header.frame.height))
-        myLabel.text = "YOUR MOMA GaY"
-        myLabel.textColor = .white
-        myLabel.textAlignment = .center
-        header.isHidden = false
-        header.addSubview(myLabel)
+            
+       
     }
+    
     
     func viewDidScroll (to position: CGFloat) {
         for cell in tableView.visibleCells as! [ReusableCellForResultsTableView] {
@@ -81,6 +86,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ReusableCellForResultsTableView
         cell.scrollDelegate = self
+       
         
         if indexPath.row == 0 {
             cell.textStrings = headerForCollectionView
@@ -96,30 +102,17 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
         return 50
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-        print(header.constraints)
-        //        let headerCell = tableView.cellForRow(at: IndexPath(row:0, section: 0))
-        //        guard headerCell == nil || (headerCell!.frame.origin.y < tableView.contentOffset.y + headerCell!.frame.height/2) else {
-        //            header?.isHidden = true
-        //            return
-        //
-        //        }
-        //
-        //        guard let hdr = header else {
-        //            return
-        //        }
-        //        hdr.isHidden = false
-        //        hdr.frame = CGRect(x: 0, y: tableView.contentOffset.y, width: hdr.frame.size.width, height: hdr.frame.size.height)
-        //
-        //        if !tableView.subviews.contains(hdr) {
-        //            tableView.addSubview(hdr)
-        //        }
-        //
-        //        tableView.bringSubviewToFront(hdr)
-    }
     
 }
 
-
+extension ResultsViewController : UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let scrollOffset = scrollView.contentOffset.y
+        if scrollOffset < 0 {
+//            headerHeight?.constant += abs(scrollOffset)
+        }
+    }
+    
+    
+}
 
