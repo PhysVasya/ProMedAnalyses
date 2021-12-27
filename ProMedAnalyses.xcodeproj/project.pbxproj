@@ -10,8 +10,9 @@
 		B3C76274A46C3725FB9BF65F /* Pods_ProMedAnalyses.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0095DF90FFB2BEF33EA9F955 /* Pods_ProMedAnalyses.framework */; };
 		FF610CEE276E2D72007DD625 /* MyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */; };
 		FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF610CF0276E3065007DD625 /* CollectionCellView.xib */; };
-		FF6B796B2778572100EB290B /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796A2778572100EB290B /* HeaderView.swift */; };
 		FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */; };
+		FF6B79702779FA7D00EB290B /* FetchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796F2779FA7D00EB290B /* FetchData.swift */; };
+		FF6B79722779FF5800EB290B /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B79712779FF5800EB290B /* HeaderView.swift */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
 		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
 		FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */; };
@@ -34,8 +35,9 @@
 		73C5B45675C1F3261B93CCE3 /* Pods-ProMedAnalyses.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMedAnalyses.debug.xcconfig"; path = "Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses.debug.xcconfig"; sourceTree = "<group>"; };
 		FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCollectionViewCell.swift; sourceTree = "<group>"; };
 		FF610CF0276E3065007DD625 /* CollectionCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CollectionCellView.xib; sourceTree = "<group>"; };
-		FF6B796A2778572100EB290B /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HeaderView.swift; path = ProMedAnalyses/TableViewControllers/HeaderView.swift; sourceTree = SOURCE_ROOT; };
 		FF6B796D2778936600EB290B /* ProMedAnalyses.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProMedAnalyses.xcdatamodel; sourceTree = "<group>"; };
+		FF6B796F2779FA7D00EB290B /* FetchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchData.swift; sourceTree = "<group>"; };
+		FF6B79712779FF5800EB290B /* HeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HeaderView.swift; path = ProMedAnalyses/Controllers/HeaderView.swift; sourceTree = SOURCE_ROOT; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -83,15 +85,16 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		FF610CE8276E2D10007DD625 /* TableViewControllers */ = {
+		FF610CE8276E2D10007DD625 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				FF610CEF276E2D76007DD625 /* CollectionView */,
 				FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */,
 				FFF087EB276933640054443B /* ResultsViewController.swift */,
 				FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */,
+				FF6B796F2779FA7D00EB290B /* FetchData.swift */,
 			);
-			path = TableViewControllers;
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 		FF610CE9276E2D25007DD625 /* Supporting Files */ = {
@@ -120,6 +123,7 @@
 		FF610CEF276E2D76007DD625 /* CollectionView */ = {
 			isa = PBXGroup;
 			children = (
+				FF6B79712779FF5800EB290B /* HeaderView.swift */,
 				FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */,
 				FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */,
 			);
@@ -149,7 +153,7 @@
 			children = (
 				FF610CEA276E2D3C007DD625 /* Model */,
 				FF87FA1B2772270B003AB648 /* View */,
-				FF610CE8276E2D10007DD625 /* TableViewControllers */,
+				FF610CE8276E2D10007DD625 /* Controllers */,
 				FF610CE9276E2D25007DD625 /* Supporting Files */,
 				FF77BFA427674EED005E9A66 /* Info.plist */,
 			);
@@ -162,7 +166,6 @@
 				FF610CF0276E3065007DD625 /* CollectionCellView.xib */,
 				FFF087ED276935490054443B /* ResultsTableCell.xib */,
 				FF77BF9927674EEC005E9A66 /* Main.storyboard */,
-				FF6B796A2778572100EB290B /* HeaderView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -292,11 +295,12 @@
 				FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */,
 				FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
-				FF6B796B2778572100EB290B /* HeaderView.swift in Sources */,
 				FF87FA1827721EE2003AB648 /* Patient.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
+				FF6B79702779FA7D00EB290B /* FetchData.swift in Sources */,
 				FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
+				FF6B79722779FF5800EB290B /* HeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

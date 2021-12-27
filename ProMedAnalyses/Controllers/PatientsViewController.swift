@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 import SwiftSoup
 
-class PatientsViewController: UIViewController, URLSessionDelegate {
+class PatientsViewController: UIViewController {
     
     @IBOutlet var patientsTableView: UITableView!
     
@@ -23,10 +23,13 @@ class PatientsViewController: UIViewController, URLSessionDelegate {
     var collectionViewHeaderItems = [String]()
     var patients = [Patient]()
     
+    let urlForRequest = URL(string: "https://crimea.promedweb.ru/?c=EvnXml&m=doLoadData")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
+        
         
         analysesData.append("С-реактивный \n белок")
         analysesData.append("1,0-10,0")
@@ -46,11 +49,50 @@ class PatientsViewController: UIViewController, URLSessionDelegate {
         patients.append(Patient(name: "Меметов Мемет Меметович", dateOfBirth: "13.01.1930", ward: 5))
         patients.append(Patient(name: "Меметов Мемет Меметович", dateOfBirth: "13.01.1930", ward: 4))
         patients.append(Patient(name: "Кек Кекович Кеков", dateOfBirth: "11.04.1945", ward: 25))
-                
+        
+        fetchData()
+        
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+    }
+    
+    func fetchData () {
+        guard let url = urlForRequest else {
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = [
+            "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8",
+            "Origin" : "https://crimea.promedweb.ru",
+            "Referer" : "https://crimea.promedweb.ru/?c=promed",
+            "Content-Length" : "54",
+            "Cookie" : "io=XavDNWBbRXzkCJFMATKQ; JSESSIONID=87A21185389261C543A100EC2607F3CF; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
+        ]
+        
+        let body = "XmlType_id=4&Evn_id=820910076978020&EvnXml_id=31197909"
+        let finalBody = body.data(using: .utf8)
+        request.httpBody = finalBody
+        
+        
+        let sessionConfig = URLSessionConfiguration.default
+        let session = URLSession(configuration: sessionConfig)
+        let task = session.dataTask(with: request) { data, response, error in
+            guard error == nil else {
+                print(error!)
+                return
+            }
+            
+            if data != nil {
+                if let unwrappedData = data {
+                    print("Success")
+                    print(String.init(data: unwrappedData, encoding: .utf8))
+                }
+            }
+        }
+        task.resume()
     }
     
 }
@@ -93,7 +135,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         let patientNames = patients.filter { patient in
             patient.ward.wardNumber == indexPath.section + 1
         }
-            
+        
         cell.textLabel?.text = patientNames[indexPath.row].name
         
         return cell
@@ -133,3 +175,6 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         
     }
 }
+
+
+
