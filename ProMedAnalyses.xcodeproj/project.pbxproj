@@ -11,8 +11,8 @@
 		FF610CEE276E2D72007DD625 /* MyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */; };
 		FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF610CF0276E3065007DD625 /* CollectionCellView.xib */; };
 		FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */; };
-		FF6B79702779FA7D00EB290B /* FetchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796F2779FA7D00EB290B /* FetchData.swift */; };
 		FF6B79722779FF5800EB290B /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B79712779FF5800EB290B /* HeaderView.swift */; };
+		FF6B7974277AB45900EB290B /* HTMLForResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B7973277AB45900EB290B /* HTMLForResults.swift */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
 		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
 		FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */; };
@@ -23,7 +23,6 @@
 		FF87FA162772134A003AB648 /* ResultsTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA152772134A003AB648 /* ResultsTableData.swift */; };
 		FF87FA1827721EE2003AB648 /* Patient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* Patient.swift */; };
 		FF87FA1A277222B8003AB648 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA19277222B8003AB648 /* Constants.swift */; };
-		FFF087EA276900840054443B /* riams.html in Resources */ = {isa = PBXBuildFile; fileRef = FFF087E9276900840054443B /* riams.html */; };
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
 		FFF087EE276935490054443B /* ResultsTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsTableCell.xib */; };
 		FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */; };
@@ -36,8 +35,8 @@
 		FF610CED276E2D72007DD625 /* MyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCollectionViewCell.swift; sourceTree = "<group>"; };
 		FF610CF0276E3065007DD625 /* CollectionCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CollectionCellView.xib; sourceTree = "<group>"; };
 		FF6B796D2778936600EB290B /* ProMedAnalyses.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProMedAnalyses.xcdatamodel; sourceTree = "<group>"; };
-		FF6B796F2779FA7D00EB290B /* FetchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchData.swift; sourceTree = "<group>"; };
 		FF6B79712779FF5800EB290B /* HeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HeaderView.swift; path = ProMedAnalyses/Controllers/HeaderView.swift; sourceTree = SOURCE_ROOT; };
+		FF6B7973277AB45900EB290B /* HTMLForResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLForResults.swift; sourceTree = "<group>"; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -50,7 +49,6 @@
 		FF87FA152772134A003AB648 /* ResultsTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsTableData.swift; sourceTree = "<group>"; };
 		FF87FA1727721EE2003AB648 /* Patient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Patient.swift; sourceTree = "<group>"; };
 		FF87FA19277222B8003AB648 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		FFF087E9276900840054443B /* riams.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = riams.html; sourceTree = "<group>"; };
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		FFF087ED276935490054443B /* ResultsTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsTableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableCellForResultsTableView.swift; sourceTree = "<group>"; };
@@ -92,7 +90,6 @@
 				FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */,
 				FFF087EB276933640054443B /* ResultsViewController.swift */,
 				FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */,
-				FF6B796F2779FA7D00EB290B /* FetchData.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -100,7 +97,6 @@
 		FF610CE9276E2D25007DD625 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				FFF087E9276900840054443B /* riams.html */,
 				FF77BF9327674EEC005E9A66 /* AppDelegate.swift */,
 				FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */,
 				FF77BF9F27674EED005E9A66 /* Assets.xcassets */,
@@ -116,6 +112,7 @@
 				FF87FA1727721EE2003AB648 /* Patient.swift */,
 				FF87FA19277222B8003AB648 /* Constants.swift */,
 				FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */,
+				FF6B7973277AB45900EB290B /* HTMLForResults.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -232,7 +229,6 @@
 			files = (
 				FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */,
 				FFF087EE276935490054443B /* ResultsTableCell.xib in Resources */,
-				FFF087EA276900840054443B /* riams.html in Resources */,
 				FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */,
 				FF610CF1276E3065007DD625 /* CollectionCellView.xib in Resources */,
 				FF77BF9B27674EEC005E9A66 /* Main.storyboard in Resources */,
@@ -296,8 +292,8 @@
 				FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
 				FF87FA1827721EE2003AB648 /* Patient.swift in Sources */,
+				FF6B7974277AB45900EB290B /* HTMLForResults.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
-				FF6B79702779FA7D00EB290B /* FetchData.swift in Sources */,
 				FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
 				FF6B79722779FF5800EB290B /* HeaderView.swift in Sources */,
@@ -468,7 +464,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -498,7 +494,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
