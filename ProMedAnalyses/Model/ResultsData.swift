@@ -17,7 +17,7 @@ struct ResultsData : Decodable {
 }
 
 
-struct DataForPatients : Decodable {
+struct PatientsList : Decodable {
     var patientData : String
     var patientId : String
     
@@ -28,4 +28,12 @@ struct DataForPatients : Decodable {
     }
     
     
+}
+
+
+struct AnalysesList: Decodable {
+    var success : Bool
+    var map : [String]
+    
+   
 }

@@ -106,8 +106,8 @@
 			children = (
 				FF87FA1727721EE2003AB648 /* Patient.swift */,
 				FF87FA19277222B8003AB648 /* Constants.swift */,
-				FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */,
 				FF6B7973277AB45900EB290B /* ResultsData.swift */,
+				FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */,
 			);
 			path = Model;
 			sourceTree = "<group>";
