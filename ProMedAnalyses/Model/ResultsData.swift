@@ -20,11 +20,13 @@ struct ResultsData : Decodable {
 struct PatientsList : Decodable {
     var patientData : String
     var patientId : String
+//    var evnId : String
     
     
     enum CodingKeys: String, CodingKey {
         case patientData = "text"
         case patientId = "id"
+//        case evnId = "EvnPS_id"
     }
     
     
@@ -33,7 +35,7 @@ struct PatientsList : Decodable {
 
 struct AnalysesList: Decodable {
     var success : Bool
-    var map : [String]
+    var html : String
     
    
 }

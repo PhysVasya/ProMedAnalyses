@@ -14,9 +14,11 @@ class PatientsViewController: UIViewController {
     @IBOutlet var patientsTableView: UITableView!
     
     var patients = [Patient]()
-    var wards = [Ward]()
+    var wards = [Int]()
     var namesArray = [String]()
     var datesAtrray = [String]()
+    var wardNumberToMoveTo = ""
+    
     
     
     //Loading Indicator to add visibility whether the process of loading is complete, initialized only
@@ -57,6 +59,73 @@ class PatientsViewController: UIViewController {
         super.viewDidLayoutSubviews()
     }
     
+    
+    func deleteRow(with style: UIContextualAction.Style, on: IndexPath, table: UITableView) -> UIContextualAction {
+        let delete = UIContextualAction(style: style, title: "Перевести из палаты") { [weak self] action, view, completionHandler in
+            view.backgroundColor = .systemRed
+            let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+            if let patientToBeDeleted = groupedPatientsByWard?[on.row] {
+                
+                if self?.patients.contains(patientToBeDeleted) != nil {
+                    self?.patients.removeAll { identicalPatient in
+                        patientToBeDeleted == identicalPatient
+                    }
+                    
+                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfBirth: patientToBeDeleted.dateOfBirth, ward: Ward(wardNumber: 0, wardType: .fourMan), id: patientToBeDeleted.id))
+                } else {
+                    return
+                }
+            }
+            let indexPathToMoveTo = IndexPath(row: 0, section: 0)
+            table.moveRow(at: on, to: indexPathToMoveTo)
+            completionHandler(true)
+        }
+        return delete
+    }
+    
+    func moveRow (with style: UIContextualAction.Style, on: IndexPath, table: UITableView) -> UIContextualAction {
+        
+        let chooseWardToMoveToAlertVC : UIAlertController = {
+            let alertController = UIAlertController(title: "Выберите палату для перевода", message: "Введите номер палаты", preferredStyle: .alert)
+            alertController.addTextField()
+            alertController.textFields?[0].keyboardType = .numberPad
+            return alertController
+        }()
+        chooseWardToMoveToAlertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
+            chooseWardToMoveToAlertVC.dismiss(animated: true) {
+                if chooseWardToMoveToAlertVC.textFields?[0].text != "" {
+                    if let textFieldText = chooseWardToMoveToAlertVC.textFields?[0].text {
+                        self?.wardNumberToMoveTo = textFieldText
+                        let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+                        if let patientToBeMoved = groupedPatientsByWard?[on.row] {
+                            if self?.patients.contains(patientToBeMoved) != nil {
+                                self?.patients.removeAll { existingPatient in
+                                    patientToBeMoved == existingPatient
+                                }
+                                self?.patients.append(Patient(name: patientToBeMoved.name, dateOfBirth: patientToBeMoved.dateOfBirth, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), id: patientToBeMoved.id))
+                            }
+                        }
+                    }
+                    let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
+                    table.moveRow(at: on, to: indexPathToMoveTo)
+                } else {
+                    return
+                }
+                
+            }
+        }))
+        
+        let move = UIContextualAction(style: style, title: "Перевести в палату") { [weak self] action, view, completionHandler in
+            
+            self?.present(chooseWardToMoveToAlertVC, animated: true) {
+                print("Alert presented")
+                completionHandler(true)
+            }
+        }
+        move.backgroundColor = .systemBlue
+        return move
+    }
+    
 }
 
 //MARK: - patientsTableView delegate methods
@@ -67,12 +136,12 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         
         for patient in patients {
-            if !wards.contains(patient.ward) {
-                wards.append(patient.ward)
+            if !wards.contains(patient.ward.wardNumber) {
+                wards.append(patient.ward.wardNumber)
             }
         }
-        
-        return wards.count
+        print(wards)
+        return wards.max()!
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -92,7 +161,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         var titleForHeader : [String] {
             var titleForHeader = [String]()
             var sections = [Int]()
-            for patient in patients {
+            patients.forEach{ patient in
                 sections.append(patient.ward.wardNumber)
             }
             for i in 0...sections.max()! {
@@ -126,30 +195,24 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         return tableView.numberOfRows(inSection: section) == 0 ? 0 : 20
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
-        let groupedPatientsByWard = patients.filter{ $0.ward.wardNumber == indexPath.section }
-        let patientToBeDeleted = groupedPatientsByWard[indexPath.row]
-        if patients.contains(patientToBeDeleted) {
-            patients.removeAll { identicalPatient in
-                patientToBeDeleted == identicalPatient
-            }
-        }
-        
-        if !patients.contains(patientToBeDeleted) {
-            patients.append(Patient(name: patientToBeDeleted.name, dateOfBirth: patientToBeDeleted.dateOfBirth, ward: Ward(wardNumber: 0, wardType: .fourMan), id: patientToBeDeleted.id))
-        } else {
-            return
-        }
-        let indexPathToMoveTo = IndexPath(row: 0, section: 0)
-        tableView.moveRow(at: indexPath, to: indexPathToMoveTo)
-        
-        
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
     }
     
-    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
-        return "Удалить из палаты"
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        if indexPath.section == 0 {
+            let move = moveRow(with: .destructive, on: indexPath, table: tableView)
+            let actions = UISwipeActionsConfiguration(actions: [move])
+            return actions
+        } else {
+            let delete = deleteRow(with: .destructive, on: indexPath, table: tableView)
+            let move = moveRow(with: .normal, on: indexPath, table: tableView)
+            let actions = UISwipeActionsConfiguration(actions: [delete, move])
+            return actions
+        }
     }
+    
     
 }
 
@@ -182,6 +245,7 @@ extension PatientsViewController {
         urlRequest.allHTTPHeaderFields = [
             "Origin" : "https://crimea.promedweb.ru",
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
+            "X-Requested-With" : "XMLHttpRequest",
             "Content-Length" : "260",
             "Cookie" : "io=RfBjHdPK47cqqxKAAiCx; JSESSIONID=73241BF7A7E30974BD403C9D1D78F418; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
             
@@ -214,14 +278,14 @@ extension PatientsViewController {
                 let decodedData = try decoder.decode([PatientsList].self, from: unwrappedData)
                 
                 for patient in decodedData {
-                    //                    print(patient.patientId)
+                    //                                        print(patient.patientId)
+                    //                    print(patient.evnId)
                     let dataForPatientsTableView = try SwiftSoup.parse(patient.patientData)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span").text()
                     let patient = Patient(name: patientNames.capitalized, dateOfBirth: "", id: patient.patientId)
                     self?.patients.append(patient)
                     DispatchQueue.main.async {
                         self?.patientsTableView.reloadData()
-                        
                     }
                 }
             } catch {
@@ -270,7 +334,9 @@ extension PatientsViewController {
                 "Referer" : "https://crimea.promedweb.ru/?c=promed",
                 "Content-Length" : "172",
                 "X-Requested-With" : "XMLHttpRequest",
-                "Cookie" : "io=RfBjHdPK47cqqxKAAiCx; JSESSIONID=73241BF7A7E30974BD403C9D1D78F418; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
+                "Cookie" : "io=sCcv3sqG_kbfCAeyAnzW; JSESSIONID=7D28392C267E9F0F94CBEA4505CACA97; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3",
+                "Accept-Language" : "en-GB,en;q=0.9",
+                "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8"
             ]
             
             let requestBody = "user_MedStaffFact_id=89902&scroll_value=EvnPS_\(patientId)&object=EvnPS&object_id=EvnPS_id&object_value=\(patientId)&archiveRecord=0&ARMType=stac&from_MZ=1&from_MSE=1"
@@ -303,7 +369,7 @@ extension PatientsViewController {
             
             do{
                 let decodedData = try decoder.decode(AnalysesList.self, from: receivedData)
-                print(decodedData.map)
+                print(decodedData.html)
             } catch {
                 DispatchQueue.main.async {
                     self?.alertwithError.message = error.localizedDescription

@@ -8,7 +8,7 @@
 import Foundation
 
 struct Ward: Equatable {
-    let wardNumber: Int
+    var wardNumber: Int
     let wardType: WardType
     
     enum WardType {
@@ -20,7 +20,7 @@ struct Patient: Equatable {
     
     let name : String
     let dateOfBirth : String
-    let ward : Ward
+    var ward : Ward
     let id : String
     
     
