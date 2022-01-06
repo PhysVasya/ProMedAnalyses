@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct ResultsData : Decodable {
     
@@ -17,9 +18,9 @@ struct ResultsData : Decodable {
 }
 
 
-struct PatientsList : Decodable {
-    var patientData : String
-    var patientId : String
+class PatientsList : NSManagedObject, Decodable {
+//    @NSManaged var patientData : String?
+//    @NSManaged var patientId : String?
 //    var evnId : String
     
     
@@ -29,7 +30,18 @@ struct PatientsList : Decodable {
 //        case evnId = "EvnPS_id"
     }
     
-    
+    required convenience init(from decoder: Decoder) throws {
+        guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext,
+             let context = decoder.userInfo[codingUserInfoKeyManagedObjectContext] as? NSManagedObjectContext,
+        let entity = NSEntityDescription.entity(forEntityName: "PatientsList", in: context) else {
+            throw DecodingConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(entity: entity, insertInto: context)
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.patientId = try container.decode(String.self, forKey: .patientId)
+    }
 }
 
 
@@ -38,4 +50,13 @@ struct AnalysesList: Decodable {
     var html : String
     
    
+}
+
+extension CodingUserInfoKey {
+    static let managedObjectContext = CodingUserInfoKey(rawValue: "managedObjectContext")
+    
+}
+
+enum DecodingConfigurationError: Error {
+    case missingManagedObjectContext
 }

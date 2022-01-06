@@ -9,11 +9,15 @@ import UIKit
 import CoreData
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
+class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
+    
+    var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        if let rootVC = window?.rootViewController as? PatientsViewController {
+            rootVC.container = persistentContainer
+        }
+            
         // Override point for customization after application launch.
         return true
     }

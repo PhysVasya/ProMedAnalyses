@@ -8,18 +8,18 @@
 import UIKit
 import WebKit
 import SwiftSoup
+import CoreData
 
 class PatientsViewController: UIViewController {
     
     @IBOutlet var patientsTableView: UITableView!
     
+    var container: NSPersistentContainer!
     var patients = [Patient]()
     var wards = [Int]()
     var namesArray = [String]()
     var datesAtrray = [String]()
     var wardNumberToMoveTo = ""
-    
-    
     
     //Loading Indicator to add visibility whether the process of loading is complete, initialized only
     let loadingIndicator : UIActivityIndicatorView = {
@@ -35,13 +35,16 @@ class PatientsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        guard container != nil else {
+            fatalError("This view needs a persistent container.")
+        }
         view.addSubview(loadingIndicator)
         loadingIndicator.frame = view.bounds
         loadingIndicator.startAnimating()
         
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
+        
         
         patients.append(Patient(name: "Елесин Василий Михайлович", dateOfBirth: "22.05.1995", ward: Ward(wardNumber: 1, wardType: .fourMan)))
         patients.append(Patient(name: "Янцер Чорт Лысый", dateOfBirth: "22.02.1998"))
@@ -87,38 +90,38 @@ class PatientsViewController: UIViewController {
         
         let chooseWardToMoveToAlertVC : UIAlertController = {
             let alertController = UIAlertController(title: "Выберите палату для перевода", message: "Введите номер палаты", preferredStyle: .alert)
-            alertController.addTextField()
-            alertController.textFields?[0].keyboardType = .numberPad
+            alertController.addTextField { textField in
+                textField.delegate = self
+                textField.placeholder = "Введите число от 1 до 21"
+                textField.textAlignment = .center
+                textField.keyboardType = .numberPad
+            }
+            
             return alertController
         }()
         chooseWardToMoveToAlertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
-            chooseWardToMoveToAlertVC.dismiss(animated: true) {
-                if chooseWardToMoveToAlertVC.textFields?[0].text != "" {
-                    if let textFieldText = chooseWardToMoveToAlertVC.textFields?[0].text {
-                        self?.wardNumberToMoveTo = textFieldText
-                        let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
-                        if let patientToBeMoved = groupedPatientsByWard?[on.row] {
-                            if self?.patients.contains(patientToBeMoved) != nil {
-                                self?.patients.removeAll { existingPatient in
-                                    patientToBeMoved == existingPatient
-                                }
-                                self?.patients.append(Patient(name: patientToBeMoved.name, dateOfBirth: patientToBeMoved.dateOfBirth, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), id: patientToBeMoved.id))
-                            }
+            
+            if self?.wardNumberToMoveTo != "" {
+                let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+                if let patientToBeMoved = groupedPatientsByWard?[on.row] {
+                    if self?.patients.contains(patientToBeMoved) != nil {
+                        self?.patients.removeAll { existingPatient in
+                            patientToBeMoved == existingPatient
                         }
+                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfBirth: patientToBeMoved.dateOfBirth, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), id: patientToBeMoved.id))
                     }
-                    let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
-                    table.moveRow(at: on, to: indexPathToMoveTo)
-                } else {
-                    return
                 }
-                
+                let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
+                table.moveRow(at: on, to: indexPathToMoveTo)
+            } else {
+                return
             }
-        }))
+        }
+                                                         ))
         
         let move = UIContextualAction(style: style, title: "Перевести в палату") { [weak self] action, view, completionHandler in
             
             self?.present(chooseWardToMoveToAlertVC, animated: true) {
-                print("Alert presented")
                 completionHandler(true)
             }
         }
@@ -135,13 +138,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         
-        for patient in patients {
-            if !wards.contains(patient.ward.wardNumber) {
-                wards.append(patient.ward.wardNumber)
-            }
-        }
-        print(wards)
-        return wards.max()!
+        return 22
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -164,16 +161,16 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             patients.forEach{ patient in
                 sections.append(patient.ward.wardNumber)
             }
-            for i in 0...sections.max()! {
+            for i in 0...21 {
                 titleForHeader.append(String(i))
             }
             return titleForHeader
         }
         
-        
         if section == 0 {
             return "Нераспределенные"
         } else {
+            
             return String("Палата № \(titleForHeader[section])")
         }
     }
@@ -194,7 +191,9 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return tableView.numberOfRows(inSection: section) == 0 ? 0 : 20
     }
-    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return tableView.numberOfRows(inSection: indexPath.section) == 0 ? 0 : 50
+    }
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
@@ -251,7 +250,7 @@ extension PatientsViewController {
             
         ]
         
-        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=30.12.2021&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
+        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=06.01.2022&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
         urlRequest.httpBody = requestBody.data(using: .utf8)
         
         let sessionConfig = URLSessionConfiguration.default
@@ -274,15 +273,20 @@ extension PatientsViewController {
             }
             
             let decoder = JSONDecoder()
+            guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext else {
+                fatalError("Failed to retreive context.")
+            }
+            decoder.userInfo[codingUserInfoKeyManagedObjectContext] = self?.container.viewContext
             do {
                 let decodedData = try decoder.decode([PatientsList].self, from: unwrappedData)
+                try self?.container.viewContext.save()
                 
                 for patient in decodedData {
                     //                                        print(patient.patientId)
                     //                    print(patient.evnId)
-                    let dataForPatientsTableView = try SwiftSoup.parse(patient.patientData)
+                    let dataForPatientsTableView = try SwiftSoup.parse(patient.patientData!)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span").text()
-                    let patient = Patient(name: patientNames.capitalized, dateOfBirth: "", id: patient.patientId)
+                    let patient = Patient(name: patientNames.capitalized, dateOfBirth: "", id: patient.patientId!)
                     self?.patients.append(patient)
                     DispatchQueue.main.async {
                         self?.patientsTableView.reloadData()
@@ -386,4 +390,55 @@ extension PatientsViewController {
     }
     
     
+}
+
+//MARK: - TextField delegate methods
+
+extension PatientsViewController : UITextFieldDelegate {
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
+        if textField.text != "" {
+            if let textFieldText = textField.text {
+                if Int(textFieldText)! > 21 {
+                    //                    textField.isError(baseColor: CGColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1), numberOfShakes: 4, revert: true)
+                    
+                    let outOfRangeAlert = UIAlertController(title: "Указанное значение выше установленного диапазона", message: "Введите число от 1 до 21", preferredStyle: .alert)
+                    DispatchQueue.main.async {
+                        self.present(outOfRangeAlert, animated: true, completion: nil)
+                        Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+                            outOfRangeAlert.dismiss(animated: true, completion: nil)
+                        }
+                    }
+                } else {
+                    self.wardNumberToMoveTo = textFieldText
+                }
+            }
+        }
+    }
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        textField.isError(baseColor: CGColor.init(red: 1, green: 0, blue: 0, alpha: 0.5), numberOfShakes: 3, revert: true)
+        return true
+    }
+}
+
+
+extension UITextField {
+    func isError(baseColor: CGColor, numberOfShakes shakes: Float, revert: Bool) {
+        let animation: CABasicAnimation = CABasicAnimation(keyPath: "shadowColor")
+        animation.fromValue = baseColor
+        animation.toValue = UIColor.red.cgColor
+        animation.duration = 0.4
+        if revert { animation.autoreverses = true } else { animation.autoreverses = false }
+        self.layer.add(animation, forKey: "shadowColor")
+        
+        let shake: CABasicAnimation = CABasicAnimation(keyPath: "position")
+        shake.duration = 0.07
+        shake.repeatCount = shakes
+        if revert { shake.autoreverses = true  } else { shake.autoreverses = false }
+        shake.fromValue = NSValue(cgPoint: CGPoint(x: self.center.x - 10, y: self.center.y))
+        shake.toValue = NSValue(cgPoint: CGPoint(x: self.center.x + 10, y: self.center.y))
+        self.layer.add(shake, forKey: "position")
+    }
 }
