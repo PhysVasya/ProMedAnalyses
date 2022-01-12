@@ -19,11 +19,7 @@ struct ResultsData : Decodable {
 
 
 class PatientsList : NSManagedObject, Decodable {
-//    @NSManaged var patientData : String?
-//    @NSManaged var patientId : String?
-//    var evnId : String
-    
-    
+        
     enum CodingKeys: String, CodingKey {
         case patientData = "text"
         case patientId = "id"
@@ -41,6 +37,7 @@ class PatientsList : NSManagedObject, Decodable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.patientId = try container.decode(String.self, forKey: .patientId)
+        self.patientData = try container.decode(String.self, forKey: .patientData)
     }
 }
 
