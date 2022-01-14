@@ -8,15 +8,6 @@
 import Foundation
 import CoreData
 
-struct ResultsData : Decodable {
-    
-    var dataForAnalysis : String
-    
-    enum CodingKeys: String, CodingKey {
-        case dataForAnalysis = "html"
-    }
-}
-
 
 class PatientsList : NSManagedObject, Decodable {
         
@@ -42,11 +33,46 @@ class PatientsList : NSManagedObject, Decodable {
 }
 
 
-struct AnalysesList: Decodable {
-    var success : Bool
-    var html : String
+class AnalysesList: NSManagedObject, Decodable {
     
+    enum CodingKeys : String, CodingKey {
+        case html = "html"
+    }
+    
+    required convenience init(from decoder: Decoder) throws {
+        guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext,
+              let context = decoder.userInfo[codingUserInfoKeyMOC] as? NSManagedObjectContext,
+              let entity = NSEntityDescription.entity(forEntityName: "AnalysesList", in: context) else {
+                  throw DecodingConfigurationError.missingManagedObjectContext
+              }
+        
+        self.init(entity: entity, insertInto: context)
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.html = try container.decode(String.self, forKey: .html)
+    }
    
+}
+
+
+class AnalysisListData : NSManagedObject, Decodable {
+    
+    enum CodingKeys: String, CodingKey {
+        case data = "html"
+    }
+    required convenience init(from decoder: Decoder) throws {
+        guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext,
+              let context = decoder.userInfo[codingUserInfoKeyMOC] as? NSManagedObjectContext,
+              let entity = NSEntityDescription.entity(forEntityName: "AnalysisListData", in: context) else {
+                  throw DecodingConfigurationError.missingManagedObjectContext
+              }
+        self.init(entity: entity, insertInto: context)
+        
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.data = try container.decode(String.self, forKey: .data)
+    }
+    
 }
 
 extension CodingUserInfoKey {

@@ -7,12 +7,15 @@
 
 import UIKit
 import SwiftSoup
+import CoreData
 
 protocol TableForDataDelegate {
     func viewDidScroll(to position: CGFloat)
 }
 
 class ResultsViewController: UIViewController, TableForDataDelegate {
+    
+    var context : NSManagedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     var headerForSection = [String]()
     var collectionViewHeaderItems = [String]()
@@ -27,24 +30,9 @@ class ResultsViewController: UIViewController, TableForDataDelegate {
     var headerHeight : NSLayoutConstraint?
     var headerTopAnchor : NSLayoutConstraint?
     
-    //Loading Indicator to add visibility whether the process of loading is complete, initialized only
-    let loadingIndicator : UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(frame: .zero)
-        return indicator
-    }()
-    
-    let alertwithError : UIAlertController = {
-        let alert = UIAlertController(title: "Unfortunately, an error has occured.", message: "", preferredStyle: .alert)
-        return alert
-    }()
-
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
-        
-        view.addSubview(loadingIndicator)
-        loadingIndicator.startAnimating()
 
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -54,14 +42,34 @@ class ResultsViewController: UIViewController, TableForDataDelegate {
         tableView.register(UINib(nibName: "ResultsTableCell", bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         tableView.delegate = self
         tableView.dataSource = self
+        fetchAnalysesData()
         
        
     }
+    
+   
             
     func viewDidScroll (to position: CGFloat) {
         for cell in tableView.visibleCells as! [ReusableCellForResultsTableView] {
             cell.collectionView.contentOffset.x = position
         }
+    }
+    
+    func presentError (_ error: Error?) {
+        guard let er = error else {
+            return
+        }
+        DispatchQueue.main.async { [weak self] in
+            let alertController = UIAlertController(title: "К сожалению, произошла ошибка", message: er.localizedDescription, preferredStyle: .alert)
+            self?.present(alertController, animated: true) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    alertController.dismiss(animated: true) {
+                        
+                    }
+                }
+            }
+        }
+        
     }
 
 }
@@ -121,7 +129,7 @@ extension ResultsViewController : UIScrollViewDelegate {
 extension ResultsViewController {
     
     //Fetch PatientData from URL
-    func fetchAnalysesData (for patientWithId: [String]) {
+    func fetchAnalysesData () {
         //URL for HTTPRequest for loading patients' analyses
         let urlForRequest: URL? = {
             var urlComponents = URLComponents()
@@ -149,7 +157,7 @@ extension ResultsViewController {
         ]
         
         //3. Body of URLRequest
-        let body = "XmlType_id=4&Evn_id=820910076978020&EvnXml_id=\(patientWithId)"
+        let body = "XmlType_id=4&Evn_id=820910079159799&EvnXml_id=31668158"
         let finalBody = body.data(using: .utf8)
         request.httpBody = finalBody
         
@@ -159,24 +167,24 @@ extension ResultsViewController {
         //5. DataTask for session created and resumed.
         let task = session.dataTask(with: request) { [weak self] data, response, error in
             guard error == nil else {
-                DispatchQueue.main.async {
-                    self?.alertwithError.message = error!.localizedDescription
-                    self?.present(self!.alertwithError, animated: true, completion: nil)
-                    Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
-                        self?.alertwithError.dismiss(animated: true, completion: nil)
-                    }
-                }
+                self?.presentError(error)
                 return
             }
             
             if data != nil {
                 if let unwrappedData = data {
-                    print("Success")
                     let decoder = JSONDecoder()
+                    guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
+                        fatalError("Failed to retrieve context.")
+                    }
+                    decoder.userInfo[codingUserInfoKeyMOC] = self?.context
                     do {
-                        let decodedData = try decoder.decode(ResultsData.self, from: unwrappedData)
-                        //                        print(decodedData.dataForAnalysis)
-                        let tableWithResultsData = try SwiftSoup.parse(decodedData.dataForAnalysis)
+                        let decodedData = try decoder.decode(AnalysisListData.self, from: unwrappedData)
+                        print(decodedData)
+                        if self?.context.hasChanges != nil {
+                            try self?.context.save()
+                        }
+                        let tableWithResultsData = try SwiftSoup.parse(decodedData.data!)
                         let analysisResults = try tableWithResultsData.getElementById("resolution")
                         if let headerTagsArray = try analysisResults?.getElementsByTag("th") {
                             for headerTag in headerTagsArray {
@@ -194,15 +202,11 @@ extension ResultsViewController {
                             }
                         }
                     } catch {
-                        DispatchQueue.main.async {
-                            self?.alertwithError.message = (error as NSError).localizedDescription
-                            self?.present(self!.alertwithError, animated: true, completion: nil)
-                        }
+                        self?.presentError(error)
                     }
                 }
             }
         }
-        loadingIndicator.stopAnimating()
         task.resume()
     }
 }
