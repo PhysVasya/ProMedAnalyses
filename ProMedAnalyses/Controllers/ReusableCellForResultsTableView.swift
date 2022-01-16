@@ -14,8 +14,8 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
     @IBOutlet weak var collectionView: UICollectionView!
     
     var textStrings = [String]()
-    var collectionViewHeaderItems = [String]()
-    var scrollDelegate: TableForDataDelegate?
+    var headerForAnalysesTableItems = [String]()
+    var scrollDelegate: ResultsViewControllerDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,13 +27,14 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
 
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return textStrings.count
+        return textStrings.count 
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.collectionViewCellForResultsData, for: indexPath) as! MyCollectionViewCell
+    
         cell.configure(with: textStrings[indexPath.row])
         return cell
     }

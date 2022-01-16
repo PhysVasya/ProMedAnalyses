@@ -10,11 +10,14 @@ import SwiftSoup
 
 class MyCollectionViewCell: UICollectionViewCell {
     
-    @IBOutlet var visibleData: UILabel!
+    @IBOutlet var textForCollectionViewCell: UILabel!
     
     public func configure (with textForAnalysis: String) {
-        self.visibleData.text = textForAnalysis
+        self.textForCollectionViewCell.text = textForAnalysis
+        textForCollectionViewCell.numberOfLines = 0
+        
     }
+    
     
 }
 

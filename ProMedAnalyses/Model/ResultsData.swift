@@ -59,6 +59,8 @@ class AnalysisListData : NSManagedObject, Decodable {
     
     enum CodingKeys: String, CodingKey {
         case data = "html"
+        case id = "id"
+
     }
     required convenience init(from decoder: Decoder) throws {
         guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext,

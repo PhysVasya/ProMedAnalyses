@@ -21,7 +21,11 @@ class PatientsViewController: UIViewController {
     }
     let search = UISearchController(searchResultsController: nil)
     var patients = [Patient]()
+    var filteredPatients = [Patient]()
     var wards = [Int]()
+    var analysesIds = [String]()
+    var analysesData = [String]()
+    var analyses = [Analysis]()
     var namesArray = [String]()
     var datesAtrray = [String]()
     var wardNumberToMoveTo = ""
@@ -32,43 +36,47 @@ class PatientsViewController: UIViewController {
         }
         return titleForHeader
     }
+    var titleForHeadersInResultsVC = [String]()
+    var analysesTableHeaderItems = [String]()
+    var tableRowForResultsVC = [TableRowForResultsVC]()
+    
+    var isSearchBarEmpty : Bool {
+        return search.searchBar.searchTextField.text?.isEmpty ?? true
+    }
+    
+    var searchFieldIsEditing : Bool {
+        return search.isActive && !isSearchBarEmpty
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupRefreshControl()
-        
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
-//        getPatients()
-        loadPatientsCoreData()
-
+                getPatients()
         
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupSearchController()
-
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
-       setupRefreshControl()
+        setupRefreshControl()
     }
- 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
+    
     
     @objc func refreshData (sender: UIRefreshControl) {
         getPatients()
-       
+        
     }
     
     func setupSearchController () {
         search.searchResultsUpdater = self
         search.obscuresBackgroundDuringPresentation = false
-        search.searchBar.placeholder = "Искать пациента..."
+        search.searchBar.placeholder = "Искать..."
         search.searchBar.autocapitalizationType = .words
         navigationItem.searchController = search
         definesPresentationContext = true
@@ -78,7 +86,6 @@ class PatientsViewController: UIViewController {
         let refresh = UIRefreshControl()
         refresh.addTarget(self, action: #selector(PatientsViewController.refreshData(sender:)), for: .valueChanged)
         refresh.attributedTitle = NSAttributedString(string: "Обновление данных...")
-        refresh.backgroundColor = .systemBackground
         patientsTableView.refreshControl = refresh
     }
     
@@ -87,28 +94,38 @@ class PatientsViewController: UIViewController {
             return
         }
         DispatchQueue.main.async { [weak self] in
-            let alertController = UIAlertController(title: "К сожалению, произошла ошибка", message: er.localizedDescription, preferredStyle: .alert)
+
+            let alertController = UIAlertController(
+                title: "К сожалению, произошла ошибка",
+                message: "\(er.localizedDescription) \n Попытка загрузить кэш.",
+                preferredStyle: .alert)
             self?.present(alertController, animated: true) {
+                self?.loadPatientsCoreData()
+                self?.cacheLoaded(title: "Кэш загружен", animationtype: .moveIn)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     alertController.dismiss(animated: true) {
                         self?.patientsTableView.refreshControl?.endRefreshing()
-                        
-                        
+                        self?.cacheLoaded(title: "Cписок пациентов", animationtype: .fade)
                     }
                 }
             }
         }
+    }
+    
+    func cacheLoaded(title: String, animationtype: CATransitionType) {
+        let fadeTextAnimation = CATransition()
+        fadeTextAnimation.duration = 0.2
+        fadeTextAnimation.type = animationtype
         
+        navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: "")
+        navigationItem.title = title
     }
     
     func loadPatientsCoreData () {
         let request : NSFetchRequest<PatientsList> = PatientsList.fetchRequest()
-        
         do {
             let results = try container.fetch(request)
-            
             for patient in results {
-                
                 if let patientsData = patient.patientData  {
                     let dataToParse = try SwiftSoup.parse(patientsData)
                     let patientNames = try dataToParse.getElementsByTag("span")
@@ -119,10 +136,9 @@ class PatientsViewController: UIViewController {
                         let createdPatient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), id: id)
                         patients.append(createdPatient)
                     }
-                    
                 }
-                
             }
+            patientsTableView.reloadData()
         } catch {
             presentError(error)
         }
@@ -133,15 +149,29 @@ class PatientsViewController: UIViewController {
         
         do {
             let results = try container.fetch(request)
-            for result in results {
-                let html = try SwiftSoup.parse(result.html!)
-                let evnUsluga = try html.getElementById("EvnUslugaStacList_\(id)")
-             
+            let html = try SwiftSoup.parse(results[0].html!)
+            let evnUsluga = try html.getElementById("EvnUslugaStacList_\(id)")
+            let tbody = try evnUsluga?.getElementsByTag("tbody")
+            guard let values = try tbody?[0].getElementsByAttribute("value") else {
+                return
+            }
+            for value in values {
+                guard let analysisId = value.getAttributes()?.get(key: "value") else {
+                    return
+                    
+                }
+                analysesIds.append(analysisId)
             }
             
         } catch {
             presentError(error)
         }
+    }
+    
+    func filterContentForSearchTextField (_ textToSearch: String) {
+        
+        filteredPatients = patients.filter {$0.name.lowercased().contains(textToSearch.lowercased()) || $0.dateOfAdmission.lowercased().contains(textToSearch.lowercased())}
+        patientsTableView.reloadData()
     }
     
     func deleteRow(with style: UIContextualAction.Style, on: IndexPath, table: UITableView) -> UIContextualAction {
@@ -233,18 +263,29 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+        if searchFieldIsEditing {
+            return filteredPatients.filter { $0.ward.wardNumber == section}.count
+        }
         return patients.filter { $0.ward.wardNumber == section }.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.patientTableCell, for: indexPath)
         cell.accessoryType = .disclosureIndicator
-        let patientsWardEqualSection = patients.filter { $0.ward.wardNumber == indexPath.section }
-        cell.textLabel?.text = patientsWardEqualSection[indexPath.row].name
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        cell.detailTextLabel?.text = patientsWardEqualSection[indexPath.row].dateOfAdmission
         cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12, weight: .light)
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        
+        let patient : Patient
+        
+        if searchFieldIsEditing {
+            let filteredPatientsWardEqualSection = filteredPatients.filter { $0.ward.wardNumber == indexPath.section }
+            patient = filteredPatientsWardEqualSection[indexPath.row]
+        } else {
+            let patientsWardEqualSection = patients.filter { $0.ward.wardNumber == indexPath.section }
+            patient = patientsWardEqualSection[indexPath.row]
+        }
+        cell.textLabel?.text = patient.name
+        cell.detailTextLabel?.text = patient.dateOfAdmission
         return cell
     }
     
@@ -265,26 +306,29 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-//                fetchPatientData(for: patients[indexPath.row].id)
-        print(patients[indexPath.row].id)
-
-        loadAnalysesCoreData(with: patients[indexPath.row].id)
         let destinationTableVC = ResultsViewController()
         destinationTableVC.modalPresentationStyle = .fullScreen
         destinationTableVC.title = "Результаты"
-        destinationTableVC.headerForSection.append("Дата взятия биоматериала: 21/12/2021")
-        destinationTableVC.collectionViewHeaderItems = ["hey", "biatch", "here"]
-        destinationTableVC.analysis = [
-            Analysis(element: "SRR"),
-            Analysis(element: "RERE")
-        ]
+        
+        
+        if searchFieldIsEditing {
+            //            fetchPatientData(for: filteredPatients[indexPath.row].id)
+            loadAnalysesCoreData(with: filteredPatients[indexPath.row].id)
+            fetchAnalysesDataFromCoreData(with: filteredPatients[indexPath.row].id)
+            destinationTableVC.headerForSection = titleForHeadersInResultsVC
+            destinationTableVC.tableHeaderItems = analysesTableHeaderItems
+            destinationTableVC.analysesResults = tableRowForResultsVC
+            
+        } else {
+            //            fetchPatientData(for: patients[indexPath.row].id)
+            loadAnalysesCoreData(with: patients[indexPath.row].id)
+        }
+        
+        
         navigationController?.pushViewController(destinationTableVC, animated: true)
         tableView.cellForRow(at: indexPath)?.isSelected = false
     }
     
-//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return tableView.numberOfRows(inSection: section) == 0 ? 0 : 20
-//    }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return tableView.numberOfRows(inSection: indexPath.section) == 0 ? 0 : 60
     }
@@ -304,9 +348,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             let actions = UISwipeActionsConfiguration(actions: [delete, move])
             return actions
         }
-    }
-    
-    
+    }    
 }
 
 
@@ -352,6 +394,7 @@ extension PatientsViewController {
         let task = urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
             guard error == nil else {
                 self?.presentError(error)
+                
                 return
             }
             
@@ -371,7 +414,6 @@ extension PatientsViewController {
                 }
                 
                 for patient in decodedData {
-                    //                    print(patient.evnId)
                     let dataForPatientsTableView = try SwiftSoup.parse(patient.patientData!)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span")
                     if !patientNames.isEmpty() {
@@ -382,10 +424,7 @@ extension PatientsViewController {
                     DispatchQueue.main.async {
                         self?.patientsTableView.refreshControl?.endRefreshing()
                         self?.patientsTableView.reloadData()
-
                     }
-                    
-
                 }
             } catch {
                 self?.presentError(error)
@@ -393,13 +432,9 @@ extension PatientsViewController {
         }
         task.resume()
     }
-}
 
-//MARK: - FetchPatientsData
-
-extension PatientsViewController {
     
-    func fetchPatientData(for patientId: String){
+    func fetchAnalysesIdsForPatient(with patientId: String){
         
         let urlForRequest : URL? = {
             var urlComponents = URLComponents()
@@ -425,10 +460,10 @@ extension PatientsViewController {
                 "Referer" : "https://crimea.promedweb.ru/?c=promed",
                 "Content-Length" : "172",
                 "Cookie" : "JSESSIONID=26F8D0FF63AAF6EEB29FCF6BDA4A9EA3; io=Vqhf80qtVIyhIrAkBNYU; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3",
-
+                
             ]
             
-            let requestBody = "user_MedStaffFact_id=89902&scroll_value=EvnPS_820910079158644&object=EvnPS&object_id=EvnPS_id&object_value=820910079158644&archiveRecord=0&ARMType=stac&from_MZ=1&from_MSE=1"
+            let requestBody = "user_MedStaffFact_id=89902&scroll_value=EvnPS_\(patientId)&object=EvnPS&object_id=EvnPS_id&object_value=\(patientId)&archiveRecord=0&ARMType=stac&from_MZ=1&from_MSE=1"
             request.httpBody = requestBody.data(using: .utf8)
             return request
         }()
@@ -459,16 +494,149 @@ extension PatientsViewController {
                 if self?.container.hasChanges != nil {
                     try self?.container.save()
                 }
-                
+                let html = try SwiftSoup.parse(decodedData.html!)
+                let evnUsluga = try html.getElementById("EvnUslugaStacList_\(patientId)")
+                let tbody = try evnUsluga?.getElementsByTag("tbody")
+                guard let values = try tbody?[0].getElementsByAttribute("value") else {
+                    return
+                }
+                for value in values {
+                    guard let analysisId = value.getAttributes()?.get(key: "value") else {
+                        return
+                    }
+                    self?.analysesIds.append(analysisId)
+                }
             } catch {
                 self?.presentError(error)
             }
-            
         }
-        
         task.resume()
     }
     
+    
+
+    func fetchAnalysesData (with id: String) {
+        //URL for HTTPRequest for loading patients' analyses
+        let urlForRequest: URL? = {
+            var urlComponents = URLComponents()
+            urlComponents.scheme = "https"
+            urlComponents.host = "crimea.promedweb.ru"
+            urlComponents.queryItems = [
+                URLQueryItem(name: "c", value: "EvnXml"),
+                URLQueryItem(name: "m", value: "doLoadData")]
+            return urlComponents.url
+        }()
+        //1. URL created earlier unwrapped else return
+        guard let url = urlForRequest else {
+            return
+        }
+        
+        //2. URLRequest, then added httpMethod and HeaderFields
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = [
+            "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8",
+            "Origin" : "https://crimea.promedweb.ru",
+            "Referer" : "https://crimea.promedweb.ru/?c=promed",
+            "Content-Length" : "54",
+            "Cookie" : "io=sCcv3sqG_kbfCAeyAnzW; JSESSIONID=7D28392C267E9F0F94CBEA4505CACA97; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
+        ]
+        
+        //3. Body of URLRequest
+        let body = "XmlType_id=4&Evn_id=\(id)&EvnXml_id=31668158"
+        let finalBody = body.data(using: .utf8)
+        request.httpBody = finalBody
+        
+        //4. Created URLSessionConfiguration (not obligatory)
+        let sessionConfig = URLSessionConfiguration.default
+        let session = URLSession(configuration: sessionConfig)
+        //5. DataTask for session created and resumed.
+        let task = session.dataTask(with: request) { [weak self] data, response, error in
+            guard error == nil else {
+                self?.presentError(error)
+                return
+            }
+            
+            if data != nil {
+                if let unwrappedData = data {
+                    let decoder = JSONDecoder()
+                    guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
+                        fatalError("Failed to retrieve context.")
+                    }
+                    decoder.userInfo[codingUserInfoKeyMOC] = self?.container
+                    do {
+                        let decodedData = try decoder.decode(AnalysisListData.self, from: unwrappedData)
+                        print(decodedData)
+                        if self?.container.hasChanges != nil {
+                            try self?.container.save()
+                        }
+                        let tableWithResultsData = try SwiftSoup.parse(decodedData.data!)
+                        let analysisResults = try tableWithResultsData.getElementById("resolution")
+                        if let headerTagsArray = try analysisResults?.getElementsByTag("th") {
+                            for headerTag in headerTagsArray {
+//                                try self?.collectionViewHeaderItems.append(headerTag.text())
+                            }
+                        }
+                        if let tableResultItems = try analysisResults?.getElementsByTag("tbody") {
+                            for resultItem in tableResultItems {
+                                let tableRowTags = try resultItem.getElementsByTag("tr")
+                                for trtag in tableRowTags {
+                                    let elementForTableRow = try trtag.text()
+                                    self?.analysesData.append(elementForTableRow)
+                                }
+                            }
+                        }
+                    } catch {
+                        self?.presentError(error)
+                    }
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    func fetchAnalysesDataFromCoreData (with id: String) {
+        
+        let request : NSFetchRequest<AnalysisListData> = AnalysisListData.fetchRequest()
+        
+        do {
+            let results = try container.fetch(request)
+            
+            let html = try SwiftSoup.parse(results[0].data!)
+            let spans = try html.getElementsContainingText("Дата взятия")
+            for span in spans {
+                if !span.ownText().isEmpty {
+                    titleForHeadersInResultsVC.append(span.ownText().trimmingCharacters(in: .whitespacesAndNewlines))
+                }
+            }
+            let tableHeadItems = try html.getElementsByTag("th")
+            for headerItem in tableHeadItems {
+                analysesTableHeaderItems.append(try headerItem.text())
+            }
+            analysesTableHeaderItems.removeFirst()
+            analysesTableHeaderItems.removeLast()
+            let tableBody = try html.getElementsByTag("tbody")
+            let tableRows = try tableBody[0].getElementsByTag("tr")
+            for row in tableRows {
+                
+                let tbRow : TableRowForResultsVC = try {
+                    let columns = try row.getElementsByTag("td")
+                    var info = [String]()
+                    for column in columns {
+                        info.append(try column.text())
+                    }
+                    info.removeFirst()
+                    info.removeLast()
+                    let tableRow = TableRowForResultsVC(tableRow: info)
+                    return tableRow
+                }()
+                tableRowForResultsVC.append(tbRow)
+            }
+        } catch {
+            presentError(error)
+        }
+        
+    }
     
 }
 
@@ -493,13 +661,14 @@ extension PatientsViewController : UITextFieldDelegate {
                 }
             }
         }
-    }  
+    }
 }
 
 //MARK: - searchController delegate
 extension PatientsViewController : UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        print(searchController.searchBar.text)
+        let searchBar = searchController.searchBar
+        filterContentForSearchTextField(searchBar.text!)
     }
 }
 

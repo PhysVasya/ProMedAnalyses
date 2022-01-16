@@ -34,5 +34,10 @@ struct Patient: Equatable {
 }
 
 struct Analysis {
-    var element : Any
+    var analysisData : String
+    var id : String
+}
+
+struct TableRowForResultsVC {
+    var tableRow : [String]
 }
