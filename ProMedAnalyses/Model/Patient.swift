@@ -43,3 +43,23 @@ struct Analysis {
 struct TableRowForResultsVC {
     var tableRow : [String]
 }
+
+struct ListOfAnalysesIDs : Decodable {
+    
+    var htmlData : String?
+    
+    enum CodingKeys : String, CodingKey {
+        case htmlData = "html"
+    }
+}
+
+struct ListOfPatients : Decodable {
+    
+    var id : String?
+    var name : String?
+    
+    enum CodingKeys : String, CodingKey {
+        case id = "id"
+        case name = "html"
+    }
+}

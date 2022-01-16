@@ -9,53 +9,7 @@ import Foundation
 import CoreData
 
 
-class PatientsList : NSManagedObject, Decodable {
-        
-    enum CodingKeys: String, CodingKey {
-        case patientData = "text"
-        case patientId = "id"
-//        case evnId = "EvnPS_id"
-    }
-    
-    required convenience init(from decoder: Decoder) throws {
-        guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext,
-             let context = decoder.userInfo[codingUserInfoKeyManagedObjectContext] as? NSManagedObjectContext,
-        let entity = NSEntityDescription.entity(forEntityName: "PatientsList", in: context) else {
-            throw DecodingConfigurationError.missingManagedObjectContext
-        }
-        
-        self.init(entity: entity, insertInto: context)
-        
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.patientId = try container.decode(String.self, forKey: .patientId)
-        self.patientData = try container.decode(String.self, forKey: .patientData)
-    }
-}
-
-
-class AnalysesList: NSManagedObject, Decodable {
-    
-    enum CodingKeys : String, CodingKey {
-        case html = "html"
-    }
-    
-    required convenience init(from decoder: Decoder) throws {
-        guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext,
-              let context = decoder.userInfo[codingUserInfoKeyMOC] as? NSManagedObjectContext,
-              let entity = NSEntityDescription.entity(forEntityName: "AnalysesList", in: context) else {
-                  throw DecodingConfigurationError.missingManagedObjectContext
-              }
-        
-        self.init(entity: entity, insertInto: context)
-        
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.html = try container.decode(String.self, forKey: .html)
-    }
-   
-}
-
-
-class AnalysisListData : NSManagedObject, Decodable {
+class AnalysisData : NSManagedObject, Decodable {
     
     enum CodingKeys: String, CodingKey {
         case data = "html"
