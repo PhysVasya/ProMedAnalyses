@@ -53,7 +53,7 @@ class PatientsViewController: UIViewController {
         
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
-                getPatients()
+                getPatientsAndLabIds()
         
     }
     
@@ -69,7 +69,7 @@ class PatientsViewController: UIViewController {
     
     
     @objc func refreshData (sender: UIRefreshControl) {
-        getPatients()
+        getPatientsAndLabIds()
         
     }
     
@@ -133,8 +133,8 @@ class PatientsViewController: UIViewController {
                         guard let id = patient.patientId else {
                             return
                         }
-                        let createdPatient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), id: id)
-                        patients.append(createdPatient)
+//                        let createdPatient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), id: id)
+//                        patients.append(createdPatient)
                     }
                 }
             }
@@ -185,7 +185,7 @@ class PatientsViewController: UIViewController {
                         patientToBeDeleted == identicalPatient
                     }
                     
-                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), id: patientToBeDeleted.id))
+                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), id: patientToBeDeleted.id, labIDs: patientToBeDeleted.analysesIDs))
                 } else {
                     return
                 }
@@ -222,7 +222,7 @@ class PatientsViewController: UIViewController {
                         self?.patients.removeAll { existingPatient in
                             patientToBeMoved == existingPatient
                         }
-                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), id: patientToBeMoved.id))
+                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), id: patientToBeMoved.id, labIDs: patientToBeMoved.analysesIDs))
                     }
                 }
                 let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
@@ -313,8 +313,9 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         
         if searchFieldIsEditing {
             //            fetchPatientData(for: filteredPatients[indexPath.row].id)
-            loadAnalysesCoreData(with: filteredPatients[indexPath.row].id)
-            fetchAnalysesDataFromCoreData(with: filteredPatients[indexPath.row].id)
+//            loadAnalysesCoreData(with: filteredPatients[indexPath.row].id)
+//            fetchAnalysesDataFromCoreData(with: filteredPatients[indexPath.row].)
+            fetchAnalysesData(with: filteredPatients[indexPath.row].analysesIDs)
             destinationTableVC.headerForSection = titleForHeadersInResultsVC
             destinationTableVC.tableHeaderItems = analysesTableHeaderItems
             destinationTableVC.analysesResults = tableRowForResultsVC
@@ -357,7 +358,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension PatientsViewController {
     
-    func getPatients () {
+    func getPatientsAndLabIds () {
         let urlForPatientRequest : URL? = {
             var urlComponents = URLComponents()
             urlComponents.scheme = "https"
@@ -403,24 +404,25 @@ extension PatientsViewController {
             }
             
             let decoder = JSONDecoder()
-            guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext else {
-                fatalError("Failed to retreive context.")
-            }
-            decoder.userInfo[codingUserInfoKeyManagedObjectContext] = self?.container
+//            guard let codingUserInfoKeyManagedObjectContext = CodingUserInfoKey.managedObjectContext else {
+//                fatalError("Failed to retreive context.")
+//            }
+//            decoder.userInfo[codingUserInfoKeyManagedObjectContext] = self?.container
             do {
                 let decodedData = try decoder.decode([PatientsList].self, from: unwrappedData)
-                if self?.container.hasChanges != nil {
-                    try self?.container.save()
-                }
+//                if self?.container.hasChanges != nil {
+//                    try self?.container.save()
+//                }
                 
                 for patient in decodedData {
+                    self?.fetchAnalysesIdsForPatient(with: patient.patientId!)
                     let dataForPatientsTableView = try SwiftSoup.parse(patient.patientData!)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span")
                     if !patientNames.isEmpty() {
-                        let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), id: patient.patientId!)
+                        let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), id: patient.patientId!, labIDs: self!.analysesIds)
                         self?.patients.append(patient)
                     }
-                    
+                    self?.analysesIds = [String]()
                     DispatchQueue.main.async {
                         self?.patientsTableView.refreshControl?.endRefreshing()
                         self?.patientsTableView.reloadData()
@@ -484,16 +486,16 @@ extension PatientsViewController {
             }
             
             let decoder = JSONDecoder()
-            guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
-                return
-            }
-            decoder.userInfo[codingUserInfoKeyMOC] = self?.container
+//            guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
+//                return
+//            }
+//            decoder.userInfo[codingUserInfoKeyMOC] = self?.container
             
             do{
                 let decodedData = try decoder.decode(AnalysesList.self, from: receivedData)
-                if self?.container.hasChanges != nil {
-                    try self?.container.save()
-                }
+//                if self?.container.hasChanges != nil {
+//                    try self?.container.save()
+//                }
                 let html = try SwiftSoup.parse(decodedData.html!)
                 let evnUsluga = try html.getElementById("EvnUslugaStacList_\(patientId)")
                 let tbody = try evnUsluga?.getElementsByTag("tbody")
@@ -515,7 +517,7 @@ extension PatientsViewController {
     
     
 
-    func fetchAnalysesData (with id: String) {
+    func fetchAnalysesData (with ids: [String]) {
         //URL for HTTPRequest for loading patients' analyses
         let urlForRequest: URL? = {
             var urlComponents = URLComponents()
@@ -541,6 +543,7 @@ extension PatientsViewController {
             "Content-Length" : "54",
             "Cookie" : "io=sCcv3sqG_kbfCAeyAnzW; JSESSIONID=7D28392C267E9F0F94CBEA4505CACA97; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
         ]
+        for id in ids {
         
         //3. Body of URLRequest
         let body = "XmlType_id=4&Evn_id=\(id)&EvnXml_id=31668158"
@@ -560,10 +563,10 @@ extension PatientsViewController {
             if data != nil {
                 if let unwrappedData = data {
                     let decoder = JSONDecoder()
-                    guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
-                        fatalError("Failed to retrieve context.")
-                    }
-                    decoder.userInfo[codingUserInfoKeyMOC] = self?.container
+//                    guard let codingUserInfoKeyMOC = CodingUserInfoKey.managedObjectContext else {
+//                        fatalError("Failed to retrieve context.")
+//                    }
+//                    decoder.userInfo[codingUserInfoKeyMOC] = self?.container
                     do {
                         let decodedData = try decoder.decode(AnalysisListData.self, from: unwrappedData)
                         print(decodedData)
@@ -592,7 +595,9 @@ extension PatientsViewController {
                 }
             }
         }
+        
         task.resume()
+        }
     }
     
     func fetchAnalysesDataFromCoreData (with id: String) {
