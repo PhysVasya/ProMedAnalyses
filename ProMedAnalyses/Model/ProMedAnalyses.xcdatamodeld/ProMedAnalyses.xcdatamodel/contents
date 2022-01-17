@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="AnalysisData" representedClassName=".AnalysisData" syncable="YES" codeGenerationType="category">
+    <entity name="LabData" representedClassName="." syncable="YES">
         <attribute name="data" optional="YES" attributeType="String"/>
         <attribute name="labID" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="ListOfPatients" representedClassName="." syncable="YES">
+    <entity name="Patient" representedClassName="." syncable="YES">
         <attribute name="dateOfAdmission" optional="YES" attributeType="String"/>
-        <attribute name="labIDs" optional="YES" attributeType="String"/>
+        <attribute name="labIDs" optional="YES" attributeType="String" customClassName=".Array&lt;String&gt;"/>
         <attribute name="patientId" optional="YES" attributeType="String"/>
         <attribute name="patientName" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="AnalysisData" positionX="-36" positionY="18" width="128" height="59"/>
-        <element name="ListOfPatients" positionX="-63" positionY="-18" width="128" height="89"/>
+        <element name="LabData" positionX="169.63671875" positionY="-22.984375" width="128" height="59"/>
+        <element name="Patient" positionX="-63" positionY="-18" width="128" height="103"/>
     </elements>
 </model>

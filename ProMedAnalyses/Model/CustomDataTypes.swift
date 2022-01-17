@@ -21,21 +21,21 @@ struct Patient: Equatable {
     let name : String
     let dateOfAdmission : String
     var ward : Ward
-    let id : String
-    let analysesIDs : [String]
+    let patientID : String
+    let evnID : String
     
     
-    init(name: String, dateOfAdmission: String, ward: Ward = Ward(wardNumber: 0, wardType: .fourMan), id: String = "", labIDs: [String]) {
+    init(name: String, dateOfAdmission: String, ward: Ward = Ward(wardNumber: 0, wardType: .fourMan), patientID: String, evnID: String) {
         self.name = name
         self.dateOfAdmission = dateOfAdmission
         self.ward = ward
-        self.id = id
-        self.analysesIDs = labIDs
+        self.patientID = patientID
+        self.evnID = evnID
     }
     
 }
 
-struct Analysis {
+struct LabData {
     var analysisData : String
     var id : String
 }
@@ -44,7 +44,7 @@ struct TableRowForResultsVC {
     var tableRow : [String]
 }
 
-struct ListOfAnalysesIDs : Decodable {
+struct FetchedListOfLabIDs : Decodable {
     
     var htmlData : String?
     
@@ -53,13 +53,25 @@ struct ListOfAnalysesIDs : Decodable {
     }
 }
 
-struct ListOfPatients : Decodable {
+struct FetchedListOfPatients : Decodable {
     
-    var id : String?
+    var patientID : String?
     var name : String?
+    var evnID : String?
     
     enum CodingKeys : String, CodingKey {
-        case id = "id"
-        case name = "html"
+        case patientID = "EvnPS_id"
+        case name = "text"
+        case evnID = "id"
     }
+}
+
+struct FetchedLabData : Decodable {
+    
+    var data : String?
+    
+    enum CodingKeys : String, CodingKey {
+        case data = "html"
+    }
+    
 }

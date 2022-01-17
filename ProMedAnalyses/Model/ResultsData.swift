@@ -13,7 +13,6 @@ class AnalysisData : NSManagedObject, Decodable {
     
     enum CodingKeys: String, CodingKey {
         case data = "html"
-        case id = "id"
 
     }
     required convenience init(from decoder: Decoder) throws {
