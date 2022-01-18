@@ -6,11 +6,11 @@
 //
 
 import UIKit
-import WebKit
 import SwiftSoup
 import CoreData
 
 class PatientsViewController: UIViewController {
+    
     
     //IBOutlets
     @IBOutlet var patientsTableView: UITableView!
@@ -33,9 +33,6 @@ class PatientsViewController: UIViewController {
         }
         return titleForHeader
     }
-    var titleForHeadersInResultsVC = [String]()
-    var analysesTableHeaderItems = [String]()
-    var tableRowForResultsVC = [TableRowForResultsVC]()
     var isSearchBarEmpty : Bool {
         return search.searchBar.searchTextField.text?.isEmpty ?? true
     }
@@ -49,8 +46,6 @@ class PatientsViewController: UIViewController {
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
         getPatientsAndLabIds()
-        
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -59,8 +54,8 @@ class PatientsViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         setupRefreshControl()
-        
     }
     
     //Target function for UIRefreshControl
@@ -90,7 +85,6 @@ class PatientsViewController: UIViewController {
             return
         }
         DispatchQueue.main.async { [weak self] in
-            
             let alertController = UIAlertController(title: "К сожалению, произошла ошибка", message: er.localizedDescription, preferredStyle: .alert)
             self?.present(alertController, animated: true) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -107,7 +101,6 @@ class PatientsViewController: UIViewController {
         let fadeTextAnimation = CATransition()
         fadeTextAnimation.duration = 0.2
         fadeTextAnimation.type = animationtype
-        
         navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: "")
         navigationItem.title = title
     }
@@ -184,18 +177,22 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         
         
         if searchFieldIsEditing {
-            fetchAnalysesIds(for: filteredPatients[indexPath.row])
-//            destinationTableVC.headerForSection = titleForHeadersInResultsVC
-//            destinationTableVC.tableHeaderItems = analysesTableHeaderItems
-//            destinationTableVC.analysesResults = tableRowForResultsVC
+            fetchAnalysesIds(for: filteredPatients[indexPath.row]) { [weak self] in
+                self?.fetchAnalysesData(with: self!.analysesIds)
+            }
+            //            destinationTableVC.headerForSection = titleForHeadersInResultsVC
+            //            destinationTableVC.tableHeaderItems = analysesTableHeaderItems
+            //            destinationTableVC.analysesResults = tableRowForResultsVC
         } else {
-            fetchAnalysesIds(for: patients[indexPath.row])
-//            destinationTableVC.headerForSection = titleForHeadersInResultsVC
-//            destinationTableVC.tableHeaderItems = analysesTableHeaderItems
-//            destinationTableVC.analysesResults = tableRowForResultsVC
+            fetchAnalysesIds(for: patients[indexPath.row]) { [weak self] in
+                self?.fetchAnalysesData(with: self!.analysesIds)
+            }
+            //            destinationTableVC.headerForSection = titleForHeadersInResultsVC
+            //            destinationTableVC.tableHeaderItems = analysesTableHeaderItems
+            //            destinationTableVC.analysesResults = tableRowForResultsVC
         }
         
-//        navigationController?.pushViewController(destinationTableVC, animated: true)
+        //        navigationController?.pushViewController(destinationTableVC, animated: true)
         tableView.cellForRow(at: indexPath)?.isSelected = false
     }
     
@@ -255,12 +252,10 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                 textField.textAlignment = .center
                 textField.keyboardType = .numberPad
             }
-            
             return alertController
         }()
         
         let action = UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
-            
             if self?.wardNumberToMoveTo != "" {
                 let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
                 if let patientToBeMoved = groupedPatientsByWard?[on.row] {
@@ -273,7 +268,6 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                 }
                 let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
                 table.moveRow(at: on, to: indexPathToMoveTo)
-                
             } else {
                 return
             }
@@ -319,7 +313,7 @@ extension PatientsViewController {
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "X-Requested-With" : "XMLHttpRequest",
             "Content-Length" : "260",
-            "Cookie" : "io=tG_6w5tB-rcHUPWsBdQz; JSESSIONID=F39F0FD8CA166FE4CE590928D2EEC33F; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
+            "Cookie" : "io=fy1INSe5W9lmkz-GBnUw; JSESSIONID=DBE761652634C1C3C2D969D28305639D; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
             
         ]
         
@@ -352,7 +346,6 @@ extension PatientsViewController {
                             self?.patients.append(patient)
                         }
                     }
-                    self?.analysesIds = [String]()
                 }
                 
                 DispatchQueue.main.async {
@@ -367,7 +360,7 @@ extension PatientsViewController {
     }
     
     
-    func fetchAnalysesIds(for patient: Patient){
+    func fetchAnalysesIds(for patient: Patient, onCompletion: (() -> Void?)? = nil){
         
         let urlForRequest : URL? = {
             var urlComponents = URLComponents()
@@ -429,10 +422,12 @@ extension PatientsViewController {
                         return
                     }
                     self?.analysesIds.append(analysisId)
-
+                    self?.savePatients(patientName: patient.name, patientID: patient.patientID, dateOfAdmission: patient.dateOfAdmission, evnID: patient.evnID, idsForAnalyses: self!.analysesIds)
+                    onCompletion?()
+                    
                 }
-//                print(self?.analysesIds)
-                self?.fetchAnalysesData(with: self!.analysesIds[0])
+                //                print(self?.analysesIds)
+                //                self?.fetchAnalysesData(with: self!.analysesIds[0])
             } catch {
                 self?.presentError(error)
             }
@@ -443,7 +438,7 @@ extension PatientsViewController {
     
     //Triggered when tableRow selected
     
-    func fetchAnalysesData (with id: String) {
+    func fetchAnalysesData (with ids: [String]) {
         let urlForRequest: URL? = {
             var urlComponents = URLComponents()
             urlComponents.scheme = "https"
@@ -467,10 +462,13 @@ extension PatientsViewController {
             "Content-Length" : "54",
             "Cookie" : "io=tG_6w5tB-rcHUPWsBdQz; JSESSIONID=F39F0FD8CA166FE4CE590928D2EEC33F; login=TischenkoZI; PHPSESSID=houoor2ctkcjsmn1mabc6r1en3"
         ]
-            
+        
+        for id in ids {
             let body = "XmlType_id=4&Evn_id=\(id)&EvnXml_id=31668158"
             let finalBody = body.data(using: .utf8)
             request.httpBody = finalBody
+            
+            
             
             let sessionConfig = URLSessionConfiguration.default
             let session = URLSession(configuration: sessionConfig)
@@ -487,22 +485,26 @@ extension PatientsViewController {
                             let decodedData = try decoder.decode(FetchedLabData.self, from: unwrappedData)
                             let html = try SwiftSoup.parse(decodedData.data!)
                             let spans = try html.getElementsContainingText("Дата взятия")
+                            var titleForAnalysisHeader = String()
+                            var analysisHeaderItems = [String]()
+                            var analysisItems = [String]()
+                            
                             for span in spans {
                                 if !span.ownText().isEmpty {
-                                    self?.titleForHeadersInResultsVC.append(span.ownText().trimmingCharacters(in: .whitespacesAndNewlines))
+                                    titleForAnalysisHeader = span.ownText().trimmingCharacters(in: .whitespacesAndNewlines)
                                 }
                             }
                             let tableHeadItems = try html.getElementsByTag("th")
                             for headerItem in tableHeadItems {
-                                self?.analysesTableHeaderItems.append(try headerItem.text())
+                                analysisHeaderItems.append(try headerItem.text())
                             }
-                            self?.analysesTableHeaderItems.removeFirst()
-                            self?.analysesTableHeaderItems.removeLast()
+                            analysisHeaderItems.removeFirst()
+                            analysisHeaderItems.removeLast()
                             let tableBody = try html.getElementsByTag("tbody")
                             let tableRows = try tableBody[0].getElementsByTag("tr")
                             for row in tableRows {
                                 
-                                let tbRow : TableRowForResultsVC = try {
+                                let tbRow : [String] = try {
                                     let columns = try row.getElementsByTag("td")
                                     var info = [String]()
                                     for column in columns {
@@ -510,20 +512,21 @@ extension PatientsViewController {
                                     }
                                     info.removeFirst()
                                     info.removeLast()
-                                    let tableRow = TableRowForResultsVC(tableRow: info)
-                                    return tableRow
+                                    return info
                                 }()
-                                self?.tableRowForResultsVC.append(tbRow)
-                             
+                                analysisItems = tbRow
+                                
                             }
-                            DispatchQueue.main.async {
-                                let destinationVC = ResultsViewController()
-                                destinationVC.title = "Результаты"
-                                destinationVC.headerForSection = self!.titleForHeadersInResultsVC
-                                destinationVC.analysesResults = self!.tableRowForResultsVC
-                                destinationVC.tableHeaderItems = self!.analysesTableHeaderItems
-                                self!.navigationController?.pushViewController(destinationVC, animated: true)
-                            }
+                            self?.saveLabData(data: analysisItems, date: titleForAnalysisHeader, header: analysisHeaderItems, labID: id)
+                            print(analysisItems)
+                            //                            DispatchQueue.main.async {
+                            //                                let destinationVC = ResultsViewController()
+                            //                                destinationVC.title = "Результаты"
+                            //                                destinationVC.headerForSection = self!.titleForHeadersInResultsVC
+                            //                                destinationVC.analysesResults = self!.tableRowForResultsVC
+                            //                                destinationVC.tableHeaderItems = self!.analysesTableHeaderItems
+                            //                                self!.navigationController?.pushViewController(destinationVC, animated: true)
+                            //                            }
                         } catch {
                             self?.presentError(error)
                         }
@@ -531,8 +534,9 @@ extension PatientsViewController {
                 }
             }
             
+            
             task.resume()
-        
+        }
     }
 }
 
@@ -570,26 +574,65 @@ extension PatientsViewController : UISearchResultsUpdating {
 
 //MARK: - CoreDataMethods
 extension PatientsViewController {
-    func save (patientName: String, patientID: String, dateOfAdmission: String, labIDs: String) {
-        // NSManagedObjectContext for CoreData
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-        let managedContext = appDelegate.persistentContainer.viewContext
+    func savePatients (patientName: String, patientID: String, dateOfAdmission: String, evnID: String, idsForAnalyses: [String]) {
         
-        //Creating an instance of ManagesObject
-        let entity = NSEntityDescription.entity(forEntityName: "Patient", in: managedContext)!
-        let person = NSManagedObject(entity: entity, insertInto: managedContext)
-        person.setValue(patientName, forKey: "patientName")
-        person.setValue(patientID, forKey: "patientID")
-        person.setValue(dateOfAdmission, forKey: "dateOfAdmission")
-        person.setValue(labIDs, forKey: "labIDs")
-        
-        do {
-            try managedContext.save()
-        } catch {
-            presentError(error)
+        DispatchQueue.main.async {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                return
+            }
+            // NSManagedObjectContext for CoreData
+            
+            let managedContext = appDelegate.persistentContainer.viewContext
+            
+            
+            //Creating an instance of ManagedObject
+            let entity = NSEntityDescription.entity(forEntityName: "ManagedPatient", in: managedContext)!
+            let person = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedPatient
+            person.patientName = patientName
+            person.patientID = patientID
+            person.dateOfAdmission = dateOfAdmission
+            person.labID = evnID
+            person.idsToFetchAnalyses = idsForAnalyses
+            
+            if managedContext.hasChanges {
+                do {
+                    try managedContext.save()
+                } catch {
+                    self.presentError(error)
+                }
+            }
+            
         }
     }
     
+    func saveLabData (data: [String], date: String, header: [String], labID: String) {
+        
+        DispatchQueue.main.async {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                return
+            }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            
+            
+            //Creating a new instance of ManagedObject
+            let entity = NSEntityDescription.entity(forEntityName: "ManagedLabData", in: managedContext)!
+            let labData = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedLabData
+            labData.labID = labID
+            labData.data = data
+            labData.date = date
+            labData.header = header
+            
+            if managedContext.hasChanges {
+                do {
+                    try managedContext.save()
+                } catch {
+                    self.presentError(error)
+                }
+            }
+        }
+        
+    }
+    
 }
+
+

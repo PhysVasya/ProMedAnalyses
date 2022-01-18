@@ -36,13 +36,12 @@ struct Patient: Equatable {
 }
 
 struct LabData {
+    var date : String
     var analysisData : String
     var id : String
 }
 
-struct TableRowForResultsVC {
-    var tableRow : [String]
-}
+
 
 struct FetchedListOfLabIDs : Decodable {
     

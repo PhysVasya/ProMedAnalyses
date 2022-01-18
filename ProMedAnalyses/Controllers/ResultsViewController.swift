@@ -19,9 +19,8 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
     
     var headerForSection = [String]()
     var tableHeaderItems = [String]()
-    var analysesResults = [TableRowForResultsVC]()
+    var analysesResults = [String]()
 
-    
     let maximumHeight : CGFloat = 250
     let minimumHeight : CGFloat = 0
     
@@ -42,7 +41,6 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
         tableView.register(UINib(nibName: "ResultsTableCell", bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         tableView.delegate = self
         tableView.dataSource = self
-        
     }
     
     func viewDidScroll (to position: CGFloat) {
@@ -65,7 +63,6 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
                 }
             }
         }
-        
     }
 
 }
@@ -97,7 +94,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
             cell.textLabel?.numberOfLines = 0
             return cell
         } else {
-            cell.textStrings = analysesResults[indexPath.row].tableRow
+            cell.textStrings = analysesResults
             
             return cell
         }
@@ -107,7 +104,6 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
-    
     
 }
 

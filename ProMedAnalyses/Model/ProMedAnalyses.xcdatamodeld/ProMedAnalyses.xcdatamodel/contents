@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="LabData" representedClassName="." syncable="YES">
-        <attribute name="data" optional="YES" attributeType="String"/>
-        <attribute name="labID" optional="YES" attributeType="String"/>
+    <entity name="ManagedLabData" representedClassName=".LabData" syncable="YES">
+        <attribute name="data" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
+        <attribute name="date" attributeType="String"/>
+        <attribute name="header" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
+        <attribute name="labID" attributeType="String"/>
     </entity>
-    <entity name="Patient" representedClassName="." syncable="YES">
-        <attribute name="dateOfAdmission" optional="YES" attributeType="String"/>
-        <attribute name="labIDs" optional="YES" attributeType="String" customClassName=".Array&lt;String&gt;"/>
-        <attribute name="patientId" optional="YES" attributeType="String"/>
-        <attribute name="patientName" optional="YES" attributeType="String"/>
+    <entity name="ManagedPatient" representedClassName=".ManagedPatient" syncable="YES">
+        <attribute name="dateOfAdmission" attributeType="String"/>
+        <attribute name="idsToFetchAnalyses" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="."/>
+        <attribute name="labID" attributeType="String" customClassName=".Array&lt;String&gt;"/>
+        <attribute name="patientID" attributeType="String"/>
+        <attribute name="patientName" attributeType="String"/>
     </entity>
     <elements>
-        <element name="LabData" positionX="169.63671875" positionY="-22.984375" width="128" height="59"/>
-        <element name="Patient" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="89"/>
+        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="104"/>
     </elements>
 </model>

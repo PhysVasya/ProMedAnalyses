@@ -20,6 +20,10 @@
 		FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */; };
 		FF87FA1827721EE2003AB648 /* CustomDataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */; };
 		FF87FA1A277222B8003AB648 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA19277222B8003AB648 /* Constants.swift */; };
+		FFDB48682797167700E57ECA /* Patient+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */; };
+		FFDB486A2797167A00E57ECA /* Patient+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */; };
+		FFDB48702797628600E57ECA /* LabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB486F2797628600E57ECA /* LabData+CoreDataProperties.swift */; };
+		FFDB48722797628800E57ECA /* LabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB48712797628800E57ECA /* LabData+CoreDataClass.swift */; };
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
 		FFF087EE276935490054443B /* ResultsTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsTableCell.xib */; };
 		FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */; };
@@ -43,6 +47,10 @@
 		FF87FA0F276FBD52003AB648 /* CustomCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionViewLayout.swift; sourceTree = "<group>"; };
 		FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataTypes.swift; sourceTree = "<group>"; };
 		FF87FA19277222B8003AB648 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Patient+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/Patient+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Patient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/Patient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FFDB486F2797628600E57ECA /* LabData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LabData+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/LabData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FFDB48712797628800E57ECA /* LabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/LabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		FFF087ED276935490054443B /* ResultsTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsTableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ReusableCellForResultsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableCellForResultsTableView.swift; sourceTree = "<group>"; };
@@ -102,6 +110,10 @@
 		FF610CEA276E2D3C007DD625 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				FFDB48712797628800E57ECA /* LabData+CoreDataClass.swift */,
+				FFDB486F2797628600E57ECA /* LabData+CoreDataProperties.swift */,
+				FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */,
+				FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */,
 				FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */,
 				FF87FA19277222B8003AB648 /* Constants.swift */,
 				FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */,
@@ -275,6 +287,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFDB48702797628600E57ECA /* LabData+CoreDataProperties.swift in Sources */,
 				FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */,
 				FF87FA1A277222B8003AB648 /* Constants.swift in Sources */,
 				FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */,
@@ -282,9 +295,12 @@
 				FFF087F0276D22570054443B /* ReusableCellForResultsTableView.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
 				FF87FA1827721EE2003AB648 /* CustomDataTypes.swift in Sources */,
+				FFDB48682797167700E57ECA /* Patient+CoreDataClass.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
 				FF87FA10276FBD52003AB648 /* CustomCollectionViewLayout.swift in Sources */,
+				FFDB486A2797167A00E57ECA /* Patient+CoreDataProperties.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
+				FFDB48722797628800E57ECA /* LabData+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
