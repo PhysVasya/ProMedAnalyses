@@ -14,10 +14,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
         
-        print("Documents Directory: ", FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last ?? "Not Found!")
-        // Override point for customization after application launch.
+        let enlity = NSEntityDescription.insertNewObject(forEntityName: "ManagedPatient", into: persistentContainer.viewContext) as! ManagedPatient
+    
+        enlity.labID = "2321151"
+        enlity.dateOfAdmission = "221.2214.241"
+        enlity.idsToFetchAnalyses = ["dsad", "dghreh", "gsdjj"]
+        enlity.patientID = "MOM"
+        enlity.patientName = "HEre you go"
+        saveContext()
+    
+        let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        
+        if let patients = try? persistentContainer.viewContext.fetch(request),
+           let testName = patients.first?.patientName,
+           let testIDs = patients.first?.idsToFetchAnalyses {
+            print(testName, testIDs)
+        } else {
+            print("test failed")
+        }
+        
         return true
     }
 
