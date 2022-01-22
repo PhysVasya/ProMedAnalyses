@@ -14,25 +14,13 @@ protocol ResultsViewControllerDelegate {
 }
 
 class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
-    
-    var context : NSManagedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    var headerForSection = [String]()
-    var tableHeaderItems = [String]()
-    var analysesResults = [String]()
-
-    let maximumHeight : CGFloat = 250
-    let minimumHeight : CGFloat = 0
-    
-    var tableView = UITableView()
-    var myLabel = UILabel()
-    var headerHeight : NSLayoutConstraint?
-    var headerTopAnchor : NSLayoutConstraint?
+        
+    var analysesView = [AnalysisView]()
+    var tableView = UITableView() 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
-  
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -41,6 +29,8 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
         tableView.register(UINib(nibName: "ResultsTableCell", bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         tableView.delegate = self
         tableView.dataSource = self
+       
+        
     }
     
     func viewDidScroll (to position: CGFloat) {
@@ -64,6 +54,13 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
             }
         }
     }
+    
+    func configureResultsVC (with analyses : [Analysis]) {
+        analyses.forEach {
+            let lab = AnalysisView(rows: $0.rows, date: $0.dateForHeaderInSection)
+            analysesView.append(lab)
+        }
+    }
 
 }
 
@@ -73,48 +70,32 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
 extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return analysesView.count
     }
     
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return headerForSection[section]
+        return analysesView[section].date
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return analysesResults.count
+        return analysesView[section].rows.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ReusableCellForResultsTableView
         cell.scrollDelegate = self
-       
-        if indexPath.row == 0 {
-            cell.textStrings = tableHeaderItems
-            cell.textLabel?.numberOfLines = 0
-            return cell
-        } else {
-            cell.textStrings = analysesResults
-            
-            return cell
-        }
-        
+        cell.textStrings = analysesView[indexPath.section].rows[indexPath.row]
+
+        return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
-    
 }
 
 extension ResultsViewController : UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let scrollOffset = scrollView.contentOffset.y
-        if scrollOffset < 0 {
-//            headerHeight?.constant += abs(scrollOffset)
-        }
-    }
-    
     
 }
 

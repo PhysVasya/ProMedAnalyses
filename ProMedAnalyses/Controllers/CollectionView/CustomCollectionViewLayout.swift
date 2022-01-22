@@ -65,11 +65,11 @@ class CustomCollectionViewLayout: UICollectionViewLayout {
                     for item in 0...rowCount-1 {
                         
                         let cellIndex = IndexPath(item: item, section: section)
-                        let xPos = Double(item) * 100
+                        let xPos = Double(item) * 120
                         let yPos = Double(section) * 50
                         
                         let cellAtributes = UICollectionViewLayoutAttributes(forCellWith: cellIndex)
-                        cellAtributes.frame = CGRect(x: xPos, y: yPos, width: 100, height: 50)
+                        cellAtributes.frame = CGRect(x: xPos, y: yPos, width: 120, height: 50)
                         
                         
                         if section == 0 && item == 0 {
@@ -87,7 +87,7 @@ class CustomCollectionViewLayout: UICollectionViewLayout {
             }
         }
         
-        let contentWidth = Double(collectionView!.numberOfItems(inSection: 0)) * 100
+        let contentWidth = Double(collectionView!.numberOfItems(inSection: 0)) * 120
         let contentHeight = Double(collectionView!.numberOfSections) * 50
         self.contentSize = CGSize(width: contentWidth, height: contentHeight)
         

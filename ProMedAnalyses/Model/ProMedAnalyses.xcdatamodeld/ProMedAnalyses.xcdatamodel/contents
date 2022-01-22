@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="ManagedLabData" representedClassName=".LabData" syncable="YES">
-        <attribute name="data" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
+    <entity name="ManagedLabData" representedClassName=".ManagedLabData" syncable="YES">
+        <attribute name="data" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[[String]]"/>
         <attribute name="date" attributeType="String"/>
         <attribute name="header" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
         <attribute name="labID" attributeType="String"/>
+        <attribute name="xmlID" attributeType="String"/>
     </entity>
     <entity name="ManagedPatient" representedClassName=".ManagedPatient" syncable="YES">
         <attribute name="dateOfAdmission" attributeType="String"/>
-        <attribute name="idsToFetchAnalyses" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="."/>
+        <attribute name="idsToFetchAnalyses" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
         <attribute name="labID" attributeType="String" customClassName=".Array&lt;String&gt;"/>
         <attribute name="patientID" attributeType="String"/>
         <attribute name="patientName" attributeType="String"/>
     </entity>
     <elements>
-        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="89"/>
+        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="104"/>
         <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="104"/>
     </elements>
 </model>

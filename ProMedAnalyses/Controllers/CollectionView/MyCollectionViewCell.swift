@@ -15,9 +15,8 @@ class MyCollectionViewCell: UICollectionViewCell {
     public func configure (with textForAnalysis: String) {
         self.textForCollectionViewCell.text = textForAnalysis
         textForCollectionViewCell.numberOfLines = 0
-        
+
     }
-    
     
 }
 
