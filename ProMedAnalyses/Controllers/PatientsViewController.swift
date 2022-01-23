@@ -94,12 +94,21 @@ class PatientsViewController: UIViewController {
     }
     
     //Interface presentation of cache loading when no internet connection
-    func cacheLoaded(title: String, animationtype: CATransitionType) {
+    func cacheLoaded(title: String, animationtype: [CATransitionType], _ completionHandler : (()-> Void?)? = nil) {
         let fadeTextAnimation = CATransition()
         fadeTextAnimation.duration = 0.2
-        fadeTextAnimation.type = animationtype
-        navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: "")
-        navigationItem.title = title
+        fadeTextAnimation.type = animationtype[0]
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: "")
+            self.navigationItem.title = title
+            Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+                fadeTextAnimation.type = animationtype[1]
+                self.navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: "")
+                self.navigationItem.title = "Список пациентов"
+            }
+            completionHandler?()
+        }
+        
     }
     
     //Triggere while using searthTextField
@@ -320,7 +329,9 @@ extension PatientsViewController {
         let task = urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
             guard error == nil else {
                 self?.presentError(error)
-                self?.fetchPatientsFromCoreData()
+                self?.cacheLoaded(title: "Кэш загружен", animationtype: [.push, .fade], {
+                        self?.fetchPatientsFromCoreData()
+                    })
                 return
             }
             
