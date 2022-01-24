@@ -10,7 +10,11 @@ import SwiftSoup
 
 class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
      
-     @IBOutlet weak var collectionView: UICollectionView! 
+     @IBOutlet weak var collectionView: UICollectionView! {
+          didSet {
+               collectionView.register(UINib(nibName: K.collectionCellView, bundle: nil), forCellWithReuseIdentifier: K.collectionViewCellForResultsData)
+          }
+     }
      
      var textStrings = [String]() {
           didSet {
@@ -24,7 +28,7 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
           super.awakeFromNib()
           collectionView.delegate = self
           collectionView.dataSource = self
-          collectionView.register(UINib(nibName: "CollectionCellView", bundle: nil), forCellWithReuseIdentifier: K.collectionViewCellForResultsData)
+          collectionView.allowsSelection = false
      }
      
      
@@ -34,7 +38,7 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
      
      func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
           let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.collectionViewCellForResultsData, for: indexPath) as! MyCollectionViewCell
-          cell.textForCollectionViewCell.layer.borderWidth = CGFloat(0.5)
+          cell.textForCollectionViewCell.layer.borderWidth = CGFloat(1)
           cell.textForCollectionViewCell.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 0.5)
           if indexPath.row == 0 {
                            cell.textForCollectionViewCell.backgroundColor = .lightGray.withAlphaComponent(0.25)
@@ -47,6 +51,7 @@ class ReusableCellForResultsTableView: UITableViewCell, UICollectionViewDelegate
           cell.configure(with: textStrings[indexPath.row])
           return cell
      }
+ 
      
      func scrollViewDidScroll(_ scrollView: UIScrollView) {
           scrollDelegate?.viewDidScroll(to: scrollView.contentOffset.x)

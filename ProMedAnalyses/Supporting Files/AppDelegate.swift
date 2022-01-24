@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-    
+//    
 //        let entity = NSEntityDescription.entity(forEntityName: "ManagedLabData", in: persistentContainer.viewContext)!
 //
 //

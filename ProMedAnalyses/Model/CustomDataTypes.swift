@@ -43,9 +43,20 @@ struct Analysis {
     let headerForAnalysis : [String]
 }
 
-struct AnalysisView {
+struct AnalysisView : Comparable {
+    static func < (lhs: AnalysisView, rhs: AnalysisView) -> Bool {
+        lhs.date < rhs.date 
+    }
+    
     let rows : [[String]]
     let date : String
+    var isExpanded : Bool 
+    
+    init(rows: [[String]], date: String, isExpanded: Bool = false) {
+        self.rows = rows
+        self.date = date
+        self.isExpanded = isExpanded
+    }
 }
 
 

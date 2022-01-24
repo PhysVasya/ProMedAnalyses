@@ -11,7 +11,6 @@ import CoreData
 
 class PatientsViewController: UIViewController {
     
-    
     //IBOutlets
     @IBOutlet var patientsTableView: UITableView!
     
@@ -134,12 +133,22 @@ class PatientsViewController: UIViewController {
 extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
    
     func numberOfSections(in tableView: UITableView) -> Int {
-        
         return 22
     }
     
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if patients.filter({$0.ward.wardNumber == section}).count == 0 {
+            return 0
+        } else {
+            return 20
+        }
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchFieldIsEditing {
+        if patients.filter({$0.ward.wardNumber == section}).count == 0 {
+            return 0
+        } else if searchFieldIsEditing {
             return filteredPatients.filter { $0.ward.wardNumber == section}.count
         } else {
         return patients.filter { $0.ward.wardNumber == section }.count
@@ -169,35 +178,29 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == section }
-        if section == 0 {
-            return "Нераспределенные"
-        } else {
             if filteredPatientsByWard.isEmpty {
                 return nil
+            } else if section == 0 {
+                return "Нераспределенные"
             } else {
                 return String("Палата № \(titleForHeader[section])")
             }
-        }
+        
     }
-    
-   
-    
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         
         if searchFieldIsEditing {
-//            fetchAnalysesIds(for: filteredPatients[indexPath.row]) { [weak self] id in
-//                self?.fetchAnalysesData(with: id)
-//            }
-            fetchLabDataFromCoreData(for: filteredPatients[indexPath.row])
+            fetchAnalysesIds(for: filteredPatients[indexPath.row]) { [weak self] id in
+                self?.fetchAnalysesData(with: id)
+            }
         } else {
-//            fetchAnalysesIds(for: patients[indexPath.row]) { [weak self] id in
-//                self?.fetchAnalysesData(with: id)
-//            }
-            fetchLabDataFromCoreData(for: patients[indexPath.row])
+            fetchAnalysesIds(for: patients[indexPath.row]) { [weak self] id in
+                self?.fetchAnalysesData(with: id)
+            }
         }
         
-        tableView.cellForRow(at: indexPath)?.isSelected = false
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -267,7 +270,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                         self?.patients.removeAll { existingPatient in
                             patientToBeMoved == existingPatient
                         }
-                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), patientID: patientToBeMoved.patientID, evnID: patientToBeMoved.evnID))
+                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), patientID: patientToBeMoved.patientID, evnID: patientToBeMoved.evnID, labIDs: patientToBeMoved.labIDs))
                     }
                 }
                 let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
@@ -277,7 +280,12 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             }
         })
         
+        let cancel = UIAlertAction(title: "Отмена", style: .cancel) { _ in
+            chooseWardToMoveToAlertVC.dismiss(animated: true, completion: nil)
+        }
+        
         chooseWardToMoveToAlertVC.addAction(action)
+        chooseWardToMoveToAlertVC.addAction(cancel)
         let move = UIContextualAction(style: style, title: "Перевести в палату") { [weak self] action, view, completionHandler in
             self?.present(chooseWardToMoveToAlertVC, animated: true) {
                 completionHandler(true)
@@ -317,11 +325,12 @@ extension PatientsViewController {
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "X-Requested-With" : "XMLHttpRequest",
             "Content-Length" : "260",
-            "Cookie" : "io=KVCvBBcjSxb3O8S6B650; JSESSIONID=4688D9084C9FE4D249FCE87FA86FD7E1; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
             
         ]
         
-        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=19.01.2022&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
+        let date = Date()
+        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=\(date.getFormattedDate())&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
         urlRequest.httpBody = requestBody.data(using: .utf8)
         
         let sessionConfig = URLSessionConfiguration.default
@@ -392,7 +401,7 @@ extension PatientsViewController {
                 "Origin" : "https://crimea.promedweb.ru",
                 "Referer" : "https://crimea.promedweb.ru/?c=promed",
                 "Content-Length" : "172",
-                "Cookie" : "io=KVCvBBcjSxb3O8S6B650; JSESSIONID=4688D9084C9FE4D249FCE87FA86FD7E1; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05",
+                "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05",
                 
             ]
             
@@ -406,7 +415,8 @@ extension PatientsViewController {
         let task = urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
             
             guard error == nil else {
-                self?.presentError(error)
+//                self?.presentError(error)
+                self?.fetchLabDataFromCoreData(for: patient)
                 return
             }
             
@@ -452,7 +462,8 @@ extension PatientsViewController {
             urlComponents.host = "crimea.promedweb.ru"
             urlComponents.queryItems = [
                 URLQueryItem(name: "c", value: "EvnXml"),
-                URLQueryItem(name: "m", value: "doLoadData")]
+                URLQueryItem(name: "m", value: "doLoadData")
+            ]
             return urlComponents.url
         }()
         
@@ -467,7 +478,7 @@ extension PatientsViewController {
             "Origin" : "https://crimea.promedweb.ru",
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "Content-Length" : "54",
-            "Cookie" : "io=KVCvBBcjSxb3O8S6B650; JSESSIONID=4688D9084C9FE4D249FCE87FA86FD7E1; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
         ]
         
         let sessionConfig = URLSessionConfiguration.default
@@ -529,8 +540,7 @@ extension PatientsViewController {
                         analysisItems.append(tbRow)
                     }
                     
-                    print(analysisItems)
-                    //                    self?.saveLabData(data: analysisItems, date: collectionDate, header: analysisHeaderItems, labID: id.value, xmlID: id.key)
+                    self?.saveLabData(data: analysisItems, date: collectionDate, header: analysisHeaderItems, labID: id.value, xmlID: id.key)
                     let analysis = Analysis(rows: analysisItems, dateForHeaderInSection: collectionDate, headerForAnalysis: analysisHeaderItems)
                     labFindings.append(analysis)
                     
@@ -588,7 +598,7 @@ extension PatientsViewController {
             let managedContext = appDelegate.persistentContainer.viewContext
             
             //Creating an instance of ManagedObject
-            let entity = NSEntityDescription.entity(forEntityName: "ManagedPatient", in: managedContext)!
+            let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedPatient, in: managedContext)!
             let person = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedPatient
             person.patientName = patientName
             person.patientID = patientID
@@ -615,7 +625,7 @@ extension PatientsViewController {
             let managedContext = appDelegate.persistentContainer.viewContext
             
             //Creating a new instance of ManagedObject
-            let entity = NSEntityDescription.entity(forEntityName: "ManagedLabData", in: managedContext)!
+            let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedLabData, in: managedContext)!
             let labData = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedLabData
             labData.labID = labID
             labData.data = data
@@ -650,10 +660,8 @@ extension PatientsViewController {
                     if patient.labIDs.contains(fetchedAnalysis.labID!) {
                         let analysis = Analysis(rows: fetchedAnalysis.data!, dateForHeaderInSection: fetchedAnalysis.date!, headerForAnalysis: fetchedAnalysis.header!)
                         labFindings.append(analysis)
-                    } else {
-                        print("There are no saved analyses for this patient.")
-                        return
-                    }
+                    
+                }
                 }
 //                print(labFindings)
                 self.presentResultsVC(with: labFindings)
@@ -691,3 +699,11 @@ extension PatientsViewController {
 }
 
 
+extension Date {
+    
+    func getFormattedDate() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        return dateFormatter.string(from: self)
+    }
+}
