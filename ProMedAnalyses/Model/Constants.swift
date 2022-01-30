@@ -11,9 +11,7 @@ import Foundation
 struct K {
     static let patientTableCell = "patientCell"
     static let resultsTableCell = "resultsTableCell"
-    static let nibResultsTableCell = "ResultsTableCell"
-    static let collectionViewCellForResultsData = "CWCell"
-    static let collectionCellView = "CollectionCellView"
+    static let nibResultsTableCell = "ResultsReusableCell"
     
     struct CoreData {
         static let managedPatient = "ManagedPatient"

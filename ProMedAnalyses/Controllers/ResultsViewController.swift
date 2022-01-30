@@ -9,12 +9,12 @@ import UIKit
 import SwiftSoup
 import CoreData
 
-protocol ResultsViewControllerDelegate {
-    func viewDidScroll(to position: CGFloat)
-}
 
-class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
-        
+
+class ResultsViewController: UIViewController {
+    
+    
+         
     var analysesView = [AnalysisView]() {
         didSet {
             analysesView.sort(by: <)
@@ -27,6 +27,8 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
         return tableView
     }()
   
+    let searchController = UISearchController(searchResultsController: nil)
+    var filteredAnalyses = [AnalysisView]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,11 +41,25 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
        
     }
     
-    func viewDidScroll (to position: CGFloat) {
-        for cell in tableView.visibleCells as! [ReusableCellForResultsTableView] {
-            cell.collectionView.contentOffset.x = position
-        }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupSearchController()
     }
+    
+    func setupSearchController () {
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.placeholder = "Искать..."
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.autocapitalizationType = .words
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
+    func filterSearchContent (_ content: String) {
+        let rows = analysesView.flatMap{$0.rows}
+        }
+    
+    
     
     func presentError (_ error: Error?) {
         guard let er = error else {
@@ -93,20 +109,26 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ReusableCellForResultsTableView
-        cell.scrollDelegate = self
-        cell.textStrings = analysesView[indexPath.section].rows[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ResultsReusableCellController
+        let rowData = analysesView[indexPath.section].rows[indexPath.row]
+    
+        cell.configure(labName: rowData[0], labValue: rowData[2])
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
+        return 80
     }
     
 }
 
-extension ResultsViewController : UIScrollViewDelegate {
+extension ResultsViewController: UISearchResultsUpdating {
     
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar.text
+        
+        
+    }
 }
 
 

@@ -159,7 +159,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.patientTableCell, for: indexPath)
         cell.accessoryType = .disclosureIndicator
         cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12, weight: .light)
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         
         let patient : Patient
         
@@ -325,7 +325,7 @@ extension PatientsViewController {
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "X-Requested-With" : "XMLHttpRequest",
             "Content-Length" : "260",
-            "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
             
         ]
         
@@ -401,7 +401,7 @@ extension PatientsViewController {
                 "Origin" : "https://crimea.promedweb.ru",
                 "Referer" : "https://crimea.promedweb.ru/?c=promed",
                 "Content-Length" : "172",
-                "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05",
+                "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05",
                 
             ]
             
@@ -478,7 +478,7 @@ extension PatientsViewController {
             "Origin" : "https://crimea.promedweb.ru",
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "Content-Length" : "54",
-            "Cookie" : "io=2jJUnfx93mSbcBrnCDjf; JSESSIONID=3911AD12AAF1D5A2873CA0D3428D3D0C; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
         ]
         
         let sessionConfig = URLSessionConfiguration.default
