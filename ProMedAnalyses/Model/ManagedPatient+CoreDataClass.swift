@@ -1,8 +1,8 @@
 //
-//  Patient+CoreDataClass.swift
+//  ManagedPatient+CoreDataClass.swift
 //  
 //
-//  Created by Vasiliy Andreyev on 18.01.2022.
+//  Created by Vasiliy Andreyev on 12.02.2022.
 //
 //
 

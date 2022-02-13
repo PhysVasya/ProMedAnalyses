@@ -61,7 +61,7 @@ class ResultsReusableCellController: UITableViewCell {
           } else if labName.contains("ферритин") {
                return Reference.ferritin.rawValue
           } else if labName.contains("Treponema") || labName.contains("virus") {
-               return Reference.hepB.rawValue
+               return Reference.stds.rawValue
           } else if labName.contains("RBC") {
                return Reference.rbc.rawValue
           } else if labName.contains("WBC") {
@@ -84,8 +84,34 @@ class ResultsReusableCellController: UITableViewCell {
                return Reference.trombocytes.rawValue
           } else if labName.contains("Эозиноф") {
                return Reference.eosinophiles.rawValue
+          } else if labName.contains("МНО") {
+               return Reference.inr.rawValue
+          } else if labName.contains("Протромб") {
+               return Reference.pti.rawValue
+          } else if labName.contains("Фибриноген") {
+               return Reference.fibrinogenA.rawValue
+          } else if labName.contains("Д-димер") {
+               return Reference.dDimer.rawValue
+          } else if labName.contains("Бактерии") {
+               return Reference.urineShouldntBe.rawValue
+          } else if labName.contains("глюкозы в моче") {
+               return Reference.urineShouldntBe.rawValue
+          } else if labName.contains("Микроскопическое") {
+               return Reference.urineShouldntBe.rawValue
+          } else if labName.contains("белка в моче") {
+               return Reference.urineProt.rawValue
+          } else if labName.contains("кислотности мочи") {
+               return Reference.pH.rawValue
+          } else if labName.contains("относительной плотности") {
+               return Reference.density.rawValue
+          } else if labName.contains("Прозрачность") {
+               return Reference.urineTransp.rawValue
+          } else if labName.contains("Цвет") {
+               return Reference.urineColor.rawValue
+          } else if labName.contains("Эритроциты изм") {
+               return Reference.urineShouldntBe.rawValue
           } else {
-               return Reference.eosinophiles.rawValue
+               return "Нет референсного значения"
           }
      }
    

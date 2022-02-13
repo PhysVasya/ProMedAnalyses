@@ -9,10 +9,14 @@
 /* Begin PBXBuildFile section */
 		B3C76274A46C3725FB9BF65F /* Pods_ProMedAnalyses.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0095DF90FFB2BEF33EA9F955 /* Pods_ProMedAnalyses.framework */; };
 		FF01D4B127A3232200331CA7 /* Threshold.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF01D4B027A3232200331CA7 /* Threshold.swift */; };
-		FF01D4B327A409B900331CA7 /* LoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF01D4B227A409B900331CA7 /* LoginScreen.swift */; };
 		FF3488E8279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FF3488E7279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf */; };
-		FF3488EF279AFB3100E4FEC7 /* ManagedLabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF3488EE279AFB3100E4FEC7 /* ManagedLabData+CoreDataProperties.swift */; };
-		FF3488F0279AFB3100E4FEC7 /* ManagedLabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF3488ED279AFB3100E4FEC7 /* ManagedLabData+CoreDataClass.swift */; };
+		FF4011EB27B40222002F93EF /* FilterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EA27B40222002F93EF /* FilterController.swift */; };
+		FF4011F027B76E40002F93EF /* ManagedLabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EC27B76E40002F93EF /* ManagedLabData+CoreDataClass.swift */; };
+		FF4011F127B76E40002F93EF /* ManagedPatient+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EF27B76E40002F93EF /* ManagedPatient+CoreDataClass.swift */; };
+		FF4011F227B76E40002F93EF /* ManagedPatient+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EE27B76E40002F93EF /* ManagedPatient+CoreDataProperties.swift */; };
+		FF4011F327B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011ED27B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift */; };
+		FF4011F527B958D9002F93EF /* LoginScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011F427B958D9002F93EF /* LoginScreenController.swift */; };
+		FF4466F227A91CF7009CB414 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4466F127A91CF7009CB414 /* CoreDataStack.swift */; };
 		FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
 		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
@@ -22,8 +26,6 @@
 		FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */; };
 		FF87FA1827721EE2003AB648 /* CustomDataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */; };
 		FF87FA1A277222B8003AB648 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA19277222B8003AB648 /* Constants.swift */; };
-		FFDB48682797167700E57ECA /* Patient+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */; };
-		FFDB486A2797167A00E57ECA /* Patient+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */; };
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
 		FFF087EE276935490054443B /* ResultsReusableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsReusableCell.xib */; };
 		FFF087F0276D22570054443B /* ResultsReusableCellController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ResultsReusableCellController.swift */; };
@@ -34,10 +36,14 @@
 		46974C817A69809795AAB258 /* Pods-ProMedAnalyses.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMedAnalyses.release.xcconfig"; path = "Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses.release.xcconfig"; sourceTree = "<group>"; };
 		73C5B45675C1F3261B93CCE3 /* Pods-ProMedAnalyses.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMedAnalyses.debug.xcconfig"; path = "Target Support Files/Pods-ProMedAnalyses/Pods-ProMedAnalyses.debug.xcconfig"; sourceTree = "<group>"; };
 		FF01D4B027A3232200331CA7 /* Threshold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Threshold.swift; sourceTree = "<group>"; };
-		FF01D4B227A409B900331CA7 /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
 		FF3488E7279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = exampleFetchedAnalysesData.rtf; sourceTree = "<group>"; };
-		FF3488ED279AFB3100E4FEC7 /* ManagedLabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedLabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
-		FF3488EE279AFB3100E4FEC7 /* ManagedLabData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedLabData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FF4011EA27B40222002F93EF /* FilterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterController.swift; sourceTree = "<group>"; };
+		FF4011EC27B76E40002F93EF /* ManagedLabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedLabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FF4011ED27B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedLabData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FF4011EE27B76E40002F93EF /* ManagedPatient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedPatient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FF4011EF27B76E40002F93EF /* ManagedPatient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/ManagedPatient+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FF4011F427B958D9002F93EF /* LoginScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreenController.swift; sourceTree = "<group>"; };
+		FF4466F127A91CF7009CB414 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		FF6B796D2778936600EB290B /* ProMedAnalyses.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProMedAnalyses.xcdatamodel; sourceTree = "<group>"; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -49,8 +55,6 @@
 		FF77BFA427674EED005E9A66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataTypes.swift; sourceTree = "<group>"; };
 		FF87FA19277222B8003AB648 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Patient+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/Patient+CoreDataClass.swift"; sourceTree = "<absolute>"; };
-		FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Patient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/Model/Patient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		FFF087ED276935490054443B /* ResultsReusableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsReusableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ResultsReusableCellController.swift */ = {isa = PBXFileReference; indentWidth = 5; lastKnownFileType = sourcecode.swift; path = ResultsReusableCellController.swift; sourceTree = "<group>"; };
@@ -91,7 +95,8 @@
 				FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */,
 				FFF087EB276933640054443B /* ResultsViewController.swift */,
 				FFF087EF276D22570054443B /* ResultsReusableCellController.swift */,
-				FF01D4B227A409B900331CA7 /* LoginScreen.swift */,
+				FF4011EA27B40222002F93EF /* FilterController.swift */,
+				FF4011F427B958D9002F93EF /* LoginScreenController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -110,15 +115,16 @@
 		FF610CEA276E2D3C007DD625 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				FF3488ED279AFB3100E4FEC7 /* ManagedLabData+CoreDataClass.swift */,
-				FF3488EE279AFB3100E4FEC7 /* ManagedLabData+CoreDataProperties.swift */,
-				FFDB48692797167A00E57ECA /* Patient+CoreDataProperties.swift */,
-				FFDB48672797167700E57ECA /* Patient+CoreDataClass.swift */,
+				FF4011EC27B76E40002F93EF /* ManagedLabData+CoreDataClass.swift */,
+				FF4011ED27B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift */,
+				FF4011EF27B76E40002F93EF /* ManagedPatient+CoreDataClass.swift */,
+				FF4011EE27B76E40002F93EF /* ManagedPatient+CoreDataProperties.swift */,
 				FF87FA1727721EE2003AB648 /* CustomDataTypes.swift */,
 				FF87FA19277222B8003AB648 /* Constants.swift */,
 				FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */,
 				FF3488E7279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf */,
 				FF01D4B027A3232200331CA7 /* Threshold.swift */,
+				FF4466F127A91CF7009CB414 /* CoreDataStack.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -282,17 +288,19 @@
 				FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */,
 				FF01D4B127A3232200331CA7 /* Threshold.swift in Sources */,
 				FF87FA1A277222B8003AB648 /* Constants.swift in Sources */,
+				FF4011F527B958D9002F93EF /* LoginScreenController.swift in Sources */,
 				FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */,
+				FF4011F327B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift in Sources */,
+				FF4011F127B76E40002F93EF /* ManagedPatient+CoreDataClass.swift in Sources */,
 				FFF087F0276D22570054443B /* ResultsReusableCellController.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
 				FF87FA1827721EE2003AB648 /* CustomDataTypes.swift in Sources */,
-				FFDB48682797167700E57ECA /* Patient+CoreDataClass.swift in Sources */,
+				FF4011F027B76E40002F93EF /* ManagedLabData+CoreDataClass.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
-				FFDB486A2797167A00E57ECA /* Patient+CoreDataProperties.swift in Sources */,
-				FF3488F0279AFB3100E4FEC7 /* ManagedLabData+CoreDataClass.swift in Sources */,
-				FF01D4B327A409B900331CA7 /* LoginScreen.swift in Sources */,
+				FF4011EB27B40222002F93EF /* FilterController.swift in Sources */,
+				FF4466F227A91CF7009CB414 /* CoreDataStack.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
-				FF3488EF279AFB3100E4FEC7 /* ManagedLabData+CoreDataProperties.swift in Sources */,
+				FF4011F227B76E40002F93EF /* ManagedPatient+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

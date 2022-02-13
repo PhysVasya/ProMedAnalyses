@@ -14,11 +14,21 @@ class PatientsViewController: UIViewController {
     //IBOutlets
     @IBOutlet var patientsTableView: UITableView!
     
+    var phpSessID: String?
+    var ioCookies: String?
+    
+    var login: String?
+    var link: String?
+    
+    let defaults = UserDefaults.standard
+    
     //UISearch and RefrestControllers
     let search = UISearchController(searchResultsController: nil)
     let refresh = UIRefreshControl()
     
     //Variables
+    let context = CoreDataStack(modelName: "ProMedAnalyses").managedContext
+    
     var patients = [Patient]()
     var filteredPatients = [Patient]()
     var wardNumberToMoveTo = ""
@@ -39,9 +49,14 @@ class PatientsViewController: UIViewController {
     //View overriden functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        patientsTableView.delegate = self
-        patientsTableView.dataSource = self
-        getPatientsAndEvnIds()
+        navigationController?.navigationBar.isHidden = false
+   
+        //        print(phpSessID)
+        patientsTableView?.delegate = self
+        patientsTableView?.dataSource = self
+        getCookies { [weak self] in
+            self?.getPatientsAndEvnIds(with: self?.phpSessID, ioCookie: self?.ioCookies)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -72,24 +87,7 @@ class PatientsViewController: UIViewController {
     func setupRefreshControl () {
         refresh.addTarget(self, action: #selector(PatientsViewController.refreshData(sender:)), for: .valueChanged)
         refresh.attributedTitle = NSAttributedString(string: "Обновление данных...")
-        patientsTableView.refreshControl = refresh
-    }
-    
-    //Universal error presentation while fetching data
-    func presentError (_ error: Error?) {
-        guard let er = error else {
-            return
-        }
-        DispatchQueue.main.async { [weak self] in
-            let alertController = UIAlertController(title: "К сожалению, произошла ошибка", message: er.localizedDescription, preferredStyle: .alert)
-            self?.present(alertController, animated: true) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    alertController.dismiss(animated: true) {
-                        self?.patientsTableView.refreshControl?.endRefreshing()
-                    }
-                }
-            }
-        }
+        patientsTableView?.refreshControl = refresh
     }
     
     //Interface presentation of cache loading when no internet connection
@@ -131,35 +129,27 @@ class PatientsViewController: UIViewController {
 
 //MARK: - PatientsTableView delegate methods and custom Table methods
 extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
-   
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 22
-    }
     
-
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if patients.filter({$0.ward.wardNumber == section}).count == 0 {
-            return 0
-        } else {
-            return 20
-        }
+    func numberOfSections(in tableView: UITableView) -> Int {
+        
+        return 21
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if patients.filter({$0.ward.wardNumber == section}).count == 0 {
+        let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == section }
+        if filteredPatientsByWard.isEmpty {
             return 0
         } else if searchFieldIsEditing {
             return filteredPatients.filter { $0.ward.wardNumber == section}.count
         } else {
-        return patients.filter { $0.ward.wardNumber == section }.count
+            return patients.filter { $0.ward.wardNumber == section }.count
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.patientTableCell, for: indexPath)
         cell.accessoryType = .disclosureIndicator
-        cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12, weight: .light)
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        var content = cell.defaultContentConfiguration()
         
         let patient : Patient
         
@@ -170,24 +160,36 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             let patientsWardEqualSection = patients.filter { $0.ward.wardNumber == indexPath.section }
             patient = patientsWardEqualSection[indexPath.row]
         }
-        cell.textLabel?.text = patient.name
-        cell.detailTextLabel?.text = patient.dateOfAdmission
+        content.textProperties.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        content.secondaryTextProperties.font = UIFont.systemFont(ofSize: 12, weight: .light)
+        
+        content.text = patient.name
+        content.secondaryText = patient.dateOfAdmission
+        cell.contentConfiguration = content
         return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == section }
-            if filteredPatientsByWard.isEmpty {
-                return nil
-            } else if section == 0 {
-                return "Нераспределенные"
-            } else {
-                return String("Палата № \(titleForHeader[section])")
-            }
+        if filteredPatientsByWard.isEmpty {
+            return nil
+        } else if section == 0 {
+            return "Нераспределенные"
+        } else {
+            return String("Палата № \(titleForHeader[section])")
+        }
         
     }
-
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return patients.filter { $0.ward.wardNumber == section }.isEmpty ? CGFloat.leastNonzeroMagnitude : 20
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return patients.filter{ $0.ward.wardNumber == section}.isEmpty ? CGFloat.leastNonzeroMagnitude : 20
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -196,15 +198,15 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                 self?.fetchAnalysesData(with: id)
             }
         } else {
-            fetchAnalysesIds(for: patients[indexPath.row]) { [weak self] id in
+            let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == indexPath.section }
+            fetchAnalysesIds(for: filteredPatientsByWard[indexPath.row]) { [weak self] id in
                 self?.fetchAnalysesData(with: id)
             }
         }
-        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return tableView.numberOfRows(inSection: indexPath.section) == 0 ? 0 : 60
+        return patients.filter { $0.ward.wardNumber == indexPath.section}.isEmpty ? CGFloat.leastNonzeroMagnitude : 60
     }
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
@@ -263,21 +265,22 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         }()
         
         let action = UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
-            if self?.wardNumberToMoveTo != "" {
-                let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
-                if let patientToBeMoved = groupedPatientsByWard?[on.row] {
-                    if self?.patients.contains(patientToBeMoved) != nil {
-                        self?.patients.removeAll { existingPatient in
-                            patientToBeMoved == existingPatient
-                        }
-                        self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo) ?? (patientToBeMoved.ward.wardNumber), wardType: .fourMan), patientID: patientToBeMoved.patientID, evnID: patientToBeMoved.evnID, labIDs: patientToBeMoved.labIDs))
+            
+            let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+            if let patientToBeMoved = groupedPatientsByWard?[on.row] {
+                if self?.patients.contains(patientToBeMoved) != nil {
+                    self?.patients.removeAll { existingPatient in
+                        patientToBeMoved == existingPatient
                     }
+                    self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID, evnID: patientToBeMoved.evnID, labIDs: patientToBeMoved.labIDs))
+                    self?.savePatient(patientName: patientToBeMoved.name, patientID: patientToBeMoved.patientID, dateOfAdmission: patientToBeMoved.dateOfAdmission, evnID: patientToBeMoved.evnID, idsForAnalyses: patientToBeMoved.labIDs, wardNumber: Int16(self!.wardNumberToMoveTo)!)
+                    
                 }
-                let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
-                table.moveRow(at: on, to: indexPathToMoveTo)
-            } else {
-                return
             }
+            
+            let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
+            
+            table.moveRow(at: on, to: indexPathToMoveTo)
         })
         
         let cancel = UIAlertAction(title: "Отмена", style: .cancel) { _ in
@@ -301,9 +304,76 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
 //MARK: - Fetch PatientsAndLabs Data
 extension PatientsViewController {
     
+    
+    func getCookies (_ completionHandler: (()->Void?)? = nil)  {
+        
+        if phpSessID != nil && ioCookies != nil {
+            getPatientsAndEvnIds(with: phpSessID, ioCookie: ioCookies)
+        } else {
+            
+            let url1 = URL(string: "https://crimea.promedweb.ru/?c=portal&m=udp")
+            let url2 = URL(string: "https://crimea.promedweb.ru:9991/socket.io/?EIO=3&transport=polling&t=1644374548290-0")
+                            
+                let task1 = URLSession.shared.dataTask(with: url1!) { [weak self] data, response, error in
+                    guard error == nil else {
+                        K.presentError(self, error: error, completion: {
+                            self?.patientsTableView?.refreshControl?.endRefreshing()
+                        })
+                        self?.cacheLoaded(title: "Кэш загружен", animationtype: [.push, .fade], {
+                            self?.fetchPatientsFromCoreData()
+                        })
+                        return
+                    }
+                    
+                    guard let urlResponse = response?.url,
+                          let httpResponse = response as? HTTPURLResponse,
+                          let fields = httpResponse.allHeaderFields as? [String : String] else {
+                              return
+                          }
+                    
+                    let cookies = HTTPCookie.cookies(withResponseHeaderFields: fields, for: urlResponse)
+                    for cookie in cookies {
+                        var cookieProps = [HTTPCookiePropertyKey : Any]()
+                        cookieProps[.value] = cookie.value
+                        self?.phpSessID = cookieProps[.value] as? String
+                        print("\(cookieProps[.value] ?? "LEL")")
+                        
+                    }
+                    
+                }
+            
+            let task2 = URLSession.shared.dataTask(with: url2!) { data, response, error in
+                guard error == nil else {
+                    return
+                }
+                
+                guard let urlResponse = response?.url,
+                      let httpResponse = response as? HTTPURLResponse,
+                      let fields = httpResponse.allHeaderFields as? [String : String] else {
+                          return
+                      }
+                
+                let cookies = HTTPCookie.cookies(withResponseHeaderFields: fields, for: urlResponse)
+                for cookie in cookies {
+                    var cookieProps = [HTTPCookiePropertyKey : Any]()
+                    cookieProps[.value] = cookie.value
+                    self.ioCookies = cookieProps[.value] as? String
+                    print("\(cookieProps[.value] ?? "LEL")")
+                    
+                }
+                
+            }
+                task1.resume()
+            task2.resume()
+            defaults.set(login, forKey: "Login")
+            defaults.set(link, forKey: "Link")
+        }
+    }
+    
+    
     //Triggered on viewDidLoad to fetch patients and analyses ids'
-    func getPatientsAndEvnIds () {
-        let urlForPatientRequest : URL? = {
+    func getPatientsAndEvnIds (with phpSessID: String? = nil, ioCookie: String? = nil) {
+        var urlForPatientRequest : URL? {
             var urlComponents = URLComponents()
             urlComponents.scheme = "https"
             urlComponents.host = "crimea.promedweb.ru"
@@ -312,12 +382,12 @@ extension PatientsViewController {
                 URLQueryItem(name: "m", value: "getSectionTreeData")
             ]
             return urlComponents.url
-        }()
+        }
         
         guard let url = urlForPatientRequest else {
             return
         }
-        
+                
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.allHTTPHeaderFields = [
@@ -325,7 +395,7 @@ extension PatientsViewController {
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "X-Requested-With" : "XMLHttpRequest",
             "Content-Length" : "260",
-            "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=\(ioCookie); JSESSIONID=D6DA62846F076AA21E01BE91BAD4615D; login=\(login); PHPSESSID=\(phpSessID)"
             
         ]
         
@@ -337,10 +407,12 @@ extension PatientsViewController {
         let urlSession = URLSession(configuration: sessionConfig)
         let task = urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
             guard error == nil else {
-                self?.presentError(error)
+                K.presentError(self, error: error, completion: {
+                    self?.patientsTableView?.refreshControl?.endRefreshing()
+                })
                 self?.cacheLoaded(title: "Кэш загружен", animationtype: [.push, .fade], {
-                        self?.fetchPatientsFromCoreData()
-                    })
+                    self?.fetchPatientsFromCoreData()
+                })
                 return
             }
             
@@ -368,7 +440,9 @@ extension PatientsViewController {
                     self?.patientsTableView.reloadData()
                 }
             } catch {
-                self?.presentError(error)
+                K.presentError(self, error: error) {
+                    self?.patientsTableView?.refreshControl?.endRefreshing()
+                }
             }
         }
         task.resume()
@@ -401,7 +475,7 @@ extension PatientsViewController {
                 "Origin" : "https://crimea.promedweb.ru",
                 "Referer" : "https://crimea.promedweb.ru/?c=promed",
                 "Content-Length" : "172",
-                "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05",
+                "Cookie" : "io=NvbvsL6z7_C5JiD6DbAs; JSESSIONID=D6DA62846F076AA21E01BE91BAD4615D; login=\(login); PHPSESSID=7velsds6e30ecgivsujn2chjc7",
                 
             ]
             
@@ -415,7 +489,6 @@ extension PatientsViewController {
         let task = urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
             
             guard error == nil else {
-//                self?.presentError(error)
                 self?.fetchLabDataFromCoreData(for: patient)
                 return
             }
@@ -441,11 +514,13 @@ extension PatientsViewController {
                     }
                     return v
                 }
-                self?.savePatient(patientName: patient.name, patientID: patient.patientID, dateOfAdmission: patient.dateOfAdmission, evnID: patient.evnID, idsForAnalyses: values)
+                self?.savePatient(patientName: patient.name, patientID: patient.patientID, dateOfAdmission: patient.dateOfAdmission, evnID: patient.evnID, idsForAnalyses: values, wardNumber: Int16(patient.ward.wardNumber))
                 onCompletion?(analysesIds)
                 
             } catch {
-                self?.presentError(error)
+                K.presentError(self, error: error) {
+                    self?.patientsTableView?.refreshControl?.endRefreshing()
+                }
             }
         }
         task.resume()
@@ -478,7 +553,7 @@ extension PatientsViewController {
             "Origin" : "https://crimea.promedweb.ru",
             "Referer" : "https://crimea.promedweb.ru/?c=promed",
             "Content-Length" : "54",
-            "Cookie" : "io=UhfPkOwp1Fj4x2ecCUod; JSESSIONID=09C5D41C9F683CCD5BF9FDF5E40697BC; login=inf1; PHPSESSID=7e3slmbpotbcqaaq31cfffbj05"
+            "Cookie" : "io=NvbvsL6z7_C5JiD6DbAs; JSESSIONID=D6DA62846F076AA21E01BE91BAD4615D; login=\(login); PHPSESSID=7velsds6e30ecgivsujn2chjc7"
         ]
         
         let sessionConfig = URLSessionConfiguration.default
@@ -491,7 +566,9 @@ extension PatientsViewController {
             
             let task = session.dataTask(with: request) { [weak self] data, response, error in
                 guard error == nil else {
-                    self?.presentError(error)
+                    K.presentError(self, error: error) {
+                        self?.patientsTableView?.refreshControl?.endRefreshing()
+                    }
                     return
                 }
                 
@@ -545,7 +622,10 @@ extension PatientsViewController {
                     labFindings.append(analysis)
                     
                 } catch {
-                    self?.presentError(error)
+                    K.presentError(self, error: error) {
+                        self?.patientsTableView?.refreshControl?.endRefreshing()
+                        
+                    }
                 }
             }
             task.resume()
@@ -588,30 +668,27 @@ extension PatientsViewController : UISearchResultsUpdating {
 
 //MARK: - CoreDataMethods
 extension PatientsViewController {
-    func savePatient (patientName: String, patientID: String, dateOfAdmission: String, evnID: String, idsForAnalyses: [String]) {
+    func savePatient (patientName: String, patientID: String, dateOfAdmission: String, evnID: String, idsForAnalyses: [String], wardNumber: Int16) {
         
         DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                return
-            }
-            // NSManagedObjectContext for CoreData
-            let managedContext = appDelegate.persistentContainer.viewContext
             
             //Creating an instance of ManagedObject
-            let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedPatient, in: managedContext)!
-            let person = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedPatient
+            guard let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedPatient, in: self.context) else {
+                return
+            }
+            let person = NSManagedObject(entity: entity, insertInto: self.context) as! ManagedPatient
             person.patientName = patientName
             person.patientID = patientID
             person.dateOfAdmission = dateOfAdmission
             person.labID = evnID
             person.idsToFetchAnalyses = idsForAnalyses
+            person.wardNumber = wardNumber
             
-            if managedContext.hasChanges {
-                do {
-                    try managedContext.save()
-                } catch {
-                    self.presentError(error)
-                }
+            do {
+                try self.context.save()
+            } catch {
+                K.presentError(self, error: error, completion: nil)
+                
             }
         }
     }
@@ -619,83 +696,70 @@ extension PatientsViewController {
     func saveLabData (data: [[String]], date: String, header: [String], labID: String, xmlID: String) {
         
         DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            //Creating a new instance of ManagedObject
+            guard let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedLabData, in: self.context) else {
                 return
             }
-            let managedContext = appDelegate.persistentContainer.viewContext
-            
-            //Creating a new instance of ManagedObject
-            let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedLabData, in: managedContext)!
-            let labData = NSManagedObject(entity: entity, insertInto: managedContext) as! ManagedLabData
+            let labData = NSManagedObject(entity: entity, insertInto: self.context) as! ManagedLabData
             labData.labID = labID
             labData.data = data
             labData.date = date
             labData.header = header
             labData.xmlID = xmlID
             
-            if managedContext.hasChanges {
                 do {
-                    try managedContext.save()
+                    try self.context.save()
                 } catch {
-                    self.presentError(error)
+                    K.presentError(self, error: error, completion: nil)
                 }
-            }
+            
         }
     }
     
     func fetchLabDataFromCoreData (for patient: Patient) {
         
         DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                return
-            }
-            let context = appDelegate.persistentContainer.viewContext
-            
             let request : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
             var labFindings = [Analysis]()
             do {
-            let fetchAnalysesFromCoreData = try context.fetch(request)
+                let fetchAnalysesFromCoreData = try self.context.fetch(request)
                 
                 for fetchedAnalysis in fetchAnalysesFromCoreData {
+                    
                     if patient.labIDs.contains(fetchedAnalysis.labID!) {
                         let analysis = Analysis(rows: fetchedAnalysis.data!, dateForHeaderInSection: fetchedAnalysis.date!, headerForAnalysis: fetchedAnalysis.header!)
                         labFindings.append(analysis)
-                    
+                        
+                    }
                 }
-                }
-//                print(labFindings)
                 self.presentResultsVC(with: labFindings)
             } catch {
-                self.presentError(error)
+                K.presentError(self, error: error)
             }
-
+            
         }
     }
     
     func fetchPatientsFromCoreData () {
-        DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                return
+        var fetchedPatients = [Patient]()
+        let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        do {
+            let fetchedPatientsFromCoreData = try self.context.fetch(request)
+            for fetchedPatient in fetchedPatientsFromCoreData {
+                let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!, patientID: fetchedPatient.patientID!, evnID: fetchedPatient.labID!, labIDs: fetchedPatient.idsToFetchAnalyses!)
+                fetchedPatients.append(patient)
             }
-            let context = appDelegate.persistentContainer.viewContext
-            var fetchedPatients = [Patient]()
-            
-            let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
-            do {
-                let fetchedPatientsFromCoreData = try context.fetch(request)
-                for fetchedPatient in fetchedPatientsFromCoreData {
-                    let patient = Patient(name: fetchedPatient.patientName, dateOfAdmission: fetchedPatient.dateOfAdmission, patientID: fetchedPatient.patientID, evnID: fetchedPatient.labID, labIDs: fetchedPatient.idsToFetchAnalyses)
-                    fetchedPatients.append(patient)
-                }
-                self.patients = fetchedPatients
-//                print(self.patients.last!.labIDs)
-                self.patientsTableView.reloadData()
-            } catch {
-                self.presentError(error)
+            self.patients = fetchedPatients
+            self.patientsTableView?.reloadData()
+        } catch {
+            K.presentError(self, error: error) {
+                self.patientsTableView?.refreshControl?.endRefreshing()
+                
             }
-            
         }
+        
     }
+    
 }
 
 

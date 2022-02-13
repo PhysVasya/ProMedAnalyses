@@ -26,7 +26,7 @@ enum Reference: String {
     case pti = "90 - 105 %"
     case fibrinogenA = "2 - 4 г/л"
     
-    case hepC, hepB, pallidum = "Отрицательный"
+    case stds = "Отрицательный"
     
     case rbc = "3,92 - 5,13"
     case wbc = "4,0 - 11,0"
@@ -42,5 +42,10 @@ enum Reference: String {
     
     case urineLeuk = "15 - 40 в п/зр"
     case urineProt = "0 - 0,033 г/л"
-    case pH = "1,010 - 1,030"
+    case pH = "5,0 - 7,0"
+    case density = "1,010 - 1,030"
+    case urineShouldntBe = "Отсутствие"
+    case urineColor = "Св/ж"
+    case urineTransp  = "Прозрачная"
+    
 }

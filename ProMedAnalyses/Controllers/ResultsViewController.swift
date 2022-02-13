@@ -13,8 +13,6 @@ import CoreData
 
 class ResultsViewController: UIViewController {
     
-    
-         
     var analysesView = [AnalysisView]() {
         didSet {
             analysesView.sort(by: <)
@@ -26,55 +24,21 @@ class ResultsViewController: UIViewController {
         tableView.register(UINib(nibName: K.nibResultsTableCell, bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
         return tableView
     }()
-  
-    let searchController = UISearchController(searchResultsController: nil)
-    var filteredAnalyses = [AnalysisView]()
+    let filterVC = FilterController()
+    var usedFilters = [String]()
+
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let filterButton = UIBarButtonItem(image: UIImage(systemName: "slider.vertical.3"), style: .plain, target: self, action: #selector(filter))
+
         view.addSubview(tableView)
         
         tableView.frame = view.bounds
         tableView.delegate = self
         tableView.dataSource = self
-        
-       
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        setupSearchController()
-    }
-    
-    func setupSearchController () {
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.placeholder = "Искать..."
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.autocapitalizationType = .words
-        navigationItem.searchController = searchController
-        definesPresentationContext = true
-    }
-    
-    func filterSearchContent (_ content: String) {
-        let rows = analysesView.flatMap{$0.rows}
-        }
-    
-    
-    
-    func presentError (_ error: Error?) {
-        guard let er = error else {
-            return
-        }
-        DispatchQueue.main.async { [weak self] in
-            let alertController = UIAlertController(title: "К сожалению, произошла ошибка", message: er.localizedDescription, preferredStyle: .alert)
-            self?.present(alertController, animated: true) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    alertController.dismiss(animated: true) {
-                        
-                    }
-                }
-            }
-        }
+        navigationItem.rightBarButtonItem = filterButton
     }
     
     func configureResultsVC (with analyses : [Analysis]) {
@@ -84,7 +48,39 @@ class ResultsViewController: UIViewController {
         }
         tableView.reloadData()
     }
-
+    
+    @objc func filter () {
+        
+        let nav = UINavigationController(rootViewController: filterVC)
+        if let sheet = nav.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.selectedDetentIdentifier = .medium
+        }
+        filterVC.navigationItem.title = "Параметры фильтров"
+        filterVC.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(chooseFilters))
+        filterVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(clear))
+        
+        present(nav, animated: true, completion: nil)
+        
+    }
+    
+    @objc func chooseFilters () {
+        
+        filterVC.sendFilters = { [weak self] filters in
+            self?.usedFilters = filters
+        }
+        filterVC.dismiss(animated: true) {
+            print(self.usedFilters)
+        }
+    }
+    
+    @objc func clear () {
+        filterVC.selectedIndexPaths.removeAll()
+        filterVC.selectedFilters.removeAll()
+        filterVC.tableForProps.reloadData()
+    }
+    
+   
 }
 
 
@@ -122,13 +118,6 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-extension ResultsViewController: UISearchResultsUpdating {
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchBar = searchController.searchBar.text
-        
-        
-    }
-}
+
 
 
