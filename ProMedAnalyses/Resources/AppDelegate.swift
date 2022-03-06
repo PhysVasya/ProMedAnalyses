@@ -10,13 +10,18 @@ import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
-    
-    var window: UIWindow?
 
+    public var connectionIsSatisfied: Bool?
+    public var phpSessionID: String?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-      
-//        print(getCookies()?)
         
+
+        CheckNetwork.shared.startMonitoring { [weak self] connectionIsSatisfied, recevedPhpSessionIdCookie in
+            self?.connectionIsSatisfied = connectionIsSatisfied
+            self?.phpSessionID = recevedPhpSessionIdCookie
+            
+        }
         
         return true
     }
@@ -78,7 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
-    }
-    
+    }  
 }
 

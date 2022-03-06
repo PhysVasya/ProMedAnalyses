@@ -13,6 +13,8 @@ struct K {
     static let patientTableCell = "patientCell"
     static let resultsTableCell = "resultsTableCell"
     static let nibResultsTableCell = "ResultsReusableCell"
+
+    
     
     struct CoreData {
         static let managedPatient = "ManagedPatient"
