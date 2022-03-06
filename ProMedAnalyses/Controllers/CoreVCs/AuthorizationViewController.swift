@@ -5,10 +5,7 @@
 //  Created by Vasiliy Andreyev on 13.02.2022.
 //
 
-import Foundation
 import UIKit
-import Network
-
 
 class AuthorizationViewController: UIViewController {
     
@@ -74,7 +71,7 @@ class AuthorizationViewController: UIViewController {
             AuthorizationManager.shared.authorize(login: loginTextField.text, password: passwordTextField.text) { [weak self] success in
                 switch success {
                 case true:
-                    FetchingManager.shared.getPatientsAndEvnIds { patients in
+                    APICallManager.shared.getPatientsAndEvnIds { patients in
                         self?.configurePatients(with: patients)
                     }
                 case false:

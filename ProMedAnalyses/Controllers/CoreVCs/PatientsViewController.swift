@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import SwiftSoup
-import CoreData
 
 class PatientsViewController: UIViewController {
     
@@ -85,7 +83,7 @@ class PatientsViewController: UIViewController {
             return
         }
         if isConnected {
-            FetchingManager.shared.getPatientsAndEvnIds { receivedPatients in
+            APICallManager.shared.getPatientsAndEvnIds { receivedPatients in
                 self.patients = receivedPatients
             }
         } else {
@@ -126,7 +124,7 @@ class PatientsViewController: UIViewController {
         
         switch connectionAvailiable {
         case true:
-            FetchingManager.shared.downloadLabData(for: patient) { [weak self] labData in
+            APICallManager.shared.downloadLabData(for: patient) { [weak self] labData in
                 self?.presentResults(with: labData)
             }
         case false:
