@@ -139,9 +139,6 @@ class FilterViewController: UIViewController {
         
     }
     
-  
-    
-    
 }
 
 extension FilterViewController: UITableViewDelegate, UITableViewDataSource {

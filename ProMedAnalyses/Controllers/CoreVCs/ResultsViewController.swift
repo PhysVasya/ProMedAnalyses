@@ -54,11 +54,12 @@ class ResultsViewController: UIViewController {
         super.viewDidLoad()
         title = "Результаты анализов"
         let filterButton = UIBarButtonItem(image: UIImage(systemName: "line.3.horizontal.decrease"), style: .plain, target: self, action: #selector(filter))
+        let createPDFButton = UIBarButtonItem(image: UIImage(systemName: "doc.badge.plus"), style: .plain, target: self, action: #selector(createPDF))
         view.addSubview(tableView)
         tableView.frame = view.bounds
         tableView.delegate = self
         tableView.dataSource = self
-        navigationItem.setRightBarButtonItems([filterButton], animated: true)
+        navigationItem.setRightBarButtonItems([filterButton, createPDFButton], animated: true)
         getReferences()
         reassembledAnalysesCopy = reassembledAnalyses
         
@@ -70,6 +71,13 @@ class ResultsViewController: UIViewController {
             reassembledAnalyses.append(lab)
         }
         tableView.reloadData()
+    }
+    
+    @objc func createPDF () {
+        createPDFFromTableView()
+        let pdfView = PDFViewController()
+        let navController = UINavigationController(rootViewController: pdfView)
+        navigationController?.present(navController, animated: true, completion: nil)
     }
     
     @objc func filter () {
@@ -174,6 +182,30 @@ class ResultsViewController: UIViewController {
             print(error)
         }
         
+    }
+    
+    func createPDFFromTableView () {
+        let priorToBounds = tableView.bounds
+        let fittedSize = tableView.sizeThatFits(CGSize(width: priorToBounds.size.width, height: tableView.contentSize.height))
+        tableView.bounds = CGRect(x: 0, y: 0, width: fittedSize.width, height: fittedSize.height)
+        
+        let pdfPageBounds = CGRect(x: 0, y: 0, width: tableView.frame.width, height: view.frame.height)
+        let pdfData = NSMutableData()
+        UIGraphicsBeginPDFContextToData(pdfData, pdfPageBounds, nil)
+        var pageOriginY = 0.0
+        while pageOriginY < fittedSize.height {
+            UIGraphicsBeginPDFPageWithInfo(pdfPageBounds, nil)
+            UIGraphicsGetCurrentContext()?.saveGState()
+            UIGraphicsGetCurrentContext()?.translateBy(x: 0, y: -pageOriginY)
+            tableView.layer.render(in: UIGraphicsGetCurrentContext()!)
+            UIGraphicsGetCurrentContext()?.restoreGState()
+            pageOriginY += pdfPageBounds.size.height
+        }
+        UIGraphicsEndPDFContext()
+        tableView.bounds = priorToBounds
+        var docURL = (FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)).last! as URL
+        docURL = docURL.appendingPathComponent("myDocument.pdf")
+        pdfData.write(to: docURL, atomically: true)
     }
 }
 

@@ -42,6 +42,7 @@
 		FFB6683D27D12B6600503EC7 /* PreviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB6683C27D12B6600503EC7 /* PreviewViewModel.swift */; };
 		FFB6683F27D12BD300503EC7 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB6683E27D12BD300503EC7 /* Filter.swift */; };
 		FFE1FD8E27D4D625004A37FE /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE1FD8D27D4D625004A37FE /* HapticsManager.swift */; };
+		FFE1FD9027D50EA8004A37FE /* PDFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE1FD8F27D50EA8004A37FE /* PDFViewController.swift */; };
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
 		FFF087EE276935490054443B /* ResultsReusableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsReusableCell.xib */; };
 		FFF087F0276D22570054443B /* ResultsCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ResultsCellViewController.swift */; };
@@ -87,6 +88,7 @@
 		FFB6683C27D12B6600503EC7 /* PreviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewModel.swift; sourceTree = "<group>"; };
 		FFB6683E27D12BD300503EC7 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		FFE1FD8D27D4D625004A37FE /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
+		FFE1FD8F27D50EA8004A37FE /* PDFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFViewController.swift; sourceTree = "<group>"; };
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		FFF087ED276935490054443B /* ResultsReusableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsReusableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ResultsCellViewController.swift */ = {isa = PBXFileReference; indentWidth = 5; lastKnownFileType = sourcecode.swift; path = ResultsCellViewController.swift; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 				FF18162527D3685A0029C06E /* DummyLaunchScreen.swift */,
 				FF4011EA27B40222002F93EF /* FilterViewController.swift */,
 				FF05061727BCE92C00E913B7 /* PreviewViewController.swift */,
+				FFE1FD8F27D50EA8004A37FE /* PDFViewController.swift */,
 			);
 			path = AdditionalVCs;
 			sourceTree = "<group>";
@@ -406,6 +409,7 @@
 				FF05061827BCE92C00E913B7 /* PreviewViewController.swift in Sources */,
 				FF4011F527B958D9002F93EF /* AuthorizationViewController.swift in Sources */,
 				FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */,
+				FFE1FD9027D50EA8004A37FE /* PDFViewController.swift in Sources */,
 				FF4011F327B76E40002F93EF /* ManagedLabData+CoreDataProperties.swift in Sources */,
 				FF7A093127C505C5009186AD /* FilterCellViewController.swift in Sources */,
 				FF4011F127B76E40002F93EF /* ManagedPatient+CoreDataClass.swift in Sources */,
@@ -586,13 +590,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = VAndreyev.ProMedAnalyses;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -617,13 +620,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = VAndreyev.ProMedAnalyses;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

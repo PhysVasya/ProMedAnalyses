@@ -33,10 +33,10 @@ class FilterCellViewController: UITableViewCell {
         if let textView = v as? UITextField {
     
             NSLayoutConstraint.activate([
-                textView.bottomAnchor.constraint(equalTo: customView.bottomAnchor, constant: -customView.frame.height / 6.5),
-                textView.topAnchor.constraint(equalTo: customView.topAnchor, constant: customView.frame.height / 6.5),
+                textView.bottomAnchor.constraint(equalTo: customView.bottomAnchor, constant: -customView.frame.height / 6),
+                textView.topAnchor.constraint(equalTo: customView.topAnchor, constant: customView.frame.height / 6),
                 textView.trailingAnchor.constraint(equalTo: customView.trailingAnchor),
-                textView.leadingAnchor.constraint(equalTo: customView.leadingAnchor, constant: 37)
+                textView.leadingAnchor.constraint(equalTo: customView.leadingAnchor, constant: customView.frame.width / 3.5)
             ])
             
         } else {
