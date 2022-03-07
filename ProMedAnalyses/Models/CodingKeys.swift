@@ -133,4 +133,6 @@ struct FetchedLabData : Codable {
         case data = "html"
     }
     
+    
+    
 }

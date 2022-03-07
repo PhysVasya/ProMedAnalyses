@@ -37,7 +37,6 @@ class CoreDataStack {
         guard managedContext.hasChanges else {
             return
         }
-        
         do {
             try managedContext.save()
 

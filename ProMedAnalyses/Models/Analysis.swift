@@ -17,3 +17,8 @@ struct AnalysisType {
     let evnUslugaID: String
     let evnXMLID: String
 }
+
+struct FetchedLabIDs {
+    let evnXMLID: String
+    let evnUslugaID: String
+}

@@ -18,10 +18,10 @@
 		FF4011EB27B40222002F93EF /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EA27B40222002F93EF /* FilterViewController.swift */; };
 		FF4011F527B958D9002F93EF /* AuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011F427B958D9002F93EF /* AuthorizationViewController.swift */; };
 		FF4466F227A91CF7009CB414 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4466F127A91CF7009CB414 /* CoreDataStack.swift */; };
-		FF66E31927D60F7D004AEA62 /* ManagedLabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31827D60F7D004AEA62 /* ManagedLabData+CoreDataClass.swift */; };
-		FF66E31A27D60F7D004AEA62 /* ManagedPatient+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31527D60F7D004AEA62 /* ManagedPatient+CoreDataProperties.swift */; };
-		FF66E31B27D60F7D004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31627D60F7D004AEA62 /* ManagedLabData+CoreDataProperties.swift */; };
-		FF66E31C27D60F7D004AEA62 /* ManagedPatient+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31727D60F7D004AEA62 /* ManagedPatient+CoreDataClass.swift */; };
+		FF66E32127D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31D27D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift */; };
+		FF66E32227D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E32027D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift */; };
+		FF66E32327D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31F27D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift */; };
+		FF66E32427D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31E27D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift */; };
 		FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
 		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
@@ -61,10 +61,10 @@
 		FF4011EA27B40222002F93EF /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		FF4011F427B958D9002F93EF /* AuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationViewController.swift; sourceTree = "<group>"; };
 		FF4466F127A91CF7009CB414 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		FF66E31527D60F7D004AEA62 /* ManagedPatient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedPatient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
-		FF66E31627D60F7D004AEA62 /* ManagedLabData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedLabData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
-		FF66E31727D60F7D004AEA62 /* ManagedPatient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedPatient+CoreDataClass.swift"; sourceTree = "<absolute>"; };
-		FF66E31827D60F7D004AEA62 /* ManagedLabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedLabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FF66E31D27D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedPatient+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FF66E31E27D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedLabData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		FF66E31F27D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedLabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		FF66E32027D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedPatient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
 		FF6B796D2778936600EB290B /* ProMedAnalyses.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProMedAnalyses.xcdatamodel; sourceTree = "<group>"; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,10 +133,10 @@
 		FF3E3D8C27CF7C0D00E14F8B /* Subclasses */ = {
 			isa = PBXGroup;
 			children = (
-				FF66E31827D60F7D004AEA62 /* ManagedLabData+CoreDataClass.swift */,
-				FF66E31627D60F7D004AEA62 /* ManagedLabData+CoreDataProperties.swift */,
-				FF66E31727D60F7D004AEA62 /* ManagedPatient+CoreDataClass.swift */,
-				FF66E31527D60F7D004AEA62 /* ManagedPatient+CoreDataProperties.swift */,
+				FF66E31F27D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift */,
+				FF66E31E27D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift */,
+				FF66E31D27D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift */,
+				FF66E32027D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift */,
 				FF4466F127A91CF7009CB414 /* CoreDataStack.swift */,
 			);
 			path = Subclasses;
@@ -403,9 +403,9 @@
 				FFB6683F27D12BD300503EC7 /* Filter.swift in Sources */,
 				FF18162427D365C80029C06E /* ConnectionViewController.swift in Sources */,
 				FF05061827BCE92C00E913B7 /* PreviewViewController.swift in Sources */,
+				FF66E32327D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift in Sources */,
 				FF4011F527B958D9002F93EF /* AuthorizationViewController.swift in Sources */,
 				FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */,
-				FF66E31B27D60F7D004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */,
 				FFE1FD9027D50EA8004A37FE /* PDFViewController.swift in Sources */,
 				FF7A093127C505C5009186AD /* FilterCellViewController.swift in Sources */,
 				FFF087F0276D22570054443B /* ResultsCellViewController.swift in Sources */,
@@ -416,9 +416,10 @@
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
 				FF4011EB27B40222002F93EF /* FilterViewController.swift in Sources */,
 				FFE1FD8E27D4D625004A37FE /* HapticsManager.swift in Sources */,
+				FF66E32127D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift in Sources */,
 				FFB6683D27D12B6600503EC7 /* PreviewViewModel.swift in Sources */,
+				FF66E32427D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */,
 				FF18162627D3685A0029C06E /* DummyLaunchScreen.swift in Sources */,
-				FF66E31C27D60F7D004AEA62 /* ManagedPatient+CoreDataClass.swift in Sources */,
 				FF4466F227A91CF7009CB414 /* CoreDataStack.swift in Sources */,
 				FFAC158027BF8DB700DCED18 /* CheckNetwork.swift in Sources */,
 				FF7A092E27C11BD0009186AD /* FetchingManager.swift in Sources */,
@@ -426,9 +427,8 @@
 				FFB6683627D12AD700503EC7 /* Ward.swift in Sources */,
 				FFB6683A27D12AE800503EC7 /* Analysis.swift in Sources */,
 				FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */,
-				FF66E31927D60F7D004AEA62 /* ManagedLabData+CoreDataClass.swift in Sources */,
 				FFB6683827D12AE000503EC7 /* Patient.swift in Sources */,
-				FF66E31A27D60F7D004AEA62 /* ManagedPatient+CoreDataProperties.swift in Sources */,
+				FF66E32227D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

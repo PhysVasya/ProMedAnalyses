@@ -7,13 +7,14 @@
 
 import Foundation
 import SwiftSoup
+import CoreData
 
 class APICallManager {
     
     static let shared = APICallManager()
     
-    private var patients = [Patient]()
     private var labFindings = [AnalysisType]()
+    private let patientFetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
     
     private init () {}
     
@@ -23,7 +24,7 @@ class APICallManager {
         case errorDownloadnigLabData = "Error downloading lab data"
     }
     
-    public func getPatientsAndEvnIds (completionHandler: @escaping (_: [Patient]) -> Void) {
+    public func getPatientsAndEvnIds (completion: @escaping (Bool) -> Void) {
         
         var urlForPatientRequest : URL? {
             var urlComponents = URLComponents()
@@ -40,6 +41,7 @@ class APICallManager {
               let io = AuthorizationManager.shared.ioCookie,
               let jSessionID = AuthorizationManager.shared.jSessionID,
               let phpSessionID = AuthorizationManager.shared.sessionID else {
+                  completion(false)
                   return
               }
         
@@ -59,13 +61,13 @@ class APICallManager {
             "Cookie" : "io=\(io); JSESSIONID=\(jSessionID); login=inf1; PHPSESSID=\(phpSessionID)"
         ]
         
-        let date = Date()
-        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=\(date.getFormattedDate())&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
+        let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=\(Date().getFormattedDate())&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
         urlRequest.httpBody = requestBody.data(using: .utf8)
         
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             guard error == nil, let unwrappedData = data else {
                 print("\(APICallErrors.errorDownloadingPatients.rawValue) : \(String(describing: error))")
+                completion(false)
                 return
             }
     
@@ -77,22 +79,22 @@ class APICallManager {
                     if !patientNames.isEmpty() {
                         if let patientID = person.patientID {
                             let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientID)
-                            self.patients.append(patient)
-                            FetchingManager.shared.savePatient(patientName: patient.name, patientID: patient.patientID, dateOfAdmission: patient.dateOfAdmission, wardNumber: Int16(patient.ward.wardNumber))
+                            FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient) 
                         }
                     }
                 }
-                completionHandler(self.patients)
             } catch let error {
                 print("\(APICallErrors.errorDownloadingPatients.rawValue) : \(error)")
+                completion(false)
+
             }
         }.resume()
     }
     
     
-    private func downloadLabIDs(for patient: Patient, onCompletion: @escaping (_ id: [String : String]) -> Void?){
+    private func downloadLabIDs(for patient: Patient, onCompletion: @escaping (_ id: [FetchedLabIDs]) -> Void){
         
-        var analysesIds = [String : String]()
+        var analysesIds = [FetchedLabIDs]()
         let urlForRequest : URL? = {
             var urlComponents = URLComponents()
             urlComponents.host = "crimea.promedweb.ru"
@@ -140,12 +142,23 @@ class APICallManager {
             }
             
             do{
-                let decodedData = try JSONDecoder().decode(FetchedListOfLabIDs.self, from: receivedData)
-                guard let items = decodedData.map?.evnPS.item[0].children.evnSection.item[1].children.evnUslugaStac.item else {
+                
+                FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient) { result in
+                    switch result {
+                    case .success(let patientExists):
+                        FetchingManager.shared.sharedPatient = patientExists
+                    case .failure(let error):
+                        print("Error checking patient \(error)")
+                    }
+                }
+                
+                let decodedData = try JSONDecoder().decode(EvnDiagDirectPS.self, from: receivedData)
+                guard let items = decodedData.item else {
                     return
                 }
                 for item in items  {
-                    analysesIds[item.data.evnXMLID] = item.data.evnUslugaID
+                    let analysisID = FetchedLabIDs(evnXMLID: item.data.evnXMLID, evnUslugaID: item.data.evnUslugaID)
+                    analysesIds.append(analysisID)
                 }
                 onCompletion(analysesIds)
             } catch let error {
@@ -154,7 +167,7 @@ class APICallManager {
         }.resume()
     }
     
-    private func downloadLabData (with ids: [String : String], completionHandler: @escaping (_ : [AnalysisType]?)->Void) {
+    private func downloadLabData (with ids: [FetchedLabIDs], completionHandler: @escaping (_ : [AnalysisType]?)->Void) {
         
         let urlForRequest: URL? = {
             var urlComponents = URLComponents()
@@ -192,7 +205,7 @@ class APICallManager {
         ]
         
         for id in ids {
-            let body = "XmlType_id=4&Evn_id=\(id.value)&EvnXml_id=\(id.key)"
+            let body = "XmlType_id=4&Evn_id=\(id.evnUslugaID)&EvnXml_id=\(id.evnXMLID)"
             let finalBody = body.data(using: .utf8)
             request.httpBody = finalBody
             
@@ -234,7 +247,7 @@ class APICallManager {
                     }
                     
                     let analysis = Analysis(data: analysisItems, date: collectionDate)
-                    let analysisType = AnalysisType(analysis: analysis, evnUslugaID: id.value, evnXMLID: id.key)
+                    let analysisType = AnalysisType(analysis: analysis, evnUslugaID: id.evnUslugaID, evnXMLID: id.evnXMLID)
                     self.labFindings.append(analysisType)
 
                 } catch let error {
@@ -251,6 +264,7 @@ class APICallManager {
                 guard let analyses = analyses else {
                     return
                 }
+                FetchingManager.shared.saveLabData(with: analyses)
                 completionHanlder(analyses)
             }
         }

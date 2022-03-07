@@ -36,13 +36,13 @@ class PatientsViewController: UIViewController {
         }
     }
     private var wardNumberToMoveTo = ""
-    
     private var isSearchBarEmpty : Bool {
         return search.searchBar.searchTextField.text?.isEmpty ?? true
     }
     private var searchFieldIsEditing : Bool {
         return search.isActive && !isSearchBarEmpty
     }
+    private var currentPatient : ManagedPatient?
     
     //View overriden functions
     override func viewDidLoad() {
@@ -85,8 +85,15 @@ class PatientsViewController: UIViewController {
             return
         }
         if isConnected {
-            APICallManager.shared.getPatientsAndEvnIds { receivedPatients in
-                self.patients = receivedPatients
+            APICallManager.shared.getPatientsAndEvnIds { success in
+                switch success {
+                case true:
+                    FetchingManager.shared.fetchPatientsFromCoreData { receivedPatients in
+                        self.patients = receivedPatients
+                    }
+                case false:
+                    print("FALSE")
+                }
             }
         } else {
             FetchingManager.shared.fetchPatientsFromCoreData { receivedPatients in
@@ -264,10 +271,17 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.removeAll { identicalPatient in
                         patientToBeDeleted == identicalPatient
                     }
-                    FetchingManager.shared.deletePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, wardNumber: Int16(patientToBeDeleted.ward.wardNumber))
+                    self?.currentPatient?.patientName = patientToBeDeleted.name
+                    self?.currentPatient?.patientID = patientToBeDeleted.patientID
+                    self?.currentPatient?.dateOfAdmission = patientToBeDeleted.dateOfAdmission.getFormattedDateFromString()
+                    self?.currentPatient?.wardNumber = Int16(patientToBeDeleted.ward.wardNumber)
+
+                    FetchingManager.shared.deletePatient(patient: self?.currentPatient)
         
                     self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientToBeDeleted.patientID))
-                    FetchingManager.shared.savePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, wardNumber: 0)
+                    self?.currentPatient?.wardNumber = 0
+
+                    FetchingManager.shared.savePatient(patient: self?.currentPatient)
                 } else {
                     return
                 }
@@ -299,8 +313,17 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.removeAll { existingPatient in
                         patientToBeMoved == existingPatient
                     }
+                    self?.currentPatient?.patientName = patientToBeMoved.name
+                    self?.currentPatient?.patientID = patientToBeMoved.patientID
+                    self?.currentPatient?.dateOfAdmission = patientToBeMoved.dateOfAdmission.getFormattedDateFromString()
+                    self?.currentPatient?.wardNumber = Int16(patientToBeMoved.ward.wardNumber)
+
+                    FetchingManager.shared.deletePatient(patient: self?.currentPatient)
+
                     self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID))
-                    FetchingManager.shared.savePatient(patientName: patientToBeMoved.name, patientID: patientToBeMoved.patientID, dateOfAdmission: patientToBeMoved.dateOfAdmission, wardNumber: Int16(self!.wardNumberToMoveTo)!)
+                    self?.currentPatient?.wardNumber = Int16(self!.wardNumberToMoveTo)!
+                    
+                    FetchingManager.shared.savePatient(patient: self?.currentPatient)
                 }
             }
             let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)

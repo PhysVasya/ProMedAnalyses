@@ -71,8 +71,15 @@ class AuthorizationViewController: UIViewController {
             AuthorizationManager.shared.authorize(login: loginTextField.text, password: passwordTextField.text) { [weak self] success in
                 switch success {
                 case true:
-                    APICallManager.shared.getPatientsAndEvnIds { patients in
-                        self?.configurePatients(with: patients)
+                    APICallManager.shared.getPatientsAndEvnIds { success in
+                        switch success {
+                        case true:
+                            FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                                self?.configurePatients(with: patients)
+                            }
+                        case false:
+                            print("FALSE")
+                        }
                     }
                 case false:
                     FetchingManager.shared.fetchPatientsFromCoreData { patients in

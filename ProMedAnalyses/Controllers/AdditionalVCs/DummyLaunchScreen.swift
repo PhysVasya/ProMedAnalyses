@@ -15,7 +15,7 @@ class DummyLaunchScreen: UIViewController {
     let loadingIndicator = UIActivityIndicatorView()
     
     var isConnected : Bool? {
-         (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied
+         return (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied ?? false
     }
 
     override func viewDidLoad() {

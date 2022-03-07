@@ -20,41 +20,41 @@ extension ManagedPatient {
     @NSManaged public var patientID: String?
     @NSManaged public var patientName: String?
     @NSManaged public var wardNumber: Int16
-    @NSManaged public var toAnalysis: NSOrderedSet?
+    @NSManaged public var analysis: NSOrderedSet?
 
 }
 
-// MARK: Generated accessors for toAnalysis
+// MARK: Generated accessors for analysis
 extension ManagedPatient {
 
-    @objc(insertObject:inToAnalysisAtIndex:)
-    @NSManaged public func insertIntoToAnalysis(_ value: ManagedLabData, at idx: Int)
+    @objc(insertObject:inAnalysisAtIndex:)
+    @NSManaged public func insertIntoAnalysis(_ value: ManagedLabData, at idx: Int)
 
-    @objc(removeObjectFromToAnalysisAtIndex:)
-    @NSManaged public func removeFromToAnalysis(at idx: Int)
+    @objc(removeObjectFromAnalysisAtIndex:)
+    @NSManaged public func removeFromAnalysis(at idx: Int)
 
-    @objc(insertToAnalysis:atIndexes:)
-    @NSManaged public func insertIntoToAnalysis(_ values: [ManagedLabData], at indexes: NSIndexSet)
+    @objc(insertAnalysis:atIndexes:)
+    @NSManaged public func insertIntoAnalysis(_ values: [ManagedLabData], at indexes: NSIndexSet)
 
-    @objc(removeToAnalysisAtIndexes:)
-    @NSManaged public func removeFromToAnalysis(at indexes: NSIndexSet)
+    @objc(removeAnalysisAtIndexes:)
+    @NSManaged public func removeFromAnalysis(at indexes: NSIndexSet)
 
-    @objc(replaceObjectInToAnalysisAtIndex:withObject:)
-    @NSManaged public func replaceToAnalysis(at idx: Int, with value: ManagedLabData)
+    @objc(replaceObjectInAnalysisAtIndex:withObject:)
+    @NSManaged public func replaceAnalysis(at idx: Int, with value: ManagedLabData)
 
-    @objc(replaceToAnalysisAtIndexes:withToAnalysis:)
-    @NSManaged public func replaceToAnalysis(at indexes: NSIndexSet, with values: [ManagedLabData])
+    @objc(replaceAnalysisAtIndexes:withAnalysis:)
+    @NSManaged public func replaceAnalysis(at indexes: NSIndexSet, with values: [ManagedLabData])
 
-    @objc(addToAnalysisObject:)
-    @NSManaged public func addToToAnalysis(_ value: ManagedLabData)
+    @objc(addAnalysisObject:)
+    @NSManaged public func addToAnalysis(_ value: ManagedLabData)
 
-    @objc(removeToAnalysisObject:)
-    @NSManaged public func removeFromToAnalysis(_ value: ManagedLabData)
+    @objc(removeAnalysisObject:)
+    @NSManaged public func removeFromAnalysis(_ value: ManagedLabData)
 
-    @objc(addToAnalysis:)
-    @NSManaged public func addToToAnalysis(_ values: NSOrderedSet)
+    @objc(addAnalysis:)
+    @NSManaged public func addToAnalysis(_ values: NSOrderedSet)
 
-    @objc(removeToAnalysis:)
-    @NSManaged public func removeFromToAnalysis(_ values: NSOrderedSet)
+    @objc(removeAnalysis:)
+    @NSManaged public func removeFromAnalysis(_ values: NSOrderedSet)
 
 }

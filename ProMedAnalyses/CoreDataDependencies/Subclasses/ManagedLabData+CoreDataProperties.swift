@@ -20,6 +20,6 @@ extension ManagedLabData {
     @NSManaged public var date: Date?
     @NSManaged public var evnUslugaID: String?
     @NSManaged public var evnXMLID: String?
-    @NSManaged public var toPatient: ManagedPatient?
+    @NSManaged public var patient: ManagedPatient?
 
 }
