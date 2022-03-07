@@ -13,6 +13,8 @@ import CoreData
 
 class ResultsViewController: UIViewController {
     
+    static let identifier = "resultsTableCell"
+    
     var reassembledAnalyses = [AnalysisViewModel]() {
         didSet {
             if reassembledAnalyses.isEmpty {
@@ -44,7 +46,7 @@ class ResultsViewController: UIViewController {
     }
     let tableView : UITableView = {
         let tableView = UITableView()
-        tableView.register(UINib(nibName: K.nibResultsTableCell, bundle: nil), forCellReuseIdentifier: K.resultsTableCell)
+        tableView.register(UINib(nibName: "ResultsReusableCell", bundle: nil), forCellReuseIdentifier: ResultsCellViewController.identifier)
         return tableView
     }()
     let filterVC = FilterViewController()
@@ -65,9 +67,9 @@ class ResultsViewController: UIViewController {
         
     }
     
-    func configureResultsVC (with analyses : [Analysis]) {
+    func configureResultsVC (with analyses : [AnalysisType]) {
         analyses.forEach {
-            let lab = AnalysisViewModel(rows: $0.rows, date: $0.dateForHeaderInSection)
+            let lab = AnalysisViewModel(rows: $0.analysis.data, date: $0.analysis.date)
             reassembledAnalyses.append(lab)
         }
         tableView.reloadData()
@@ -230,7 +232,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.resultsTableCell, for: indexPath) as! ResultsCellViewController
+        let cell = tableView.dequeueReusableCell(withIdentifier: ResultsViewController.identifier, for: indexPath) as! ResultsCellViewController
         let rowData = reassembledAnalyses[indexPath.section].rows[indexPath.row]
         var ref: ReferenceForAnalysis?
         if let refs = references {

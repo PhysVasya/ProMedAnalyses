@@ -13,17 +13,14 @@ struct Patient: Equatable {
     let dateOfAdmission : String
     var ward : Ward
     let patientID : String
-    let evnID : String
-    let labIDs : [String]
     
     
-    init(name: String, dateOfAdmission: String, ward: Ward = Ward(wardNumber: 0, wardType: .fourMan), patientID: String, evnID: String, labIDs: [String] = []) {
+    
+    init(name: String, dateOfAdmission: String, ward: Ward = Ward(wardNumber: 0, wardType: .fourMan), patientID: String) {
         self.name = name
         self.dateOfAdmission = dateOfAdmission
         self.ward = ward
         self.patientID = patientID
-        self.evnID = evnID
-        self.labIDs = labIDs
     }
     
 }

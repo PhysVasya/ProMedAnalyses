@@ -2,7 +2,7 @@
 //  ManagedLabData+CoreDataProperties.swift
 //  
 //
-//  Created by Vasiliy Andreyev on 12.02.2022.
+//  Created by Vasiliy Andreyev on 07.03.2022.
 //
 //
 
@@ -17,9 +17,9 @@ extension ManagedLabData {
     }
 
     @NSManaged public var data: [[String]]?
-    @NSManaged public var date: String?
-    @NSManaged public var header: [String]?
-    @NSManaged public var labID: String?
-    @NSManaged public var xmlID: String?
+    @NSManaged public var date: Date?
+    @NSManaged public var evnUslugaID: String?
+    @NSManaged public var evnXMLID: String?
+    @NSManaged public var toPatient: ManagedPatient?
 
 }

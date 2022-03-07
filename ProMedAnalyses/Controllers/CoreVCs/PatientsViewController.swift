@@ -6,39 +6,41 @@
 //
 
 import UIKit
+import CoreData
 
 class PatientsViewController: UIViewController {
     
     static let identifier = "PatientsViewController"
+    static let cellIdentifier = "PatientsCellController"
     
-    let patientsTableView: UITableView = {
+    private let patientsTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         return tableView
     }()
     
-    let search = UISearchController(searchResultsController: nil)
-    let refresh = UIRefreshControl()
+    private let search = UISearchController(searchResultsController: nil)
+    private let refresh = UIRefreshControl()
     
-    var isConnected : Bool? {
+    private var isConnected : Bool? {
         return (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied
     }
 
-    var patients = [Patient]() {
+    private var patients = [Patient]() {
         didSet{
             patientsTableView.reloadData()
         }
     }
-    var filteredPatients = [Patient]() {
+    private var filteredPatients = [Patient]() {
         didSet{
             patientsTableView.reloadData()
         }
     }
-    var wardNumberToMoveTo = ""
+    private var wardNumberToMoveTo = ""
     
-    var isSearchBarEmpty : Bool {
+    private var isSearchBarEmpty : Bool {
         return search.searchBar.searchTextField.text?.isEmpty ?? true
     }
-    var searchFieldIsEditing : Bool {
+    private var searchFieldIsEditing : Bool {
         return search.isActive && !isSearchBarEmpty
     }
     
@@ -50,9 +52,9 @@ class PatientsViewController: UIViewController {
         configureTableView()
     }
     
-    func configureTableView () {
+    private func configureTableView () {
         view.addSubview(patientsTableView)
-        patientsTableView.register(UITableViewCell.self, forCellReuseIdentifier: K.patientTableCell)
+        patientsTableView.register(UITableViewCell.self, forCellReuseIdentifier: PatientsViewController.cellIdentifier)
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
     }
@@ -74,11 +76,11 @@ class PatientsViewController: UIViewController {
         ConnectionViewController.shared.removeConnectionPresentation()
     }
     
-    func configure(with patients: [Patient]) {
+    public func configure(with patients: [Patient]) {
         self.patients = patients
     }
     
-    @objc func refreshData (sender: UIRefreshControl) {
+    @objc private func refreshData (sender: UIRefreshControl) {
         guard let isConnected = isConnected else {
             return
         }
@@ -96,7 +98,7 @@ class PatientsViewController: UIViewController {
     }
 
 
-    func setupSearchController () {
+    private func setupSearchController () {
         search.searchResultsUpdater = self
         search.obscuresBackgroundDuringPresentation = false
         search.searchBar.placeholder = "Искать..."
@@ -105,18 +107,18 @@ class PatientsViewController: UIViewController {
         definesPresentationContext = true
     }
     
-    func setupRefreshControl () {
+    private func setupRefreshControl () {
         refresh.addTarget(self, action: #selector(PatientsViewController.refreshData(sender:)), for: .valueChanged)
         refresh.attributedTitle = NSAttributedString(string: "Обновление данных...")
         patientsTableView.refreshControl = refresh
     }
     
-    func filterContentForSearchTextField (_ textToSearch: String) {
+    private func filterContentForSearchTextField (_ textToSearch: String) {
         filteredPatients = patients.filter {$0.name.lowercased().contains(textToSearch.lowercased()) || $0.dateOfAdmission.lowercased().contains(textToSearch.lowercased())}
         patientsTableView.reloadData()
     }
  
-    func configureResults (for patient: Patient) {
+    private func configureResults (for patient: Patient) {
         
         guard let connectionAvailiable = isConnected else {
             return
@@ -125,6 +127,7 @@ class PatientsViewController: UIViewController {
         switch connectionAvailiable {
         case true:
             APICallManager.shared.downloadLabData(for: patient) { [weak self] labData in
+
                 self?.presentResults(with: labData)
             }
         case false:
@@ -134,7 +137,7 @@ class PatientsViewController: UIViewController {
         }
     }
 
-    func presentResults (with analyses: [Analysis]) {
+    private func presentResults (with analyses: [AnalysisType]) {
         DispatchQueue.main.async {
             if analyses.isEmpty {
                 let alertCont = UIAlertController(title: "Ошибка", message: "К сожалению, данных для отображения нет.", preferredStyle: .alert)
@@ -174,7 +177,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.patientTableCell, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: PatientsViewController.cellIdentifier, for: indexPath)
         cell.accessoryType = .disclosureIndicator
         var content = cell.defaultContentConfiguration()
         
@@ -261,10 +264,10 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.removeAll { identicalPatient in
                         patientToBeDeleted == identicalPatient
                     }
-                    FetchingManager.shared.deletePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, evnID: patientToBeDeleted.evnID, idsForAnalyses: patientToBeDeleted.labIDs, wardNumber: Int16(patientToBeDeleted.ward.wardNumber))
+                    FetchingManager.shared.deletePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, wardNumber: Int16(patientToBeDeleted.ward.wardNumber))
         
-                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientToBeDeleted.patientID, evnID: patientToBeDeleted.evnID))
-                    FetchingManager.shared.savePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, evnID: patientToBeDeleted.evnID, idsForAnalyses: patientToBeDeleted.labIDs, wardNumber: 0)
+                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientToBeDeleted.patientID))
+                    FetchingManager.shared.savePatient(patientName: patientToBeDeleted.name, patientID: patientToBeDeleted.patientID, dateOfAdmission: patientToBeDeleted.dateOfAdmission, wardNumber: 0)
                 } else {
                     return
                 }
@@ -296,8 +299,8 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.removeAll { existingPatient in
                         patientToBeMoved == existingPatient
                     }
-                    self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID, evnID: patientToBeMoved.evnID, labIDs: patientToBeMoved.labIDs))
-                    FetchingManager.shared.savePatient(patientName: patientToBeMoved.name, patientID: patientToBeMoved.patientID, dateOfAdmission: patientToBeMoved.dateOfAdmission, evnID: patientToBeMoved.evnID, idsForAnalyses: patientToBeMoved.labIDs, wardNumber: Int16(self!.wardNumberToMoveTo)!)
+                    self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID))
+                    FetchingManager.shared.savePatient(patientName: patientToBeMoved.name, patientID: patientToBeMoved.patientID, dateOfAdmission: patientToBeMoved.dateOfAdmission, wardNumber: Int16(self!.wardNumberToMoveTo)!)
                 }
             }
             let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
@@ -359,5 +362,14 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
         return dateFormatter.string(from: self)
+    }
+}
+
+extension String {
+    
+    func getFormattedDateFromString () -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        return dateFormatter.date(from: self)
     }
 }

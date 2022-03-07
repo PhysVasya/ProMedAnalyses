@@ -2,7 +2,7 @@
 //  ManagedLabData+CoreDataClass.swift
 //  
 //
-//  Created by Vasiliy Andreyev on 12.02.2022.
+//  Created by Vasiliy Andreyev on 07.03.2022.
 //
 //
 

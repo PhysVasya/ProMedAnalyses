@@ -8,7 +8,12 @@
 import Foundation
 
 struct Analysis {
-    let rows : [[String]]
-    let dateForHeaderInSection : String
-    let headerForAnalysis : [String]
+    let data : [[String]]
+    let date : String
+}
+
+struct AnalysisType {
+    let analysis: Analysis
+    let evnUslugaID: String
+    let evnXMLID: String
 }

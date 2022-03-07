@@ -10,6 +10,8 @@ import SwiftSoup
 
 class ResultsCellViewController: UITableViewCell {
      
+     static let identifier = "resultsTableCell"
+     
      @IBOutlet weak var analysisName: UILabel!
      @IBOutlet weak var analysisValue: UILabel!
      @IBOutlet weak var threshold: UILabel!

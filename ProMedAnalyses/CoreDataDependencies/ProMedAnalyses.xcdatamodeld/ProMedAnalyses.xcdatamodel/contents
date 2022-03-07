@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="ManagedLabData" representedClassName=".ManagedLabData" syncable="YES">
         <attribute name="data" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[[String]]"/>
-        <attribute name="date" attributeType="String"/>
-        <attribute name="header" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
-        <attribute name="labID" attributeType="String"/>
-        <attribute name="xmlID" attributeType="String"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="evnUslugaID" attributeType="String"/>
+        <attribute name="evnXMLID" attributeType="String"/>
+        <relationship name="toPatient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="toAnalysis" inverseEntity="ManagedPatient"/>
     </entity>
     <entity name="ManagedPatient" representedClassName=".ManagedPatient" syncable="YES">
-        <attribute name="dateOfAdmission" attributeType="String"/>
-        <attribute name="idsToFetchAnalyses" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[String]"/>
-        <attribute name="labID" attributeType="String" customClassName=".Array&lt;String&gt;"/>
+        <attribute name="dateOfAdmission" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="patientID" attributeType="String"/>
         <attribute name="patientName" attributeType="String"/>
         <attribute name="wardNumber" optional="YES" attributeType="Integer 16" valueTransformerName="WardToDataTransformer" defaultValueString="0" usesScalarValueType="YES" customClassName=".Ward"/>
+        <relationship name="toAnalysis" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedLabData" inverseName="toPatient" inverseEntity="ManagedLabData"/>
     </entity>
     <elements>
         <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="104"/>
-        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="119"/>
+        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="104"/>
     </elements>
 </model>

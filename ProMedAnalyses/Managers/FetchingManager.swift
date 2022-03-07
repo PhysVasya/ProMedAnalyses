@@ -12,98 +12,88 @@ import CoreData
 class FetchingManager {
     
     static let shared = FetchingManager()
-    
-    private var patients = [Patient]()
-    private var labFindings = [Analysis]()
-    
+    static let managedPatient = "ManagedPatient"
+    static let managedLabData = "ManagedLabData"
+        
     private let context = CoreDataStack(modelName: "ProMedAnalyses").managedContext
     
     private init () { }
     
+    enum FetchingError: String, Error {
+        case unableToFetchPatientFromCoreData = "Unable to fetch patient from CoreData"
+        case unableToFetchAnalysisDataFromCoreData = "Unable to fetch analysis data from CoreData"
+    }
+    
+    enum SavingError: String, Error {
+        case unableToSavePatient = "Unable to save patient"
+        case unableToProperlyDeletePatient = "Unable to properly delete patient"
+        case unableToSaveAnalysis = "Unable to save analysis"
+    }
     
     public func fetchPatientsFromCoreData (completionHandler: (_ : [Patient])->Void) {
+        
         var fetchedPatients = [Patient]()
         let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         do {
             let fetchedPatientsFromCoreData = try self.context.fetch(request)
             for fetchedPatient in fetchedPatientsFromCoreData {
-                let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!, ward: Ward(wardNumber: Int(fetchedPatient.wardNumber), wardType: .fourMan), patientID: fetchedPatient.patientID!, evnID: fetchedPatient.labID!, labIDs: fetchedPatient.idsToFetchAnalyses!)
+                let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!.getFormattedDate(), ward: Ward(wardNumber: Int(fetchedPatient.wardNumber), wardType: .fourMan), patientID: fetchedPatient.patientID!)
                 fetchedPatients.append(patient)
             }
-            patients = fetchedPatients
             completionHandler(fetchedPatients)
             
-        } catch {
-            
+        } catch let error {
+            print("\(FetchingError.unableToFetchPatientFromCoreData.rawValue): \(error)")
         }
         
     }
     
     
-    public func fetchLabDataFromCoreData (for patient: Patient, predicateArg: String? = nil, completionHandler: @escaping (_ : [Analysis]) -> Void) {
+    public func fetchLabDataFromCoreData (for patient: Patient, predicateArg: String? = nil, completionHandler: @escaping (_ : [AnalysisType]) -> Void) {
         
-        DispatchQueue.main.async {
-            let request : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
-            if let arg = predicateArg {
-                request.predicate = NSPredicate(format: "SELF CONTAINS %@", "\(arg)")
-            }
-            var labFindings = [Analysis]()
-            do {
-                let fetchAnalysesFromCoreData = try self.context.fetch(request)
-                
-                for fetchedAnalysis in fetchAnalysesFromCoreData {
-                    
-                    if patient.labIDs.contains(fetchedAnalysis.labID!) {
-                        let analysis = Analysis(rows: fetchedAnalysis.data!, dateForHeaderInSection: fetchedAnalysis.date!, headerForAnalysis: fetchedAnalysis.header!)
-                        labFindings.append(analysis)
-                        
-                    }
-                }
-                completionHandler(labFindings)
-            } catch let error {
-                print("Error fetching analyses data from coredata: \(error.localizedDescription)")
-            }
-            
+        var labFindings = [AnalysisType]()
+        let request : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
+        if let arg = predicateArg {
+            request.predicate = NSPredicate(format: "SELF CONTAINS %@", "\(arg)")
         }
+        do {
+            let fetchAnalysesFromCoreData = try self.context.fetch(request)
+            
+            for fetchedAnalysis in fetchAnalysesFromCoreData {
+                let analysisType = AnalysisType(analysis: Analysis(data: fetchedAnalysis.data!, date: fetchedAnalysis.date!.getFormattedDate()), evnUslugaID: fetchedAnalysis.evnUslugaID!, evnXMLID: fetchedAnalysis.evnXMLID!)
+                labFindings.append(analysisType)
+            }
+            completionHandler(labFindings)
+        } catch let error {
+            print("\(FetchingError.unableToFetchAnalysisDataFromCoreData.rawValue): \(error.localizedDescription)")
+        }
+        
+        
     }
     
     
-    public func savePatient (patientName: String, patientID: String, dateOfAdmission: String, evnID: String, idsForAnalyses: [String], wardNumber: Int16) {
+    public func savePatient (patientName: String, patientID: String, dateOfAdmission: String, wardNumber: Int16) {
         
-        DispatchQueue.main.async {
-            
-            //Creating an instance of ManagedObject
-            guard let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedPatient, in: self.context) else {
-                return
-            }
-            let person = NSManagedObject(entity: entity, insertInto: self.context) as! ManagedPatient
-            person.patientName = patientName
-            person.patientID = patientID
-            person.dateOfAdmission = dateOfAdmission
-            person.labID = evnID
-            person.idsToFetchAnalyses = idsForAnalyses
-            person.wardNumber = wardNumber
-            
-            do {
-                try self.context.save()
-            } catch let error {
-                print("Error saving patient: \(error)")
-            }
-        }
-    }
-    
-    func deletePatient (patientName: String, patientID: String, dateOfAdmission: String, evnID: String, idsForAnalyses: [String], wardNumber: Int16) {
-        
-        guard let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedPatient, in: context) else {
-            return
-        }
-        
-        let person = NSManagedObject(entity: entity, insertInto: context) as! ManagedPatient
+        let person = ManagedPatient(context: context)
         person.patientName = patientName
         person.patientID = patientID
-        person.dateOfAdmission = dateOfAdmission
-        person.labID = evnID
-        person.idsToFetchAnalyses = idsForAnalyses
+        person.dateOfAdmission = dateOfAdmission.getFormattedDateFromString()
+        person.wardNumber = wardNumber
+        
+        do {
+            try self.context.save()
+        } catch let error {
+            print("\(SavingError.unableToSavePatient.rawValue): \(error)")
+        }
+        
+    }
+    
+    func deletePatient (patientName: String, patientID: String, dateOfAdmission: String, wardNumber: Int16) {
+        
+        let person = ManagedPatient(context: context)
+        person.patientName = patientName
+        person.patientID = patientID
+        person.dateOfAdmission = dateOfAdmission.getFormattedDateFromString()
         person.wardNumber = wardNumber
         
         context.delete(person)
@@ -111,31 +101,28 @@ class FetchingManager {
         do {
             try context.save()
         } catch let error {
-            print("Error deleting and saving data: \(error)")
+            print("\(SavingError.unableToProperlyDeletePatient.rawValue): \(error)")
         }
         
     }
     
-    func saveLabData (data: [[String]], date: String, header: [String], labID: String, xmlID: String) {
+    func saveLabData (for patient: ManagedPatient, with data: [[String]], date: String, labID: String, xmlID: String) {
         
-        DispatchQueue.main.async {
-            //Creating a new instance of ManagedObject
-            guard let entity = NSEntityDescription.entity(forEntityName: K.CoreData.managedLabData, in: self.context) else {
-                return
-            }
-            let labData = NSManagedObject(entity: entity, insertInto: self.context) as! ManagedLabData
-            labData.labID = labID
-            labData.data = data
-            labData.date = date
-            labData.header = header
-            labData.xmlID = xmlID
-            
-            do {
-                try self.context.save()
-            } catch let error {
-                print("Error saving lab data: \(error)")
-            }
+        
+        let managedLabData = ManagedLabData(context: context)
+        managedLabData.evnXMLID = xmlID
+        managedLabData.evnUslugaID = labID
+        managedLabData.date = date.getFormattedDateFromString()
+        managedLabData.data = data
+        
+        patient.addToToAnalysis(managedLabData)
+        
+        do {
+            try self.context.save()
+        } catch let error {
+            print("\(SavingError.unableToSaveAnalysis.rawValue): \(error)")
         }
+        
     }
     
 }

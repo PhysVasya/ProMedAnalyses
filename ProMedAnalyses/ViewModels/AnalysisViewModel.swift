@@ -16,7 +16,7 @@ struct AnalysisViewModel : Comparable, Hashable {
     let rows : [[String]]
     let date : String
     
-    init(rows: [[String]], date: String, isExpanded: Bool = false) {
+    init(rows: [[String]], date: String) {
         self.rows = rows
         self.date = date
     }
