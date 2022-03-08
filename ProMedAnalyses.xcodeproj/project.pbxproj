@@ -13,7 +13,6 @@
 		FF18162027D359E60029C06E /* AuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF18161F27D359E60029C06E /* AuthorizationManager.swift */; };
 		FF18162227D35F1D0029C06E /* APICallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF18162127D35F1D0029C06E /* APICallManager.swift */; };
 		FF18162427D365C80029C06E /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF18162327D365C80029C06E /* ConnectionViewController.swift */; };
-		FF18162627D3685A0029C06E /* DummyLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF18162527D3685A0029C06E /* DummyLaunchScreen.swift */; };
 		FF3488E8279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FF3488E7279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf */; };
 		FF4011EB27B40222002F93EF /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011EA27B40222002F93EF /* FilterViewController.swift */; };
 		FF4011F527B958D9002F93EF /* AuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4011F427B958D9002F93EF /* AuthorizationViewController.swift */; };
@@ -23,10 +22,10 @@
 		FF66E32327D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31F27D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift */; };
 		FF66E32427D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66E31E27D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift */; };
 		FF6B796E2778936600EB290B /* ProMedAnalyses.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6B796C2778936600EB290B /* ProMedAnalyses.xcdatamodeld */; };
+		FF720A0B27D7904800AA2EF1 /* LoginViewSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF720A0A27D7904800AA2EF1 /* LoginViewSwiftUI.swift */; };
 		FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9327674EEC005E9A66 /* AppDelegate.swift */; };
 		FF77BF9627674EEC005E9A66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */; };
 		FF77BF9827674EEC005E9A66 /* PatientsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */; };
-		FF77BF9B27674EEC005E9A66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BF9927674EEC005E9A66 /* Main.storyboard */; };
 		FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF77BF9F27674EED005E9A66 /* Assets.xcassets */; };
 		FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */; };
 		FF7A092E27C11BD0009186AD /* FetchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7A092D27C11BD0009186AD /* FetchingManager.swift */; };
@@ -45,6 +44,7 @@
 		FFF087EC276933640054443B /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EB276933640054443B /* ResultsViewController.swift */; };
 		FFF087EE276935490054443B /* ResultsReusableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF087ED276935490054443B /* ResultsReusableCell.xib */; };
 		FFF087F0276D22570054443B /* ResultsCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF087EF276D22570054443B /* ResultsCellViewController.swift */; };
+		FFF8778527D7BE2300DCE6B6 /* PreviewView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFF8778427D7BE2300DCE6B6 /* PreviewView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,7 +56,6 @@
 		FF18161F27D359E60029C06E /* AuthorizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationManager.swift; sourceTree = "<group>"; };
 		FF18162127D35F1D0029C06E /* APICallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICallManager.swift; sourceTree = "<group>"; };
 		FF18162327D365C80029C06E /* ConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
-		FF18162527D3685A0029C06E /* DummyLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyLaunchScreen.swift; sourceTree = "<group>"; };
 		FF3488E7279AFA3800E4FEC7 /* exampleFetchedAnalysesData.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = exampleFetchedAnalysesData.rtf; sourceTree = "<group>"; };
 		FF4011EA27B40222002F93EF /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		FF4011F427B958D9002F93EF /* AuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationViewController.swift; sourceTree = "<group>"; };
@@ -66,11 +65,11 @@
 		FF66E31F27D65CB3004AEA62 /* ManagedLabData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedLabData+CoreDataClass.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedLabData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
 		FF66E32027D65CB3004AEA62 /* ManagedPatient+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ManagedPatient+CoreDataProperties.swift"; path = "/Users/vasiliy/Development/ProMedAnalyses/ProMedAnalyses/CoreDataDependencies/Subclasses/ManagedPatient+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
 		FF6B796D2778936600EB290B /* ProMedAnalyses.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProMedAnalyses.xcdatamodel; sourceTree = "<group>"; };
+		FF720A0A27D7904800AA2EF1 /* LoginViewSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewSwiftUI.swift; sourceTree = "<group>"; };
 		FF77BF9027674EEC005E9A66 /* ProMedAnalyses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMedAnalyses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF77BF9327674EEC005E9A66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF77BF9527674EEC005E9A66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		FF77BF9727674EEC005E9A66 /* PatientsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientsViewController.swift; sourceTree = "<group>"; };
-		FF77BF9A27674EEC005E9A66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FF77BF9F27674EED005E9A66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF77BFA227674EED005E9A66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FF77BFA427674EED005E9A66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -90,6 +89,7 @@
 		FFF087EB276933640054443B /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		FFF087ED276935490054443B /* ResultsReusableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultsReusableCell.xib; sourceTree = "<group>"; };
 		FFF087EF276D22570054443B /* ResultsCellViewController.swift */ = {isa = PBXFileReference; indentWidth = 5; lastKnownFileType = sourcecode.swift; path = ResultsCellViewController.swift; sourceTree = "<group>"; };
+		FFF8778427D7BE2300DCE6B6 /* PreviewView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreviewView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,7 +190,6 @@
 			isa = PBXGroup;
 			children = (
 				FF18162327D365C80029C06E /* ConnectionViewController.swift */,
-				FF18162527D3685A0029C06E /* DummyLaunchScreen.swift */,
 				FF4011EA27B40222002F93EF /* FilterViewController.swift */,
 				FF05061727BCE92C00E913B7 /* PreviewViewController.swift */,
 				FFE1FD8F27D50EA8004A37FE /* PDFViewController.swift */,
@@ -226,6 +225,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		FF720A0927D7902A00AA2EF1 /* SwiftUIPages */ = {
+			isa = PBXGroup;
+			children = (
+				FF720A0A27D7904800AA2EF1 /* LoginViewSwiftUI.swift */,
+			);
+			path = SwiftUIPages;
+			sourceTree = "<group>";
+		};
 		FF77BF8727674EEC005E9A66 = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +254,7 @@
 		FF77BF9227674EEC005E9A66 /* ProMedAnalyses */ = {
 			isa = PBXGroup;
 			children = (
+				FF720A0927D7902A00AA2EF1 /* SwiftUIPages */,
 				FF3E3D8D27CF7C2800E14F8B /* References */,
 				FF3E3D8B27CF7BF600E14F8B /* CoreDataDependencies */,
 				FF3E3D8F27CF7C7800E14F8B /* Managers */,
@@ -264,9 +272,9 @@
 			isa = PBXGroup;
 			children = (
 				FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */,
-				FF77BF9927674EEC005E9A66 /* Main.storyboard */,
 				FF7A093027C505C5009186AD /* FilterTableCell.xib */,
 				FFF087ED276935490054443B /* ResultsReusableCell.xib */,
+				FFF8778427D7BE2300DCE6B6 /* PreviewView.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -345,8 +353,8 @@
 				FF05061C27BD496800E913B7 /* Database.json in Resources */,
 				FF7A093227C505C5009186AD /* FilterTableCell.xib in Resources */,
 				FFF087EE276935490054443B /* ResultsReusableCell.xib in Resources */,
+				FFF8778527D7BE2300DCE6B6 /* PreviewView.xib in Resources */,
 				FF77BFA027674EED005E9A66 /* Assets.xcassets in Resources */,
-				FF77BF9B27674EEC005E9A66 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,6 +419,7 @@
 				FFF087F0276D22570054443B /* ResultsCellViewController.swift in Sources */,
 				FF77BF9427674EEC005E9A66 /* AppDelegate.swift in Sources */,
 				FF87FA1827721EE2003AB648 /* CodingKeys.swift in Sources */,
+				FF720A0B27D7904800AA2EF1 /* LoginViewSwiftUI.swift in Sources */,
 				FF18162227D35F1D0029C06E /* APICallManager.swift in Sources */,
 				FFB6683427D12AAD00503EC7 /* AnalysisViewModel.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
@@ -419,7 +428,6 @@
 				FF66E32127D65CB3004AEA62 /* ManagedPatient+CoreDataClass.swift in Sources */,
 				FFB6683D27D12B6600503EC7 /* PreviewViewModel.swift in Sources */,
 				FF66E32427D65CB3004AEA62 /* ManagedLabData+CoreDataProperties.swift in Sources */,
-				FF18162627D3685A0029C06E /* DummyLaunchScreen.swift in Sources */,
 				FF4466F227A91CF7009CB414 /* CoreDataStack.swift in Sources */,
 				FFAC158027BF8DB700DCED18 /* CheckNetwork.swift in Sources */,
 				FF7A092E27C11BD0009186AD /* FetchingManager.swift in Sources */,
@@ -435,14 +443,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		FF77BF9927674EEC005E9A66 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FF77BF9A27674EEC005E9A66 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -584,7 +584,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "ПроМед Анализы";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -614,7 +613,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "ПроМед Анализы";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -6,35 +6,56 @@
 //
 
 import UIKit
+import SwiftUI
 
 class AuthorizationViewController: UIViewController {
     
-    @IBOutlet weak var loginTextField: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var loginButton: UIButton!
-    
-    
-    let dummyVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: DummyLaunchScreen.identifier)
-
-    
     var loginText: String?
     static let identifier = "AuthorizationViewController"
+    var loginCredentials : ((String, String) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
- 
-        dummyVC.modalPresentationStyle = .overFullScreen
-        navigationController?.present(dummyVC, animated: false)
+        loginCredentials = { [weak self] login, password in
+            print(login, password)
+            AuthorizationManager.shared.authorize(login: login, password: password) { success in
+                switch success {
+                
+                case true:
+                    HapticsManager.shared.vibrate(for: .success)
+                    APICallManager.shared.getPatientsAndEvnIds { successful in
+                        switch successful {
+                            
+                        case true:
+                            FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                                self?.configurePatients(with: patients)
+                            }
+                        case false:
+                            print("CANNOT FETCH PATIENTS FROM PROMED")
+                        }
+                    }
+                case false:
+                    HapticsManager.shared.vibrate(for: .error)
+                    FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                        self?.unsuccessfulAuth(patientsVCwithCached: patients)
+                    }
+                }
+            }
+        }
         
+        let childVC = UIHostingController(rootView: LoginViewSwiftUI(sendData: loginCredentials))
+        addChild(childVC)
+        childVC.view.frame = view.bounds
+        view.addSubview(childVC.view)
         title = "Логин"
-        loginButton.layer.cornerRadius = 10
-        loginTextField.delegate = self
-        passwordTextField.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
         view.addGestureRecognizer(tapGesture)
+        
+            
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,8 +66,9 @@ class AuthorizationViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ConnectionViewController.shared.presentConnection(dependingOnReachability: (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied) { success in
-            dummyVC.dismiss(animated: false, completion: nil)
+            print(success)
         }
+        
     }
     
     
@@ -64,35 +86,6 @@ class AuthorizationViewController: UIViewController {
         }
     }
     
-    @IBAction func loginButtonPressed (_ sender: UIButton) {
-        HapticsManager.shared.vibrateForSelection()
-        
-        if loginTextField.text != "" && passwordTextField.text != "" {
-            AuthorizationManager.shared.authorize(login: loginTextField.text, password: passwordTextField.text) { [weak self] success in
-                switch success {
-                case true:
-                    APICallManager.shared.getPatientsAndEvnIds { success in
-                        switch success {
-                        case true:
-                            FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                                self?.configurePatients(with: patients)
-                            }
-                        case false:
-                            print("FALSE")
-                        }
-                    }
-                case false:
-                    FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                        self?.unsuccessfulAuth(patientsVCwithCached: patients)
-                    }
-                }
-            }
-            
-        } else {
-            loginTextField.placeholder = "Введите логин"
-            passwordTextField.placeholder = "Введите пароль"
-        }
-    }
     
     @IBAction func forgetPasswordPressed (_ sender: UIButton) {
         let alertController = UIAlertController(title: "Не знаете логин?", message: "Обратитесь к Вашему системному администратору", preferredStyle: .alert)
@@ -122,24 +115,6 @@ class AuthorizationViewController: UIViewController {
             alertVC.dismiss(animated: true, completion: nil)
         }))
         navigationController?.present(alertVC, animated: true, completion: nil)
-    }
-    
-}
-
-extension AuthorizationViewController: UITextFieldDelegate {
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        loginText = textField.text
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField.text != "" {
-            loginButtonPressed(loginButton)
-            textField.resignFirstResponder()
-            return true
-        } else {
-            return false
-        }
     }
     
 }
