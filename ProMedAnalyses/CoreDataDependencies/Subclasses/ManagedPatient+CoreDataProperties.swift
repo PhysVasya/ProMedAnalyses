@@ -22,6 +22,7 @@ extension ManagedPatient {
     @NSManaged public var wardNumber: Int16
     @NSManaged public var analysis: NSOrderedSet?
 
+    
 }
 
 // MARK: Generated accessors for analysis

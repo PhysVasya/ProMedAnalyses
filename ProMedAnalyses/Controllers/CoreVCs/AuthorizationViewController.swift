@@ -27,18 +27,24 @@ class AuthorizationViewController: UIViewController {
                         switch successful {
                             
                         case true:
-                            FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                                self?.configurePatients(with: patients)
+                            DispatchQueue.main.async {
+                                FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                                    self?.configurePatients(with: patients)
+                                }
                             }
+                            
                         case false:
                             print("CANNOT FETCH PATIENTS FROM PROMED")
                         }
                     }
                 case false:
                     HapticsManager.shared.vibrate(for: .error)
-                    FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                        self?.unsuccessfulAuth(patientsVCwithCached: patients)
+                    DispatchQueue.main.async {
+                        FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                            self?.unsuccessfulAuth(patientsVCwithCached: patients)
+                        }
                     }
+                    
                 }
             }
         }

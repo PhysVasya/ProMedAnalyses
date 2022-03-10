@@ -43,6 +43,7 @@ class PatientsViewController: UIViewController {
         return search.isActive && !isSearchBarEmpty
     }
     private var currentPatient : ManagedPatient?
+    private var analysesTypes = [AnalysisType]()
     
     //View overriden functions
     override func viewDidLoad() {
@@ -138,13 +139,13 @@ class PatientsViewController: UIViewController {
                 self?.presentResults(with: labData)
             }
         case false:
-            FetchingManager.shared.fetchLabDataFromCoreData(for: patient, predicateArg: nil) { [weak self] analyses in
+            FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { [weak self] analyses in
                 self?.presentResults(with: analyses)
             }
         }
     }
 
-    private func presentResults (with analyses: [AnalysisType]) {
+    private func presentResults (with analyses: [AnalysisViewModel]) {
         DispatchQueue.main.async {
             if analyses.isEmpty {
                 let alertCont = UIAlertController(title: "Ошибка", message: "К сожалению, данных для отображения нет.", preferredStyle: .alert)
@@ -281,7 +282,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientToBeDeleted.patientID))
                     self?.currentPatient?.wardNumber = 0
 
-                    FetchingManager.shared.savePatient(patient: self?.currentPatient)
+                    FetchingManager.shared.savePatient(patient: patientToBeDeleted)
                 } else {
                     return
                 }
@@ -323,7 +324,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
                     self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID))
                     self?.currentPatient?.wardNumber = Int16(self!.wardNumberToMoveTo)!
                     
-                    FetchingManager.shared.savePatient(patient: self?.currentPatient)
+                    FetchingManager.shared.savePatient(patient: patientToBeMoved)
                 }
             }
             let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)

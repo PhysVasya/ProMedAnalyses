@@ -13,7 +13,6 @@ class APICallManager {
     
     static let shared = APICallManager()
     
-    private var labFindings = [AnalysisType]()
     private let patientFetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
     
     private init () {}
@@ -70,7 +69,7 @@ class APICallManager {
                 completion(false)
                 return
             }
-    
+            
             do {
                 let decodedData = try JSONDecoder().decode([FetchedListOfPatients].self, from: unwrappedData)
                 for person in decodedData {
@@ -79,14 +78,15 @@ class APICallManager {
                     if !patientNames.isEmpty() {
                         if let patientID = person.patientID {
                             let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientID)
-                            FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient) 
+                            FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient)
                         }
                     }
                 }
+                completion(true)
             } catch let error {
                 print("\(APICallErrors.errorDownloadingPatients.rawValue) : \(error)")
                 completion(false)
-
+                
             }
         }.resume()
     }
@@ -152,10 +152,12 @@ class APICallManager {
                     }
                 }
                 
-                let decodedData = try JSONDecoder().decode(EvnDiagDirectPS.self, from: receivedData)
-                guard let items = decodedData.item else {
+                //                let decodedData = try JSONSerialization.jsonObject(with: receivedData, options: .fragmentsAllowed)
+                let decodedData = try JSONDecoder().decode(FetchedListOfLabIDs.self, from: receivedData)
+                guard let items = decodedData.map?.evnPS.item[0].children.evnSection.item[1].children.evnUslugaStac.item else {
                     return
                 }
+                
                 for item in items  {
                     let analysisID = FetchedLabIDs(evnXMLID: item.data.evnXMLID, evnUslugaID: item.data.evnUslugaID)
                     analysesIds.append(analysisID)
@@ -203,13 +205,17 @@ class APICallManager {
             "Content-Length" : "54",
             "Cookie" : "io=\(io); JSESSIONID=\(jSessionID); login=\(login); PHPSESSID=\(phpSessionID)"
         ]
+        var labFindings = [AnalysisType]()
+        let dispatchGroup = DispatchGroup()
         
         for id in ids {
+            dispatchGroup.enter()
             let body = "XmlType_id=4&Evn_id=\(id.evnUslugaID)&EvnXml_id=\(id.evnXMLID)"
             let finalBody = body.data(using: .utf8)
             request.httpBody = finalBody
             
             URLSession.shared.dataTask(with: request) { data, response, error in
+                defer { dispatchGroup.leave() }
                 guard error == nil, let receivedLabData = data  else {
                     print("\(APICallErrors.errorDownloadnigLabData.rawValue) : \(String(describing: error?.localizedDescription))")
                     return
@@ -229,7 +235,7 @@ class APICallManager {
                             collectionDate = span.ownText().trimmingCharacters(in: .whitespacesAndNewlines)
                         }
                     }
-                      
+                    
                     let tableBody = try html.getElementsByTag("tbody")
                     let tableRows = try tableBody[0].getElementsByTag("tr")
                     for row in tableRows {
@@ -246,26 +252,31 @@ class APICallManager {
                         analysisItems.append(tbRow)
                     }
                     
-                    let analysis = Analysis(data: analysisItems, date: collectionDate)
+                    let analysis = AnalysisViewModel(data: analysisItems, date: collectionDate)
                     let analysisType = AnalysisType(analysis: analysis, evnUslugaID: id.evnUslugaID, evnXMLID: id.evnXMLID)
-                    self.labFindings.append(analysisType)
-
+                    labFindings.append(analysisType)
+                    
                 } catch let error {
                     print("\(APICallErrors.errorDownloadnigLabData.rawValue) : \(String(describing: error.localizedDescription))")
                 }
             }.resume()
         }
-        completionHandler(labFindings)
+        dispatchGroup.notify(queue: .main) {
+            completionHandler(labFindings)
+        }
     }
     
-    public func downloadLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisType]) -> Void) {
+    public func downloadLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisViewModel]) -> Void) {
         downloadLabIDs(for: patient) { [weak self] id in
+            
             self?.downloadLabData(with: id) { analyses in
+                
                 guard let analyses = analyses else {
                     return
-                }
-                FetchingManager.shared.saveLabData(with: analyses)
-                completionHanlder(analyses)
+                }            
+                FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
+                
+                completionHanlder(analyses.map { $0.analysis } )
             }
         }
     }

@@ -7,13 +7,8 @@
 
 import Foundation
 
-struct Analysis {
-    let data : [[String]]
-    let date : String
-}
-
 struct AnalysisType {
-    let analysis: Analysis
+    let analysis: AnalysisViewModel
     let evnUslugaID: String
     let evnXMLID: String
 }

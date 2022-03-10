@@ -67,9 +67,9 @@ class ResultsViewController: UIViewController {
         
     }
     
-    func configureResultsVC (with analyses : [AnalysisType]) {
+    func configureResultsVC (with analyses : [AnalysisViewModel]) {
         analyses.forEach {
-            let lab = AnalysisViewModel(rows: $0.analysis.data, date: $0.analysis.date)
+            let lab = AnalysisViewModel(data: $0.data, date: $0.date)
             reassembledAnalyses.append(lab)
         }
         tableView.reloadData()
@@ -134,7 +134,7 @@ class ResultsViewController: UIViewController {
                     self.reassembledAnalyses = self.reassembledAnalyses.compactMap({ eachAnalysis in
                         var filteredAnalyses: AnalysisViewModel?
                         
-                        eachAnalysis.rows.forEach { el in
+                        eachAnalysis.data.forEach { el in
                             if el[0].lowercased().contains(typeFilter.lowercased()) {
                                 filteredAnalyses = eachAnalysis
                             }
@@ -150,9 +150,9 @@ class ResultsViewController: UIViewController {
 
                 self.reassembledAnalyses = self.reassembledAnalyses.compactMap({ eachAnalysis in
                     var filteredAnalysis: AnalysisViewModel?
-                    eachAnalysis.rows.forEach { el in
+                    eachAnalysis.data.forEach { el in
                         if el[2].contains("▲") || el[2].contains(pathological) {
-                            let flt = AnalysisViewModel(rows: [el], date: eachAnalysis.date)
+                            let flt = AnalysisViewModel(data: [el], date: eachAnalysis.date)
                             filteredAnalysis = flt
                         }
                     }
@@ -227,13 +227,13 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = reassembledAnalyses[section]
         
-        return section.rows.count
+        return section.data.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: ResultsViewController.identifier, for: indexPath) as! ResultsCellViewController
-        let rowData = reassembledAnalyses[indexPath.section].rows[indexPath.row]
+        let rowData = reassembledAnalyses[indexPath.section].data[indexPath.row]
         var ref: ReferenceForAnalysis?
         if let refs = references {
             for item in refs {

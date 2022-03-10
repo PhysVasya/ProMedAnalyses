@@ -44,12 +44,9 @@ class FetchingManager {
                 checkingPatient = results.first
                 completionHanlder?(.success(checkingPatient))
             } else {
-                checkingPatient?.patientName = patient.name
-                checkingPatient?.patientID = patient.patientID
-                checkingPatient?.dateOfAdmission = patient.dateOfAdmission.getFormattedDateFromString()
-                checkingPatient?.wardNumber = Int16(patient.ward.wardNumber)
                 completionHanlder?(.failure(FetchingError.thereIsNoSuchPatient))
-                savePatient(patient: checkingPatient)
+                savePatient(patient: patient)
+                print(patient)
             }
             
         } catch let error as NSError {
@@ -67,6 +64,7 @@ class FetchingManager {
             for fetchedPatient in fetchedPatientsFromCoreData {
                 let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!.getFormattedDate(), ward: Ward(wardNumber: Int(fetchedPatient.wardNumber), wardType: .fourMan), patientID: fetchedPatient.patientID!)
                 fetchedPatients.append(patient)
+            
             }
             completionHandler(fetchedPatients)
             
@@ -77,40 +75,39 @@ class FetchingManager {
     }
     
     
-    public func fetchLabDataFromCoreData (for patient: Patient, predicateArg: String? = nil, completionHandler: @escaping (_ : [AnalysisType]) -> Void) {
+    
+    public func fetchLabDataFromCoreData (for patient: Patient, completionHandler: @escaping (_ : [AnalysisViewModel]) -> Void) {
         
-        var labFindings = [AnalysisType]()
-        let request : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
-        if let arg = predicateArg {
-            request.predicate = NSPredicate(format: "SELF CONTAINS %@", "\(arg)")
-        }
+        let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientID), patient.patientID)
         do {
-            let fetchAnalysesFromCoreData = try self.context.fetch(request)
-            
-            for fetchedAnalysis in fetchAnalysesFromCoreData {
-                let analysisType = AnalysisType(analysis: Analysis(data: fetchedAnalysis.data!, date: fetchedAnalysis.date!.getFormattedDate()), evnUslugaID: fetchedAnalysis.evnUslugaID!, evnXMLID: fetchedAnalysis.evnXMLID!)
-                labFindings.append(analysisType)
+            let fetchedPatient = try context.fetch(request)
+            if let fetchedAnalyses = fetchedPatient.first?.analysis?.compactMap({$0}) as? [ManagedLabData] {
+                
+                completionHandler( fetchedAnalyses.map { AnalysisViewModel(data: $0.data!, date: $0.date!.getFormattedDate()) })
+                
             }
-            completionHandler(labFindings)
+            
+    
         } catch let error {
             print("\(FetchingError.unableToFetchAnalysisDataFromCoreData.rawValue): \(error.localizedDescription)")
         }
         
         
     }
-    
-    
-    public func savePatient (patient: ManagedPatient?) {
-        
-        guard let patient = patient else {
-            return
-        }
 
+    
+    public func savePatient (patient: Patient) {
+        
+        var date  = patient.dateOfAdmission.lowercased().components(separatedBy: NSCharacterSet.letters).joined()
+        date.removeFirst()
+        date.removeFirst()
+   
         let savingPatient = ManagedPatient(context: context)
-        savingPatient.patientName = patient.patientName
+        savingPatient.patientName = patient.name
         savingPatient.patientID = patient.patientID
-        savingPatient.dateOfAdmission = patient.dateOfAdmission
-        savingPatient.wardNumber = patient.wardNumber
+        savingPatient.dateOfAdmission = date.getFormattedDateFromString()
+        savingPatient.wardNumber = Int16(patient.ward.wardNumber)
             
         if context.hasChanges {
             do {
@@ -138,15 +135,27 @@ class FetchingManager {
         }
     }
     
-    func saveLabData (with analysisType: [AnalysisType]) {
+    func saveLabData (forPatient: Patient, with analysisType: [AnalysisType]) {
+        
+        let fetchPatient: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        fetchPatient.predicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientName), forPatient.name)
+        do {
+            let results = try context.fetch(fetchPatient)
+            if results.count > 0 {
+                sharedPatient = results.first
+            }
+        } catch let error {
+            print("Error fetching patient and saing labs \(error)")
+        }
         
         analysisType.forEach { analysis in
             let managedLabData = ManagedLabData(context: context)
             managedLabData.evnXMLID = analysis.evnXMLID
             managedLabData.evnUslugaID = analysis.evnUslugaID
-            managedLabData.date = analysis.analysis.date.getFormattedDateFromString()
+
+            let date = analysis.analysis.date.getDateFormatted()
+            managedLabData.date = date.getFormattedDateFromString()
             managedLabData.data = analysis.analysis.data
-            
             sharedPatient?.addToAnalysis(managedLabData)
             
             if context.hasChanges {
@@ -159,9 +168,22 @@ class FetchingManager {
             }
         }
         
-        
+    }
+    
+    func fetchLabData (forPatient: Patient, completion: ([AnalysisType]) -> Void ) {
+//        let patient
     }
     
 }
 
+
+extension String {
+    
+    func getDateFormatted() -> String {
+        var date = self.lowercased().components(separatedBy: NSCharacterSet.letters).joined()
+        date.removeFirst(4)
+        date.removeLast(2)
+        return date
+    }
+}
 

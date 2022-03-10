@@ -13,11 +13,11 @@ struct AnalysisViewModel : Comparable, Hashable {
         lhs.date < rhs.date
     }
     
-    let rows : [[String]]
+    let data : [[String]]
     let date : String
     
-    init(rows: [[String]], date: String) {
-        self.rows = rows
+    init(data: [[String]], date: String) {
+        self.data = data
         self.date = date
     }
 }
