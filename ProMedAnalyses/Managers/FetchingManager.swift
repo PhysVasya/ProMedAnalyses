@@ -33,11 +33,11 @@ class FetchingManager {
     }
     
     public func checkPatientAndSaveIfNeeded (patient: Patient, completionHanlder: ((Result<ManagedPatient?, Error>) -> Void)? = nil) {
-
+        
         let patientFetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         patientFetch.predicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientName), patient.name)
         var checkingPatient : ManagedPatient?
-
+        
         do {
             let results = try context.fetch(patientFetch)
             if results.count > 0 {
@@ -64,7 +64,7 @@ class FetchingManager {
             for fetchedPatient in fetchedPatientsFromCoreData {
                 let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!.getFormattedDate(), ward: Ward(wardNumber: Int(fetchedPatient.wardNumber), wardType: .fourMan), patientID: fetchedPatient.patientID!)
                 fetchedPatients.append(patient)
-            
+                
             }
             completionHandler(fetchedPatients)
             
@@ -83,32 +83,56 @@ class FetchingManager {
         do {
             let fetchedPatient = try context.fetch(request)
             if let fetchedAnalyses = fetchedPatient.first?.analysis?.compactMap({$0}) as? [ManagedLabData] {
-                
                 completionHandler( fetchedAnalyses.map { AnalysisViewModel(data: $0.data!, date: $0.date!.getFormattedDate()) })
-                
             }
-            
-    
         } catch let error {
             print("\(FetchingError.unableToFetchAnalysisDataFromCoreData.rawValue): \(error.localizedDescription)")
         }
-        
+    }
+    
+    public func fetchOnlyPatientsWithAnalyses (completion: ([Patient]) -> Void) {
+        let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        do {
+            let results = try context.fetch(request)
+            let mappedPatients = results.compactMap { patient -> ManagedPatient? in
+                let patientAnalysis = patient.analysis?.compactMap({$0}) as? [ManagedLabData]
+                return patientAnalysis!.isEmpty ? nil : patient
+            }
+            
+            let patients = mappedPatients.map { Patient(name: $0.patientName!, dateOfAdmission: ($0.dateOfAdmission?.getFormattedDate())!, patientID: $0.patientID!)}
+            completion(patients)
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    public func fetchPatientsWithHighCRP (completion: ([Patient]) -> Void) {
+        let request: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        do {
+            let results = try context.fetch(request)
+             
+                
+    
+            
+        } catch let error {
+            print(error)
+        }
         
     }
-
+    
     
     public func savePatient (patient: Patient) {
         
         var date  = patient.dateOfAdmission.lowercased().components(separatedBy: NSCharacterSet.letters).joined()
         date.removeFirst()
         date.removeFirst()
-   
+        
         let savingPatient = ManagedPatient(context: context)
         savingPatient.patientName = patient.name
         savingPatient.patientID = patient.patientID
         savingPatient.dateOfAdmission = date.getFormattedDateFromString()
         savingPatient.wardNumber = Int16(patient.ward.wardNumber)
-            
+        
         if context.hasChanges {
             do {
                 try self.context.save()
@@ -152,7 +176,7 @@ class FetchingManager {
             let managedLabData = ManagedLabData(context: context)
             managedLabData.evnXMLID = analysis.evnXMLID
             managedLabData.evnUslugaID = analysis.evnUslugaID
-
+            
             let date = analysis.analysis.date.getDateFormatted()
             managedLabData.date = date.getFormattedDateFromString()
             managedLabData.data = analysis.analysis.data
@@ -167,15 +191,8 @@ class FetchingManager {
                 }
             }
         }
-        
     }
-    
-    func fetchLabData (forPatient: Patient, completion: ([AnalysisType]) -> Void ) {
-//        let patient
-    }
-    
 }
-
 
 extension String {
     

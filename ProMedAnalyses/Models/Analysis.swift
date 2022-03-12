@@ -17,3 +17,11 @@ struct FetchedLabIDs {
     let evnXMLID: String
     let evnUslugaID: String
 }
+
+extension AnalysisType {
+    
+    var formattedToViewModel: AnalysisViewModel {
+        return self.analysis
+    }
+    
+}

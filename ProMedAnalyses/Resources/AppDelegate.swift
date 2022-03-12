@@ -7,27 +7,24 @@
 
 import UIKit
 import CoreData
+import SwiftUI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
 
-    public var connectionIsSatisfied: Bool?
-    public var phpSessionID: String?
+   
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
      
-        
         let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = UINavigationController(rootViewController: AuthorizationViewController())
+        window.rootViewController = UIHostingController(rootView: ContentView())
         window.makeKeyAndVisible()
         self.window = window
-
-        CheckNetwork.shared.startMonitoring { [weak self] connectionIsSatisfied, recevedPhpSessionIdCookie in
-            self?.connectionIsSatisfied = connectionIsSatisfied
-            self?.phpSessionID = recevedPhpSessionIdCookie
-            
-        }
+        
+        
+        UserDefaults.standard.set(false, forKey: "showAuthorizationVC")
+        
         
         return true
     }

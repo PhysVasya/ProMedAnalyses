@@ -12,7 +12,7 @@ class CheckNetwork {
     
     static let shared = CheckNetwork(requiredInterfaceType: .wifi)
     private let monitor: NWPathMonitor
-    private let queue = DispatchQueue.global()
+    private let queue = DispatchQueue(label: "Monitor")
     
     private init(requiredInterfaceType: NWInterface.InterfaceType) {
         monitor = NWPathMonitor(requiredInterfaceType: requiredInterfaceType)
@@ -21,6 +21,7 @@ class CheckNetwork {
     public func startMonitoring (_ completionHandler: @escaping (_ isSatisfied: Bool, _ receivedPhpSessIdCookie: String?)->Void) {
         monitor.start(queue: queue)
         monitor.pathUpdateHandler = { [weak self] _ in
+            
             self?.checkConnection { result in
                 switch result {
                 case .success(let phpSessionID):
@@ -45,6 +46,7 @@ class CheckNetwork {
         let url = URL(string: "https://crimea.promedweb.ru/?c=portal&m=udp")
         var request = URLRequest(url: url!)
         let sessionconfig = URLSessionConfiguration.default
+        sessionconfig.timeoutIntervalForResource = 5
         let session = URLSession(configuration: sessionconfig)
         
         request.allHTTPHeaderFields = [

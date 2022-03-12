@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import SwiftUI
 
 class PatientsViewController: UIViewController {
     
@@ -14,27 +15,28 @@ class PatientsViewController: UIViewController {
     static let cellIdentifier = "PatientsCellController"
     
     private let patientsTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .insetGrouped)
+        let tableView = UITableView(frame: .zero, style: .plain)
         return tableView
     }()
     
     private let search = UISearchController(searchResultsController: nil)
     private let refresh = UIRefreshControl()
-    
+
+    private var onlyPatientsWithAnalysesPressed : ((Bool) -> Void)?
+    private var onlyHighCRPPressed: ((Bool)->Void)?
     private var isConnected : Bool? {
-        return (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied
+        UserDefaults.standard.bool(forKey: "isConnected")
+    }
+    private var downloadingViewShouldStayPresented: ((Bool) -> Void)?
+    private var rootView : UIViewController {
+        let vc = UIHostingController(rootView: LoadingAllDataAlert(shouldStayOnScreen: downloadingViewShouldStayPresented))
+        vc.sheetPresentationController?.detents = [.medium()]
+        vc.sheetPresentationController?.selectedDetentIdentifier = .medium
+        return vc
     }
 
-    private var patients = [Patient]() {
-        didSet{
-            patientsTableView.reloadData()
-        }
-    }
-    private var filteredPatients = [Patient]() {
-        didSet{
-            patientsTableView.reloadData()
-        }
-    }
+    private var patients = [Patient]()
+    private var filteredPatients = [Patient]()
     private var wardNumberToMoveTo = ""
     private var isSearchBarEmpty : Bool {
         return search.searchBar.searchTextField.text?.isEmpty ?? true
@@ -44,20 +46,87 @@ class PatientsViewController: UIViewController {
     }
     private var currentPatient : ManagedPatient?
     private var analysesTypes = [AnalysisType]()
-    
+     
     //View overriden functions
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Список пациентов"
         navigationController?.navigationBar.isHidden = false
+        onlyPatientsWithAnalysesPressed = { [weak self] success in
+            switch success {
+            case true:
+                self?.applyFilter()
+            case false:
+                FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                    self?.patients = patients
+                    self?.patientsTableView.reloadData()
+                }
+            }
+        }
+        onlyHighCRPPressed = { [weak self] success in
+            switch success {
+            case true:
+                print("NOT KEK")
+            case false:
+                print("KEK")
+            }
+            
+        }
+        downloadingViewShouldStayPresented = { success in
+            switch success {
+            case true:
+                print(success)
+            case false:
+                self.navigationController?.dismiss(animated: true, completion: nil)
+            }
+            
+        }
+        
         configureTableView()
+        configureNavigationBar()
+        
     }
     
+    private func configureNavigationBar () {
+        let menuElement = UIAction(title: "Загрузить все данные", image: UIImage(systemName: "arrow.down.circle")) { action in
+            let alert = UIAlertController(title: "Загрузить все данные?", message: "Вы уверены, что хотите загрузить данные всех пациентов? \n Это займёт некоторое время", preferredStyle: .alert)
+            let processAction = UIAlertAction(title: "Загрузить", style: .default, handler: { action in
+                self.navigationController?.present(self.rootView, animated: true, completion: nil)
+                })
+            let dismissAction = UIAlertAction(title: "Отмена", style: .cancel) { action in
+                alert.dismiss(animated: true, completion: nil)
+            }
+            alert.addAction(processAction)
+            alert.addAction(dismissAction)
+            self.present(alert, animated: true, completion: nil)
+
+        }
+        let navBarRightButton = UIBarButtonItem(systemItem: .action, primaryAction: nil, menu: UIMenu(title: "", children: [menuElement]))
+        navBarRightButton.tintColor = UIColor(named: "ColorOrange")
+        navigationItem.setRightBarButton(navBarRightButton, animated: false)
+ 
+    }
+    
+  
+        
+        
+       
+        
     private func configureTableView () {
         view.addSubview(patientsTableView)
         patientsTableView.register(UITableViewCell.self, forCellReuseIdentifier: PatientsViewController.cellIdentifier)
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
+        let headerView = UIHostingController(rootView: TableHeaderView(onSavedButtonPressed: onlyPatientsWithAnalysesPressed, onHighCRPButtonPressed: onlyHighCRPPressed))
+        patientsTableView.tableHeaderView = headerView.view
+        headerView.view.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    private func applyFilter () {
+        FetchingManager.shared.fetchOnlyPatientsWithAnalyses { patients in
+            self.patients = patients
+            patientsTableView.reloadData()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -75,6 +144,7 @@ class PatientsViewController: UIViewController {
         patientsTableView.frame = view.bounds
         patientsTableView.reloadData()
         ConnectionViewController.shared.removeConnectionPresentation()
+        patientsTableView.tableHeaderView?.layoutIfNeeded()
     }
     
     public func configure(with patients: [Patient]) {
@@ -134,9 +204,9 @@ class PatientsViewController: UIViewController {
         
         switch connectionAvailiable {
         case true:
-            APICallManager.shared.downloadLabData(for: patient) { [weak self] labData in
-
-                self?.presentResults(with: labData)
+            APICallManager.shared.downloadAndSaveLabData(for: patient) { [weak self] labData in
+                let labDataFormatted = labData.compactMap{$0.formattedToViewModel}
+                self?.presentResults(with: labDataFormatted)
             }
         case false:
             FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { [weak self] analyses in
@@ -198,10 +268,10 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             let patientsWardEqualSection = patients.filter { $0.ward.wardNumber == indexPath.section }
             patient = patientsWardEqualSection[indexPath.row]
         }
-        content.textProperties.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        content.textProperties.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         content.secondaryTextProperties.font = UIFont.systemFont(ofSize: 12, weight: .light)
         content.text = patient.name
-        content.secondaryText = patient.dateOfAdmission
+        content.secondaryText = "Поступил: \(patient.dateOfAdmission)"
         cell.contentConfiguration = content
         return cell
     }
@@ -219,8 +289,15 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         
     }
     
+    
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return nil
+    }
+    
+    
+    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return patients.filter { $0.ward.wardNumber == section }.isEmpty ? CGFloat.leastNonzeroMagnitude : 20
+        return patients.filter { $0.ward.wardNumber == section }.isEmpty ? CGFloat.leastNonzeroMagnitude : 20 
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {

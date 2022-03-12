@@ -63,7 +63,13 @@ class APICallManager {
         let requestBody = "object=LpuSection&object_id=LpuSection_id&object_value=19219&level=0&LpuSection_id=19219&ARMType=stac&date=\(Date().getFormattedDate())&filter_Person_F=&filter_Person_I=&filter_Person_O=&filter_PSNumCard=&filter_Person_BirthDay=&filter_MedStaffFact_id=&MedService_id=0&node=root"
         urlRequest.httpBody = requestBody.data(using: .utf8)
         
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+        let urlConfig = URLSessionConfiguration.default
+        urlConfig.timeoutIntervalForResource = 5
+        urlConfig.timeoutIntervalForRequest = 5
+        let urlSession = URLSession(configuration: urlConfig)
+        
+        
+        urlSession.dataTask(with: urlRequest) { data, response, error in
             guard error == nil, let unwrappedData = data else {
                 print("\(APICallErrors.errorDownloadingPatients.rawValue) : \(String(describing: error))")
                 completion(false)
@@ -266,17 +272,47 @@ class APICallManager {
         }
     }
     
-    public func downloadLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisViewModel]) -> Void) {
-        downloadLabIDs(for: patient) { [weak self] id in
+    public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisType]) -> Void) {
+        downloadLabIDs(for: patient) { [weak self] ids in
             
-            self?.downloadLabData(with: id) { analyses in
+            self?.downloadLabData(with: ids) { analyses in
                 
                 guard let analyses = analyses else {
                     return
                 }            
                 FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
                 
-                completionHanlder(analyses.map { $0.analysis } )
+                completionHanlder(analyses)
+            }
+        }
+    }
+    
+    
+    
+    public func downloadAll (refresh: @escaping (Double) -> Void) {
+        
+        var currentStatus: Double = 0
+        var patientsCount: Int = 0
+        var currentPatient: Int = 0
+              
+        FetchingManager.shared.fetchPatientsFromCoreData { [weak self] patients in
+            patientsCount = patients.count
+            patients.forEach { patient in
+                
+                var index = Double.random(in: 2.1...3.7)
+                let timeInterval = TimeInterval.random(in: 1.1...3.9)
+                
+                Timer.scheduledTimer(withTimeInterval: timeInterval * index, repeats: false) { _ in
+                    self?.downloadAndSaveLabData(for: patient) { labData in
+                        print(labData)
+                        FetchingManager.shared.saveLabData(forPatient: patient, with: labData)
+                        
+                    }
+                    currentPatient += 1
+                    currentStatus = Double(currentPatient) / Double(patientsCount)
+                    index += index
+                    refresh(currentStatus)
+                }
             }
         }
     }

@@ -27,9 +27,10 @@ class ResultsCellViewController: UITableViewCell {
           analysisName.text = labName
           analysisName.backgroundColor = .systemGray6
           if labValue.contains("▲") {
-               analysisValue.backgroundColor = .systemRed.withAlphaComponent(0.5)
+               analysisValue.backgroundColor = UIColor(named: "ColorOrange")
+               analysisValue.font = .systemFont(ofSize: 14, weight: .semibold)
           } else if labValue.contains("▼") {
-               analysisValue.backgroundColor = .systemBlue.withAlphaComponent(0.3)
+               analysisValue.backgroundColor = UIColor(named: "ColorBlue")
           } else {
                analysisValue.backgroundColor = .systemBackground
           }

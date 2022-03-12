@@ -13,14 +13,16 @@ class AuthorizationViewController: UIViewController {
     var loginText: String?
     static let identifier = "AuthorizationViewController"
     var loginCredentials : ((String, String) -> Void)?
+    var isConnected: Bool {
+        UserDefaults.standard.bool(forKey: "isConnected")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         loginCredentials = { [weak self] login, password in
             print(login, password)
             AuthorizationManager.shared.authorize(login: login, password: password) { success in
-                switch success {
-                
+                switch success { 
                 case true:
                     HapticsManager.shared.vibrate(for: .success)
                     APICallManager.shared.getPatientsAndEvnIds { successful in
@@ -60,18 +62,14 @@ class AuthorizationViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
         view.addGestureRecognizer(tapGesture)
         
-            
+        
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.navigationBar.isHidden = true
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ConnectionViewController.shared.presentConnection(dependingOnReachability: (UIApplication.shared.delegate as! AppDelegate).connectionIsSatisfied) { success in
+        ConnectionViewController.shared.presentConnection(dependingOnReachability: isConnected) { success in
             print(success)
         }
         
@@ -104,10 +102,13 @@ class AuthorizationViewController: UIViewController {
     
     
     func configurePatients (with patients: [Patient]) {
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.main.async {
             let patientVC = PatientsViewController()
             patientVC.configure(with: patients)
-            self?.navigationController?.pushViewController(patientVC, animated: true)
+            let navigationController = UINavigationController(rootViewController: patientVC)
+            navigationController.modalPresentationStyle = .fullScreen
+            navigationController.navigationBar.prefersLargeTitles = true
+            self.present(navigationController, animated: true, completion: nil)
         }
     }
     
@@ -120,7 +121,21 @@ class AuthorizationViewController: UIViewController {
         alertVC.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: { action in
             alertVC.dismiss(animated: true, completion: nil)
         }))
-        navigationController?.present(alertVC, animated: true, completion: nil)
+        present(alertVC, animated: true, completion: nil)
     }
     
 }
+
+struct AuthorizationViewControllerRepresentable : UIViewControllerRepresentable {
+    
+    func makeUIViewController(context: Context) -> AuthorizationViewController {
+        let vc = AuthorizationViewController()
+        return vc
+    }
+    func updateUIViewController(_ uiViewController: AuthorizationViewController, context: Context) {
+        
+    }
+    typealias UIViewControllerType = AuthorizationViewController
+    
+}
+

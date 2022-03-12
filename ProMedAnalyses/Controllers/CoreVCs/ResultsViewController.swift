@@ -8,6 +8,7 @@
 import UIKit
 import SwiftSoup
 import CoreData
+import SwiftUI
 
 
 
@@ -84,10 +85,9 @@ class ResultsViewController: UIViewController {
     
     @objc func filter () {
         let nav = UINavigationController(rootViewController: filterVC)
-        if let sheet = nav.sheetPresentationController {
-            sheet.detents = [.medium()]
-            sheet.selectedDetentIdentifier = .medium
-        }
+        nav.sheetPresentationController?.detents = [.medium()]
+        nav.sheetPresentationController?.selectedDetentIdentifier = .medium
+      
         filterVC.configure(with: fetchedAnalysesDates?.uniqued())
         filterVC.sendFilters = { [weak self] passedFilter in
             guard let self = self else {
@@ -221,7 +221,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return reassembledAnalyses[section].date
+        return "Дата получения результата: \(reassembledAnalyses[section].date)"
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -274,13 +274,16 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
         let selectedCell = tableView.cellForRow(at: indexPath) as! ResultsCellViewController
         return UIContextMenuConfiguration(identifier: nil) {
             HapticsManager.shared.vibrate(for: .success)
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let previewVC = storyboard.instantiateViewController(withIdentifier: PreviewViewController.identifier) as? PreviewViewController {
-                previewVC.configurePreview(resultValue: ResultLabelPreview(value: selectedCell.analysisValue.text, labelColor: selectedCell.analysisValue.backgroundColor), normalValue: selectedCell.threshold.text, valueDescription: selectedCell.referenceDescription)
-                return previewVC
-            } else {
-                return nil
+            var valueBGColor : UIColor? {
+                if selectedCell.analysisValue.backgroundColor == .systemBackground {
+                    return .systemGray.withAlphaComponent(0.1)
+                } else {
+                    return selectedCell.analysisValue.backgroundColor
+                }
             }
+            let previewVC = UIHostingController(rootView: PreviewSwiftUIView(value: selectedCell.analysisValue.text!, normalValue: selectedCell.threshold.text!, description: selectedCell.referenceDescription!, color: valueBGColor!))
+            return previewVC
+            
             
         } actionProvider: { suggestedActions in
             return UIMenu()
