@@ -32,7 +32,7 @@ struct ButtonView: View {
             .foregroundColor(isButtonPressed ? Color(.white) : Color(.label))
 
         }
-        .frame(width: 180, height: 30, alignment: .center)
+        .frame(width: 200, height: 30, alignment: .center)
         .cornerRadius(15)
         .overlay(
             isButtonPressed ? RoundedRectangle(cornerRadius: 15)

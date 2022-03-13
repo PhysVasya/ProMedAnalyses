@@ -35,7 +35,7 @@ class FetchingManager {
     public func checkPatientAndSaveIfNeeded (patient: Patient, completionHanlder: ((Result<ManagedPatient?, Error>) -> Void)? = nil) {
         
         let patientFetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
-        patientFetch.predicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientName), patient.name)
+        patientFetch.predicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientID), patient.patientID)
         var checkingPatient : ManagedPatient?
         
         do {
@@ -110,10 +110,25 @@ class FetchingManager {
         let request: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         do {
             let results = try context.fetch(request)
-             
+            var managedMatchedPatients = [ManagedPatient]()
+            results.compactMap { patient -> ManagedPatient? in
+                if let patientAnalysis = patient.analysis?.compactMap({$0}) as? [ManagedLabData] {
+                    patientAnalysis.forEach { analysisType in
+                        analysisType.data?.forEach({ analysis in
+                            let matches = analysis[0].lowercased().contains("с-реа".lowercased()) && analysis[2].lowercased() > "5"
+                            if matches {
+                                managedMatchedPatients.append(patient)
+                            }
+                        })
+                    }
+                    return patientAnalysis.isEmpty ? nil : patient
+                } else {
+                    return nil
+                }
                 
-    
-            
+            }
+            completion(managedMatchedPatients.map({Patient(name: $0.patientName!, dateOfAdmission: ($0.dateOfAdmission?.getFormattedDate())!, patientID: $0.patientID!)}))
+           
         } catch let error {
             print(error)
         }
@@ -121,34 +136,53 @@ class FetchingManager {
     }
     
     
-    public func savePatient (patient: Patient) {
+    public func changeWardAndSavePatient (patient: Patient, moveTo: Int) {
         
-        var date  = patient.dateOfAdmission.lowercased().components(separatedBy: NSCharacterSet.letters).joined()
-        date.removeFirst()
-        date.removeFirst()
+        let fetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
+        let predicate: NSPredicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientID), patient.patientID)
+        fetch.predicate = predicate
         
-        let savingPatient = ManagedPatient(context: context)
-        savingPatient.patientName = patient.name
-        savingPatient.patientID = patient.patientID
-        savingPatient.dateOfAdmission = date.getFormattedDateFromString()
-        savingPatient.wardNumber = Int16(patient.ward.wardNumber)
-        
-        if context.hasChanges {
-            do {
-                try self.context.save()
-            } catch let error {
-                print("\(SavingError.unableToSavePatient.rawValue): \(error)")
+        do {
+            let result = try context.fetch(fetch)
+            if result.count > 0 {
+                guard let existingPatient = result.first else {
+                    return
+                }
+                existingPatient.wardNumber = Int16(moveTo)
+               
+                if context.hasChanges {
+                    try context.save()
+                }
             }
+        } catch let error as NSError {
+            print("Error moving and  saving patient \(error)")
         }
     }
     
-    func deletePatient (patient: ManagedPatient?) {
+    private func savePatient (patient: Patient) {
         
-        guard let patient = patient else {
-            return
+        let managedPatient = ManagedPatient()
+        managedPatient.patientID = patient.patientID
+        managedPatient.dateOfAdmission = patient.dateOfAdmission.getFormattedDateFromString()
+        managedPatient.patientName = patient.name
+        managedPatient.wardNumber = Int16(patient.ward.wardNumber)
+        
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch let error as NSError {
+                print("\(SavingError.unableToSavePatient) : \(error)")
+            }
         }
         
-        context.delete(patient)
+    }
+    
+    func deletePatient (patient: Patient) {
+        
+        let patientToDelete = ManagedPatient(context: context)
+        patientToDelete.patientID = patient.patientID
+                    
+        context.delete(patientToDelete)
         
         if context.hasChanges {
             do {

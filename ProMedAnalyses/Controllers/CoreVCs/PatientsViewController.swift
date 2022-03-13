@@ -21,6 +21,9 @@ class PatientsViewController: UIViewController {
     
     private let search = UISearchController(searchResultsController: nil)
     private let refresh = UIRefreshControl()
+    
+    var ascending: Bool = false
+
 
     private var onlyPatientsWithAnalysesPressed : ((Bool) -> Void)?
     private var onlyHighCRPPressed: ((Bool)->Void)?
@@ -28,7 +31,7 @@ class PatientsViewController: UIViewController {
         UserDefaults.standard.bool(forKey: "isConnected")
     }
     private var downloadingViewShouldStayPresented: ((Bool) -> Void)?
-    private var rootView : UIViewController {
+    private var progressDownloadView : UIViewController {
         let vc = UIHostingController(rootView: LoadingAllDataAlert(shouldStayOnScreen: downloadingViewShouldStayPresented))
         vc.sheetPresentationController?.detents = [.medium()]
         vc.sheetPresentationController?.selectedDetentIdentifier = .medium
@@ -44,7 +47,6 @@ class PatientsViewController: UIViewController {
     private var searchFieldIsEditing : Bool {
         return search.isActive && !isSearchBarEmpty
     }
-    private var currentPatient : ManagedPatient?
     private var analysesTypes = [AnalysisType]()
      
     //View overriden functions
@@ -55,8 +57,10 @@ class PatientsViewController: UIViewController {
         onlyPatientsWithAnalysesPressed = { [weak self] success in
             switch success {
             case true:
+                self?.patientsTableView.refreshControl = nil
                 self?.applyFilter()
             case false:
+                self?.patientsTableView.refreshControl = self?.refresh
                 FetchingManager.shared.fetchPatientsFromCoreData { patients in
                     self?.patients = patients
                     self?.patientsTableView.reloadData()
@@ -66,9 +70,17 @@ class PatientsViewController: UIViewController {
         onlyHighCRPPressed = { [weak self] success in
             switch success {
             case true:
-                print("NOT KEK")
+                self?.patientsTableView.refreshControl = nil
+                FetchingManager.shared.fetchPatientsWithHighCRP { patients in
+                    self?.patients = patients
+                    self?.patientsTableView.reloadData()
+                }
             case false:
-                print("KEK")
+                self?.patientsTableView.refreshControl = self?.refresh
+                FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                    self?.patients = patients
+                    self?.patientsTableView.reloadData()
+                }
             }
             
         }
@@ -88,28 +100,50 @@ class PatientsViewController: UIViewController {
     }
     
     private func configureNavigationBar () {
-        let menuElement = UIAction(title: "Загрузить все данные", image: UIImage(systemName: "arrow.down.circle")) { action in
-            let alert = UIAlertController(title: "Загрузить все данные?", message: "Вы уверены, что хотите загрузить данные всех пациентов? \n Это займёт некоторое время", preferredStyle: .alert)
+        
+        
+        
+        let menuElement1 = UIAction(title: "Загрузить все данные", image: UIImage(systemName: "arrow.down.circle")?.withTintColor(.label, renderingMode: .alwaysOriginal)) { [weak self] action in
+            let alertOnConnection = UIAlertController(title: "Загрузить все данные?", message: "Вы уверены, что хотите загрузить данные всех пациентов? \n Это займёт некоторое время", preferredStyle: .alert)
             let processAction = UIAlertAction(title: "Загрузить", style: .default, handler: { action in
-                self.navigationController?.present(self.rootView, animated: true, completion: nil)
+              self?.navigationController?.present(self!.progressDownloadView, animated: true, completion: nil)
                 })
             let dismissAction = UIAlertAction(title: "Отмена", style: .cancel) { action in
-                alert.dismiss(animated: true, completion: nil)
+                alertOnConnection.dismiss(animated: true, completion: nil)
             }
-            alert.addAction(processAction)
-            alert.addAction(dismissAction)
-            self.present(alert, animated: true, completion: nil)
+            alertOnConnection.addAction(processAction)
+            alertOnConnection.addAction(dismissAction)
+            
+            let alertOffConnection = UIAlertController(title: "Ошибка", message: "Данное действие невозможно, ввиду отсутствия должного интернет подключения.", preferredStyle: .alert)
+            let offConnectionDismiss = UIAlertAction(title: "Отмена", style: .cancel) { action in
+                alertOffConnection.dismiss(animated: true, completion: nil)
+            }
+            alertOffConnection.addAction(offConnectionDismiss)
+            
+            if self?.isConnected == true {
+                self?.present(alertOnConnection, animated: true, completion: nil)
+
+            } else {
+                self?.present(alertOffConnection, animated: true, completion: nil)
+            }
 
         }
-        let navBarRightButton = UIBarButtonItem(systemItem: .action, primaryAction: nil, menu: UIMenu(title: "", children: [menuElement]))
-        navBarRightButton.tintColor = UIColor(named: "ColorOrange")
-        navigationItem.setRightBarButton(navBarRightButton, animated: false)
+       
+        let navBarButton1 = UIBarButtonItem(systemItem: .action, primaryAction: nil, menu: UIMenu(title: "", children: [menuElement1]))
+        navBarButton1.tintColor = UIColor(named: "ColorOrange")
+        
+        let menuElement2 = UIAction(title: "По имени", image: UIImage(systemName: "person")) { [weak self] action in
+            self?.sortPatients(with: .name)
+        }
+        let menuElement3 = UIAction(title: "По дате поступления", image: UIImage(systemName: "calendar")) { [weak self] action in
+            self?.sortPatients(with: .date)
+        }
+        
+        let navBarButton2 = UIBarButtonItem(image: UIImage(systemName: "list.dash"), menu: UIMenu(title: "Сортировать", children: [menuElement2, menuElement3]))
+        navBarButton2.tintColor = UIColor(named: "ColorOrange")
+        navigationItem.setRightBarButtonItems([navBarButton1, navBarButton2], animated: false)
  
     }
-    
-  
-        
-        
        
         
     private func configureTableView () {
@@ -174,6 +208,30 @@ class PatientsViewController: UIViewController {
         patientsTableView.reloadData()
         refresh.endRefreshing()
     }
+    
+    private func sortPatients (with filter: PatientFilter) {
+        switch filter {
+
+        case .date:
+
+            patients = patients.sorted { n1, n2 in
+                ascending ? n1.dateOfAdmission.getFormattedDateFromString()! > n2.dateOfAdmission.getFormattedDateFromString()! :
+                n1.dateOfAdmission.getFormattedDateFromString()! < n2.dateOfAdmission.getFormattedDateFromString()!
+            }
+            patientsTableView.reloadData()
+            ascending = !ascending
+        case .name:
+           
+            patients = patients.sorted { n1, n2 in
+                
+                ascending ? n1.name.first! > n2.name.first! : n1.name.first! < n2.name.first!
+                
+            }
+            patientsTableView.reloadData()
+            ascending = !ascending
+        }
+        
+    }
 
 
     private func setupSearchController () {
@@ -201,7 +259,6 @@ class PatientsViewController: UIViewController {
         guard let connectionAvailiable = isConnected else {
             return
         }
-        
         switch connectionAvailiable {
         case true:
             APICallManager.shared.downloadAndSaveLabData(for: patient) { [weak self] labData in
@@ -244,13 +301,10 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == section }
-        if filteredPatientsByWard.isEmpty {
-            return 0
-        } else if searchFieldIsEditing {
+         if searchFieldIsEditing {
             return filteredPatients.filter { $0.ward.wardNumber == section}.count
         } else {
-            return patients.filter { $0.ward.wardNumber == section }.count
+            return patients.filter{ $0.ward.wardNumber == section }.count
         }
     }
     
@@ -343,29 +397,20 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         let delete = UIContextualAction(style: style, title: "Перевести из палаты") { [weak self] action, view, completionHandler in
             view.backgroundColor = .systemRed
             let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
-            if let patientToBeDeleted = groupedPatientsByWard?[on.row] {
-                
+            if var patientToBeDeleted = groupedPatientsByWard?[on.row] {
                 if self?.patients.contains(patientToBeDeleted) != nil {
-                    self?.patients.removeAll { identicalPatient in
-                        patientToBeDeleted == identicalPatient
-                    }
-                    self?.currentPatient?.patientName = patientToBeDeleted.name
-                    self?.currentPatient?.patientID = patientToBeDeleted.patientID
-                    self?.currentPatient?.dateOfAdmission = patientToBeDeleted.dateOfAdmission.getFormattedDateFromString()
-                    self?.currentPatient?.wardNumber = Int16(patientToBeDeleted.ward.wardNumber)
+                    self?.patients.removeAll { $0.patientID == patientToBeDeleted.patientID}
+                    FetchingManager.shared.changeWardAndSavePatient(patient: patientToBeDeleted, moveTo: 0)
+                    let indexPathToMoveTo = IndexPath(row: 0, section: 0)
+                    patientToBeDeleted.ward.wardNumber = 0
+                    self?.patients.append(patientToBeDeleted)
+                    table.moveRow(at: on, to: indexPathToMoveTo)
 
-                    FetchingManager.shared.deletePatient(patient: self?.currentPatient)
-        
-                    self?.patients.append(Patient(name: patientToBeDeleted.name, dateOfAdmission: patientToBeDeleted.dateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientToBeDeleted.patientID))
-                    self?.currentPatient?.wardNumber = 0
-
-                    FetchingManager.shared.savePatient(patient: patientToBeDeleted)
                 } else {
                     return
                 }
             }
-            let indexPathToMoveTo = IndexPath(row: 0, section: 0)
-            table.moveRow(at: on, to: indexPathToMoveTo)
+            
             completionHandler(true)
         }
         return delete
@@ -386,26 +431,17 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let action = UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
             let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
-            if let patientToBeMoved = groupedPatientsByWard?[on.row] {
+            if var patientToBeMoved = groupedPatientsByWard?[on.row] {
                 if self?.patients.contains(patientToBeMoved) != nil {
-                    self?.patients.removeAll { existingPatient in
-                        patientToBeMoved == existingPatient
-                    }
-                    self?.currentPatient?.patientName = patientToBeMoved.name
-                    self?.currentPatient?.patientID = patientToBeMoved.patientID
-                    self?.currentPatient?.dateOfAdmission = patientToBeMoved.dateOfAdmission.getFormattedDateFromString()
-                    self?.currentPatient?.wardNumber = Int16(patientToBeMoved.ward.wardNumber)
-
-                    FetchingManager.shared.deletePatient(patient: self?.currentPatient)
-
-                    self?.patients.append(Patient(name: patientToBeMoved.name, dateOfAdmission: patientToBeMoved.dateOfAdmission, ward: Ward(wardNumber: Int(self!.wardNumberToMoveTo)! , wardType: .fourMan), patientID: patientToBeMoved.patientID))
-                    self?.currentPatient?.wardNumber = Int16(self!.wardNumberToMoveTo)!
-                    
-                    FetchingManager.shared.savePatient(patient: patientToBeMoved)
+                    self?.patients.removeAll(where: {$0.patientID == patientToBeMoved.patientID})
+                    FetchingManager.shared.changeWardAndSavePatient(patient: patientToBeMoved, moveTo: Int(self!.wardNumberToMoveTo)!)
+                    let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
+                    patientToBeMoved.ward.wardNumber = Int(self!.wardNumberToMoveTo)!
+                    self?.patients.append(patientToBeMoved)
+                    table.moveRow(at: on, to: indexPathToMoveTo)
                 }
             }
-            let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
-            table.moveRow(at: on, to: indexPathToMoveTo)
+            
         })
         
         let cancel = UIAlertAction(title: "Отмена", style: .cancel) { _ in

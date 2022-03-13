@@ -33,6 +33,7 @@ struct LoadingAllDataAlert: View {
                     }
                 }
                 .padding()
+                .transition(.scale)
                 Text("Пожалуйста, подождите...")
                     .font(.system(size: 14, weight: .regular))
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
@@ -52,6 +53,7 @@ struct LoadingAllDataAlert: View {
             }
         }
         .onChange(of: shouldDisappear) { newValue in
+            HapticsManager.shared.vibrate(for: .success)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 shouldStayOnScreen?(!newValue)
 

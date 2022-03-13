@@ -98,7 +98,7 @@ class APICallManager {
     }
     
     
-    private func downloadLabIDs(for patient: Patient, onCompletion: @escaping (_ id: [FetchedLabIDs]) -> Void){
+    private func downloadLabIDs(for patient: Patient, onCompletion: @escaping (_ id: [FetchedLabIDs]?) -> Void){
         
         var analysesIds = [FetchedLabIDs]()
         let urlForRequest : URL? = {
@@ -117,6 +117,7 @@ class APICallManager {
               let jSessionID = AuthorizationManager.shared.jSessionID,
               let phpSessionID = AuthorizationManager.shared.sessionID,
               let login = AuthorizationManager.shared.login else {
+                  onCompletion(nil)
                   return
               }
         
@@ -175,7 +176,7 @@ class APICallManager {
         }.resume()
     }
     
-    private func downloadLabData (with ids: [FetchedLabIDs], completionHandler: @escaping (_ : [AnalysisType]?)->Void) {
+    private func downloadLabData (with ids: [FetchedLabIDs], completionHandler: @escaping (_ : [AnalysisType])->Void) {
         
         let urlForRequest: URL? = {
             var urlComponents = URLComponents()
@@ -274,12 +275,12 @@ class APICallManager {
     
     public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisType]) -> Void) {
         downloadLabIDs(for: patient) { [weak self] ids in
-            
+            guard let ids = ids else {
+        return
+            }
             self?.downloadLabData(with: ids) { analyses in
+                print(analyses)
                 
-                guard let analyses = analyses else {
-                    return
-                }            
                 FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
                 
                 completionHanlder(analyses)

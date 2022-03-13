@@ -19,58 +19,71 @@ class AuthorizationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loginCredentials = { [weak self] login, password in
-            print(login, password)
-            AuthorizationManager.shared.authorize(login: login, password: password) { success in
-                switch success { 
-                case true:
-                    HapticsManager.shared.vibrate(for: .success)
-                    APICallManager.shared.getPatientsAndEvnIds { successful in
-                        switch successful {
-                            
-                        case true:
-                            DispatchQueue.main.async {
-                                FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                                    self?.configurePatients(with: patients)
+      
+            loginCredentials = { [weak self] login, password in
+                print(login, password)
+                AuthorizationManager.shared.authorize(login: login, password: password) { success in
+                    switch success { 
+                    case true:
+                        HapticsManager.shared.vibrate(for: .success)
+                        APICallManager.shared.getPatientsAndEvnIds { successful in
+                            switch successful {
+                                
+                            case true:
+                                DispatchQueue.main.async {
+                                    FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                                        self?.configurePatients(with: patients)
+                                    }
                                 }
+                                
+                            case false:
+                                print("CANNOT FETCH PATIENTS FROM PROMED")
                             }
-                            
-                        case false:
-                            print("CANNOT FETCH PATIENTS FROM PROMED")
                         }
-                    }
-                case false:
-                    HapticsManager.shared.vibrate(for: .error)
-                    DispatchQueue.main.async {
-                        FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                            self?.unsuccessfulAuth(patientsVCwithCached: patients)
+                    case false:
+                        HapticsManager.shared.vibrate(for: .error)
+                        DispatchQueue.main.async {
+                            FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                                self?.unsuccessfulAuth(patientsVCwithCached: patients)
+                            }
                         }
+                        
                     }
-                    
                 }
             }
-        }
         
-        let childVC = UIHostingController(rootView: LoginViewSwiftUI(sendData: loginCredentials))
-        addChild(childVC)
-        childVC.view.frame = view.bounds
-        view.addSubview(childVC.view)
-        title = "Логин"
+            let childVC = UIHostingController(rootView: LoginViewSwiftUI(sendData: loginCredentials))
+            addChild(childVC)
+            childVC.view.frame = view.bounds
+            view.addSubview(childVC.view)
+            
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+            let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+            view.addGestureRecognizer(tapGesture)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
-        view.addGestureRecognizer(tapGesture)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        
-        
+        if !isConnected {
+            FetchingManager.shared.fetchPatientsFromCoreData { patients in
+                configurePatients(with: patients)
+            }
+        } 
     }
     
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ConnectionViewController.shared.presentConnection(dependingOnReachability: isConnected) { success in
-            print(success)
+            switch success {
+            case true:
+                print(success)
+            case false:
+                print(success)
+            }
         }
         
     }

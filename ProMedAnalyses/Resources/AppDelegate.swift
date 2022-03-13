@@ -22,7 +22,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         self.window = window
         
-        
         UserDefaults.standard.set(false, forKey: "showAuthorizationVC")
         
         

@@ -28,6 +28,7 @@
 		FF77BFA327674EED005E9A66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF77BFA127674EED005E9A66 /* LaunchScreen.storyboard */; };
 		FF789DE927DD19630052DD31 /* OnDisappear.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF789DE827DD19630052DD31 /* OnDisappear.swift */; };
 		FF789DEB27DD1A710052DD31 /* DoneSuccessfully.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF789DEA27DD1A710052DD31 /* DoneSuccessfully.swift */; };
+		FF789DED27DE518C0052DD31 /* PatientFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF789DEC27DE518C0052DD31 /* PatientFilter.swift */; };
 		FF7A092E27C11BD0009186AD /* FetchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7A092D27C11BD0009186AD /* FetchingManager.swift */; };
 		FF7A093127C505C5009186AD /* FilterCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7A092F27C505C5009186AD /* FilterCellViewController.swift */; };
 		FF87FA1827721EE2003AB648 /* CodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF87FA1727721EE2003AB648 /* CodingKeys.swift */; };
@@ -79,6 +80,7 @@
 		FF77BFA427674EED005E9A66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF789DE827DD19630052DD31 /* OnDisappear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDisappear.swift; sourceTree = "<group>"; };
 		FF789DEA27DD1A710052DD31 /* DoneSuccessfully.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneSuccessfully.swift; sourceTree = "<group>"; };
+		FF789DEC27DE518C0052DD31 /* PatientFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientFilter.swift; sourceTree = "<group>"; };
 		FF7A092D27C11BD0009186AD /* FetchingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchingManager.swift; sourceTree = "<group>"; };
 		FF7A092F27C505C5009186AD /* FilterCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCellViewController.swift; sourceTree = "<group>"; };
 		FF87FA1727721EE2003AB648 /* CodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodingKeys.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				FFB6683727D12AE000503EC7 /* Patient.swift */,
 				FFB6683927D12AE800503EC7 /* Analysis.swift */,
 				FFB6683E27D12BD300503EC7 /* Filter.swift */,
+				FF789DEC27DE518C0052DD31 /* PatientFilter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -239,9 +242,9 @@
 		FF720A0927D7902A00AA2EF1 /* SwiftUIPages */ = {
 			isa = PBXGroup;
 			children = (
+				FF789DE727DD19430052DD31 /* LoadingAllDataViews */,
 				FFA1894D27DBEA6B006B561A /* Table Header View */,
 				FFA1894327DA0D12006B561A /* PreviewSwiftUIView.swift */,
-				FF789DE727DD19430052DD31 /* LoadingAllDataViews */,
 			);
 			path = SwiftUIPages;
 			sourceTree = "<group>";
@@ -468,6 +471,7 @@
 				FFA1895127DCBDBD006B561A /* LoadingAllDataAlert.swift in Sources */,
 				FF18162227D35F1D0029C06E /* APICallManager.swift in Sources */,
 				FFB6683427D12AAD00503EC7 /* AnalysisViewModel.swift in Sources */,
+				FF789DED27DE518C0052DD31 /* PatientFilter.swift in Sources */,
 				FFF087EC276933640054443B /* ResultsViewController.swift in Sources */,
 				FF4011EB27B40222002F93EF /* FilterViewController.swift in Sources */,
 				FFA1894427DA0D12006B561A /* PreviewSwiftUIView.swift in Sources */,
