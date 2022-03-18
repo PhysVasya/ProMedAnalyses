@@ -104,12 +104,17 @@ struct EvnDiagDirectPSItem : Codable {
 struct EvnDiagDirectPSItemData : Codable {
     let evnXMLID : String
     let evnUslugaID, evnUslugaPID, evnUslugaRID : String
+    let evnUslugaDate : String
+    let uslugaName : String
+    
     
     enum CodingKeys : String, CodingKey {
         case evnXMLID = "EvnXml_id"
         case evnUslugaID = "EvnUsluga_id"
         case evnUslugaPID = "EvnUsluga_pid"
         case evnUslugaRID = "EvnUsluga_rid"
+        case evnUslugaDate = "EvnUsluga_setDate"
+        case uslugaName = "Usluga_Name"
     }
 }
 
@@ -117,11 +122,17 @@ struct FetchedListOfPatients : Codable {
     let patientID : String?
     let name : String?
     let evnID : String?
+    let sex : String?
+    let birthday : String?
+    let dateOfAdmission : String?
     
     enum CodingKeys : String, CodingKey {
         case patientID = "EvnPS_id"
         case name = "text"
         case evnID = "id"
+        case sex = "Sex_id"
+        case birthday = "Person_BirthDay"
+        case dateOfAdmission = "EvnSection_setDate"
     }
 }
 

@@ -9,7 +9,7 @@ import Foundation
 import SwiftSoup
 import CoreData
 
-class APICallManager {
+struct APICallManager {
     
     static let shared = APICallManager()
     
@@ -82,8 +82,13 @@ class APICallManager {
                     let dataForPatientsTableView = try SwiftSoup.parse(person.name!)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span")
                     if !patientNames.isEmpty() {
-                        if let patientID = person.patientID {
-                            let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: try patientNames[1].text().trimmingCharacters(in: .whitespacesAndNewlines), ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientID)
+                    
+                        if let patientID = person.patientID,
+                           let patientDateOfAdmission = person.dateOfAdmission,
+                           let patientBirthday = person.birthday,
+                           let patientSex = person.sex
+                        {
+                            let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: patientDateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientID, birthday: patientBirthday, sex: patientSex)
                             FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient)
                         }
                     }
@@ -159,14 +164,13 @@ class APICallManager {
                     }
                 }
                 
-                //                let decodedData = try JSONSerialization.jsonObject(with: receivedData, options: .fragmentsAllowed)
                 let decodedData = try JSONDecoder().decode(FetchedListOfLabIDs.self, from: receivedData)
                 guard let items = decodedData.map?.evnPS.item[0].children.evnSection.item[1].children.evnUslugaStac.item else {
                     return
                 }
                 
                 for item in items  {
-                    let analysisID = FetchedLabIDs(evnXMLID: item.data.evnXMLID, evnUslugaID: item.data.evnUslugaID)
+                    let analysisID = FetchedLabIDs(evnXMLID: item.data.evnXMLID, evnUslugaID: item.data.evnUslugaID, uslugaName: item.data.uslugaName, evnUslugaDate: item.data.evnUslugaDate)
                     analysesIds.append(analysisID)
                 }
                 onCompletion(analysesIds)
@@ -228,20 +232,12 @@ class APICallManager {
                     return
                 }
                 
-                var collectionDate = String()
                 var analysisItems = [[String]]()
                 
                 do {
                     let decodedData = try JSONDecoder().decode(FetchedLabData.self, from: receivedLabData)
                     let html = try SwiftSoup.parse(decodedData.data!)
-                    let spans = try html.getElementsContainingText("Дата взятия")
-                    
-                    //Get date of analysis
-                    for span in spans {
-                        if !span.ownText().isEmpty {
-                            collectionDate = span.ownText().trimmingCharacters(in: .whitespacesAndNewlines)
-                        }
-                    }
+                
                     
                     let tableBody = try html.getElementsByTag("tbody")
                     let tableRows = try tableBody[0].getElementsByTag("tr")
@@ -259,8 +255,8 @@ class APICallManager {
                         analysisItems.append(tbRow)
                     }
                     
-                    let analysis = AnalysisViewModel(data: analysisItems, date: collectionDate)
-                    let analysisType = AnalysisType(analysis: analysis, evnUslugaID: id.evnUslugaID, evnXMLID: id.evnXMLID)
+                    let analysis = AnalysisDataModel(data: analysisItems, date: id.evnUslugaDate)
+                    let analysisType = AnalysisType(analysis: analysis, evnUslugaID: id.evnUslugaID, evnXMLID: id.evnXMLID, name: id.uslugaName, date: id.evnUslugaDate)
                     labFindings.append(analysisType)
                     
                 } catch let error {
@@ -274,13 +270,13 @@ class APICallManager {
     }
     
     public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisType]) -> Void) {
-        downloadLabIDs(for: patient) { [weak self] ids in
+        downloadLabIDs(for: patient) { ids in
             guard let ids = ids else {
         return
             }
-            self?.downloadLabData(with: ids) { analyses in
-                print(analyses)
+            downloadLabData(with: ids) { analyses in
                 
+                print(analyses[0].name)
                 FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
                 
                 completionHanlder(analyses)
@@ -296,7 +292,7 @@ class APICallManager {
         var patientsCount: Int = 0
         var currentPatient: Int = 0
               
-        FetchingManager.shared.fetchPatientsFromCoreData { [weak self] patients in
+        FetchingManager.shared.fetchPatientsFromCoreData { patients in
             patientsCount = patients.count
             patients.forEach { patient in
                 
@@ -304,8 +300,7 @@ class APICallManager {
                 let timeInterval = TimeInterval.random(in: 1.1...3.9)
                 
                 Timer.scheduledTimer(withTimeInterval: timeInterval * index, repeats: false) { _ in
-                    self?.downloadAndSaveLabData(for: patient) { labData in
-                        print(labData)
+                    downloadAndSaveLabData(for: patient) { labData in
                         FetchingManager.shared.saveLabData(forPatient: patient, with: labData)
                         
                     }
@@ -317,6 +312,8 @@ class APICallManager {
             }
         }
     }
+    
+   
     
 }
 

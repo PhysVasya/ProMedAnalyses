@@ -15,8 +15,12 @@ import SwiftUI
 class ResultsViewController: UIViewController {
     
     static let identifier = "resultsTableCell"
+    public var patient: Patient?
+    private var isConnected : Bool {
+        return UserDefaults.standard.bool(forKey: "isConnected")
+    }
     
-    var reassembledAnalyses = [AnalysisViewModel]() {
+    var reassembledAnalyses = [AnalysisDataModel]() {
         didSet {
             if reassembledAnalyses.isEmpty {
                 let alert = UIAlertController(title: "Ошибка", message: "Анализов с примененными фильтрами нет", preferredStyle: .alert)
@@ -32,16 +36,16 @@ class ResultsViewController: UIViewController {
             } else {
                 fetchedAnalysesDates = reassembledAnalyses.compactMap{$0.date.components(separatedBy: CharacterSet.decimalDigits.inverted).filter{$0 != ""}.joined(separator: ".")}
                 
-                reassembledAnalyses.sort(by: <)
+//                reassembledAnalyses.sort(by: <)
                 tableView.reloadData()
             }
         }
     }
     var fetchedAnalysesDates : [String]?
     
-    var reassembledAnalysesCopy = [AnalysisViewModel]() {
+    var reassembledAnalysesCopy = [AnalysisDataModel]() {
         didSet {
-            reassembledAnalysesCopy.sort(by: <)
+//            reassembledAnalysesCopy.sort(by: <)
             tableView.reloadData()
         }
     }
@@ -55,6 +59,19 @@ class ResultsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        dataIsLoading(with: "Пожалуйста, подождите") { [weak self] indicator in
+            if self?.isConnected == true, let patient = self?.patient {
+                APICallManager.shared.downloadAndSaveLabData(for: patient) { labData in
+                    self?.reassembledAnalyses = labData.compactMap({$0.formattedToViewModel})
+                    DispatchQueue.main.async {
+                        indicator.stopAnimating()
+                        self?.tableView.reloadData()
+                    }
+                }
+            }
+        }
+        
         title = "Результаты анализов"
         let filterButton = UIBarButtonItem(image: UIImage(systemName: "line.3.horizontal.decrease"), style: .plain, target: self, action: #selector(filter))
         let createPDFButton = UIBarButtonItem(image: UIImage(systemName: "doc.badge.plus"), style: .plain, target: self, action: #selector(createPDF))
@@ -68,9 +85,9 @@ class ResultsViewController: UIViewController {
         
     }
     
-    func configureResultsVC (with analyses : [AnalysisViewModel]) {
+    func configureResultsVC (with analyses : [AnalysisDataModel]) {
         analyses.forEach {
-            let lab = AnalysisViewModel(data: $0.data, date: $0.date)
+            let lab = AnalysisDataModel(data: $0.data, date: $0.date)
             reassembledAnalyses.append(lab)
         }
         tableView.reloadData()
@@ -101,11 +118,11 @@ class ResultsViewController: UIViewController {
 
             if let dateFilter = passedFilter.dateFilter {
                 if dateFilter != [] {
-                    var analysesFilteredByDate: [AnalysisViewModel] = []
+                    var analysesFilteredByDate: [AnalysisDataModel] = []
                     
                     var date = "" {
                         didSet {
-                            let filteredAnalysisByDate : [AnalysisViewModel] = self.reassembledAnalysesCopy.compactMap({ eachAnalysis in
+                            let filteredAnalysisByDate : [AnalysisDataModel] = self.reassembledAnalysesCopy.compactMap({ eachAnalysis in
                                 let formatter = DateFormatter()
                                 let analysisDates = eachAnalysis.date.components(separatedBy: CharacterSet.decimalDigits.inverted).filter {$0 != ""}.joined(separator: ".")
                                 formatter.dateFormat = "dd.MM.yyyy"
@@ -132,7 +149,7 @@ class ResultsViewController: UIViewController {
             if let typeFilter = passedFilter.typeFilter {
                 if typeFilter != "" {
                     self.reassembledAnalyses = self.reassembledAnalyses.compactMap({ eachAnalysis in
-                        var filteredAnalyses: AnalysisViewModel?
+                        var filteredAnalyses: AnalysisDataModel?
                         
                         eachAnalysis.data.forEach { el in
                             if el[0].lowercased().contains(typeFilter.lowercased()) {
@@ -149,10 +166,10 @@ class ResultsViewController: UIViewController {
             if let pathological = passedFilter.pathologicalFilter {
 
                 self.reassembledAnalyses = self.reassembledAnalyses.compactMap({ eachAnalysis in
-                    var filteredAnalysis: AnalysisViewModel?
+                    var filteredAnalysis: AnalysisDataModel?
                     eachAnalysis.data.forEach { el in
                         if el[2].contains("▲") || el[2].contains(pathological) {
-                            let flt = AnalysisViewModel(data: [el], date: eachAnalysis.date)
+                            let flt = AnalysisDataModel(data: [el], date: eachAnalysis.date)
                             filteredAnalysis = flt
                         }
                     }

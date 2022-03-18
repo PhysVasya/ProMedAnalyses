@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-class HapticsManager {
+struct HapticsManager {
     
     static let shared = HapticsManager()
     

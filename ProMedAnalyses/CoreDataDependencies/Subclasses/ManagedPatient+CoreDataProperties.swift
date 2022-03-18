@@ -2,7 +2,7 @@
 //  ManagedPatient+CoreDataProperties.swift
 //  
 //
-//  Created by Vasiliy Andreyev on 07.03.2022.
+//  Created by Vasiliy Andreyev on 14.03.2022.
 //
 //
 
@@ -20,42 +20,43 @@ extension ManagedPatient {
     @NSManaged public var patientID: String?
     @NSManaged public var patientName: String?
     @NSManaged public var wardNumber: Int16
-    @NSManaged public var analysis: NSOrderedSet?
+    @NSManaged public var sex: String?
+    @NSManaged public var birthday: Date?
+    @NSManaged public var labData: NSOrderedSet?
 
-    
 }
 
-// MARK: Generated accessors for analysis
+// MARK: Generated accessors for labData
 extension ManagedPatient {
 
-    @objc(insertObject:inAnalysisAtIndex:)
-    @NSManaged public func insertIntoAnalysis(_ value: ManagedLabData, at idx: Int)
+    @objc(insertObject:inLabDataAtIndex:)
+    @NSManaged public func insertIntoLabData(_ value: ManagedLabData, at idx: Int)
 
-    @objc(removeObjectFromAnalysisAtIndex:)
-    @NSManaged public func removeFromAnalysis(at idx: Int)
+    @objc(removeObjectFromLabDataAtIndex:)
+    @NSManaged public func removeFromLabData(at idx: Int)
 
-    @objc(insertAnalysis:atIndexes:)
-    @NSManaged public func insertIntoAnalysis(_ values: [ManagedLabData], at indexes: NSIndexSet)
+    @objc(insertLabData:atIndexes:)
+    @NSManaged public func insertIntoLabData(_ values: [ManagedLabData], at indexes: NSIndexSet)
 
-    @objc(removeAnalysisAtIndexes:)
-    @NSManaged public func removeFromAnalysis(at indexes: NSIndexSet)
+    @objc(removeLabDataAtIndexes:)
+    @NSManaged public func removeFromLabData(at indexes: NSIndexSet)
 
-    @objc(replaceObjectInAnalysisAtIndex:withObject:)
-    @NSManaged public func replaceAnalysis(at idx: Int, with value: ManagedLabData)
+    @objc(replaceObjectInLabDataAtIndex:withObject:)
+    @NSManaged public func replaceLabData(at idx: Int, with value: ManagedLabData)
 
-    @objc(replaceAnalysisAtIndexes:withAnalysis:)
-    @NSManaged public func replaceAnalysis(at indexes: NSIndexSet, with values: [ManagedLabData])
+    @objc(replaceLabDataAtIndexes:withLabData:)
+    @NSManaged public func replaceLabData(at indexes: NSIndexSet, with values: [ManagedLabData])
 
-    @objc(addAnalysisObject:)
-    @NSManaged public func addToAnalysis(_ value: ManagedLabData)
+    @objc(addLabDataObject:)
+    @NSManaged public func addToLabData(_ value: ManagedLabData)
 
-    @objc(removeAnalysisObject:)
-    @NSManaged public func removeFromAnalysis(_ value: ManagedLabData)
+    @objc(removeLabDataObject:)
+    @NSManaged public func removeFromLabData(_ value: ManagedLabData)
 
-    @objc(addAnalysis:)
-    @NSManaged public func addToAnalysis(_ values: NSOrderedSet)
+    @objc(addLabData:)
+    @NSManaged public func addToLabData(_ values: NSOrderedSet)
 
-    @objc(removeAnalysis:)
-    @NSManaged public func removeFromAnalysis(_ values: NSOrderedSet)
+    @objc(removeLabData:)
+    @NSManaged public func removeFromLabData(_ values: NSOrderedSet)
 
 }

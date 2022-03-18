@@ -45,4 +45,17 @@ class CoreDataStack {
         }
     }
     
+    public func clearDatabase() {
+        guard let url = container.persistentStoreDescriptions.first?.url else { return }
+        
+        let persistentStoreCoordinator = container.persistentStoreCoordinator
+
+         do {
+             try persistentStoreCoordinator.destroyPersistentStore(at:url, ofType: NSSQLiteStoreType, options: nil)
+             try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
+         } catch {
+             print("Attempted to clear persistent store: " + error.localizedDescription)
+         }
+    }
+    
 }

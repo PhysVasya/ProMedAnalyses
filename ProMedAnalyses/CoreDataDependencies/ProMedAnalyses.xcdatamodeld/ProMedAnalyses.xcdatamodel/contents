@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ManagedAnalysis" representedClassName=".ManagedAnalysis" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="String"/>
+        <relationship name="labData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedLabData" inverseName="analysis" inverseEntity="ManagedLabData"/>
+    </entity>
     <entity name="ManagedLabData" representedClassName=".ManagedLabData" syncable="YES">
-        <attribute name="data" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName=".[[String]]"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="evnUslugaID" attributeType="String"/>
         <attribute name="evnXMLID" attributeType="String"/>
-        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="analysis" inverseEntity="ManagedPatient"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="analysis" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedAnalysis" inverseName="labData" inverseEntity="ManagedAnalysis"/>
+        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="labData" inverseEntity="ManagedPatient"/>
     </entity>
     <entity name="ManagedPatient" representedClassName=".ManagedPatient" syncable="YES">
+        <attribute name="birthday" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateOfAdmission" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="patientID" attributeType="String"/>
         <attribute name="patientName" attributeType="String"/>
+        <attribute name="sex" optional="YES" attributeType="String"/>
         <attribute name="wardNumber" optional="YES" attributeType="Integer 16" valueTransformerName="WardToDataTransformer" defaultValueString="0" usesScalarValueType="YES" customClassName=".Ward"/>
-        <relationship name="analysis" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedLabData" inverseName="patient" inverseEntity="ManagedLabData"/>
+        <relationship name="labData" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedLabData" inverseName="patient" inverseEntity="ManagedLabData"/>
     </entity>
     <elements>
-        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="104"/>
-        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="104"/>
+        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="119"/>
+        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="134"/>
+        <element name="ManagedAnalysis" positionX="54" positionY="27" width="128" height="74"/>
     </elements>
 </model>

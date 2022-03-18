@@ -24,9 +24,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
         
         UserDefaults.standard.set(false, forKey: "showAuthorizationVC")
         
+//        print("Documents folder is here : \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
+        
+//        CoreDataStack.init(modelName: "ProMedAnalyses").clearDatabase()
+        
         
         return true
     }
+    
+    
 
     // MARK: UISceneSession Lifecycle
 
@@ -40,6 +46,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        AuthorizationManager.shared.logout()
     }
 
 }

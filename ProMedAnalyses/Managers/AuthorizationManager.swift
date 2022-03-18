@@ -8,7 +8,7 @@
 import Foundation
 
 
-class AuthorizationManager {
+struct AuthorizationManager {
     
     enum AuthorizationError: String, Error {
         case errorGettingNewSessionID = "Error getting new session ID"
@@ -220,13 +220,13 @@ class AuthorizationManager {
         UserDefaults.standard.set(login, forKey: "login")
         UserDefaults.standard.set(password, forKey: "password")
         
-        getNewSessionID(with: login, and: password) { [weak self] success in
+        getNewSessionID(with: login, and: password) { success in
             switch success {
             case true:
-                self?.getIoCookie { success in
+                getIoCookie { success in
                     switch success {
                     case true:
-                        self?.getJSessionID { success in
+                        getJSessionID { success in
                             switch success {
                             case true:
                                 completion(true)
@@ -246,6 +246,46 @@ class AuthorizationManager {
                 completion(false)
             }
         }
+    }
+    
+    
+    public func logout () {
+        
+        let url : URL = {
+            var urlComponents = URLComponents()
+            urlComponents.scheme = "https"
+            urlComponents.queryItems = [
+                URLQueryItem(name: "c", value: "main"),
+                URLQueryItem(name: "m", value: "Logout")
+            ]
+            urlComponents.path = "crimea.promedweb.ru"
+            
+            return urlComponents.url!
+        }()
+        
+        guard let io = AuthorizationManager.shared.ioCookie,
+              let jSessionID = AuthorizationManager.shared.jSessionID,
+              let phpSessionID = AuthorizationManager.shared.sessionID else {
+                  return
+              }
+        
+        var request = URLRequest(url: url)
+        request.allHTTPHeaderFields = [
+            "Origin" : "https://crimea.promedweb.ru",
+            "Referer" : "https://crimea.promedweb.ru/?c=promed",
+            "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.3 Safari/605.1.15",
+            "Host":"crimea.promedweb.ru",
+            "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-GB,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+            "X-Requested-With" : "XMLHttpRequest",
+            "Content-Length" : "260",
+            "Cookie" : "io=\(io); JSESSIONID=\(jSessionID); login=inf1; PHPSESSID=\(phpSessionID)"
+        ]
+        
+        
+        URLSession.shared.dataTask(with: request).resume()
     }
     
 }

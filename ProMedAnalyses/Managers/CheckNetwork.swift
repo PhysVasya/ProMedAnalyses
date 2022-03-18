@@ -8,7 +8,7 @@
 import Foundation
 import Network
 
-class CheckNetwork {
+struct CheckNetwork {
     
     static let shared = CheckNetwork(requiredInterfaceType: .wifi)
     private let monitor: NWPathMonitor
@@ -20,9 +20,9 @@ class CheckNetwork {
     
     public func startMonitoring (_ completionHandler: @escaping (_ isSatisfied: Bool, _ receivedPhpSessIdCookie: String?)->Void) {
         monitor.start(queue: queue)
-        monitor.pathUpdateHandler = { [weak self] _ in
+        monitor.pathUpdateHandler = { _ in
             
-            self?.checkConnection { result in
+            checkConnection { result in
                 switch result {
                 case .success(let phpSessionID):
                     completionHandler(true, phpSessionID)
@@ -58,12 +58,12 @@ class CheckNetwork {
             "Connection": "keep-alive"
         ]
         
-        session.dataTask(with: request) { [weak self] _, response, er in
+        session.dataTask(with: request) { _, response, er in
             guard er == nil else {
                 completionHandler(.failure(ConnectionError.noConnection))
                 return
             }
-    
+            
             guard let response = response,
                   let urlResponse = response.url,
                   let httpResponse = response as? HTTPURLResponse,
@@ -71,7 +71,7 @@ class CheckNetwork {
                       completionHandler(.failure(ConnectionError.noConnection))
                       return
                   }
-        
+            
             let cookies = HTTPCookie.cookies(withResponseHeaderFields: fields, for: urlResponse)
             for cookie in cookies {
                 var cookieProps = [HTTPCookiePropertyKey : Any]()
@@ -80,7 +80,7 @@ class CheckNetwork {
                     completionHandler(.failure(ConnectionError.noCookie))
                     return
                 }
-                self?.cachePhpSessionID(id: phpSessionID)
+                cachePhpSessionID(id: phpSessionID)
                 completionHandler(.success(phpSessionID))
             }
         }.resume()
