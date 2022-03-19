@@ -60,17 +60,17 @@ class ResultsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        dataIsLoading(with: "Пожалуйста, подождите") { [weak self] indicator in
-            if self?.isConnected == true, let patient = self?.patient {
-                APICallManager.shared.downloadAndSaveLabData(for: patient) { labData in
-                    self?.reassembledAnalyses = labData.compactMap({$0.formattedToViewModel})
-                    DispatchQueue.main.async {
-                        indicator.stopAnimating()
-                        self?.tableView.reloadData()
-                    }
-                }
-            }
-        }
+//        dataIsLoading(with: "Пожалуйста, подождите") { [weak self] indicator in
+//            if self?.isConnected == true, let patient = self?.patient {
+//                APICallManager.shared.downloadAndSaveLabData(for: patient) { labData in
+//                    self?.reassembledAnalyses = labData.compactMap({$0.formattedToViewModel})
+//                    DispatchQueue.main.async {
+//                        indicator.stopAnimating()
+//                        self?.tableView.reloadData()
+//                    }
+//                }
+//            }
+//        }
         
         title = "Результаты анализов"
         let filterButton = UIBarButtonItem(image: UIImage(systemName: "line.3.horizontal.decrease"), style: .plain, target: self, action: #selector(filter))
