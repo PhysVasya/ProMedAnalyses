@@ -77,7 +77,19 @@ class ResultsViewController: UIViewController {
             }
             
             if let pathologicalFilter = passedFilter.pathologicalFilter {
-                
+                self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({ eachAnalysis in
+                    var filteredAnalysis: AnalysisViewModel?
+                    eachAnalysis.analysis.forEach { el in
+                        if el.value.contains("▲") || el.value.contains(pathologicalFilter) {
+                            var pathologicalAnalyses = [Analysis]()
+                            pathologicalAnalyses.append(Analysis(name: el.name, value: el.value))
+                            let flt = AnalysisViewModel(name: eachAnalysis.name, date: eachAnalysis.date, analysis: pathologicalAnalyses)
+                            filteredAnalysis = flt
+                        }
+                    }
+                    return filteredAnalysis
+                })
+                self?.tableView.reloadData()
             }
             
         }
