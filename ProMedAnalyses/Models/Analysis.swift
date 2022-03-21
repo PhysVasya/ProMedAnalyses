@@ -29,11 +29,12 @@ struct AnalysisDataModel {
 
 struct AnalysisViewModel {
  
+    let name: String
     let date: String
     let analysis: [Analysis]
     
-    public init (date: String, analysis: [Analysis]) {
-        
+    public init (name: String, date: String, analysis: [Analysis]) {
+        self.name = name
         self.date = date
         self.analysis = analysis
     }

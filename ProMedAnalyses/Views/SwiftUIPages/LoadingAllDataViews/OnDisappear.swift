@@ -24,6 +24,6 @@ struct OnDisappear: View {
 
 //struct OnDisappear_Previews: PreviewProvider {
 //    static var previews: some View {
-//        OnDisappear(double: Binding<Double(0.2)>)
+//        OnDisappear(double: Binding<0.2>)
 //    }
 //}

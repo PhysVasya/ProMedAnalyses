@@ -289,23 +289,23 @@ struct APICallManager {
     
     public func downloadAll (completionHandler : @escaping (Double?) -> Void) async {
         
-        var fetchedPatients : [Patient]?
-        var double: Double?
+        var fetchedPatients: [Patient]?
         var currentPatient : Int = 0
+        var double: Double?
         
         FetchingManager.shared.fetchPatientsFromCoreData { patients in
             fetchedPatients = patients
         }
         
         if let fetchedPatients = fetchedPatients {
-            for  patient in fetchedPatients {
+            for patient in fetchedPatients {
                 
                 if let ids = await downloadLabIDs(for: patient) {
                     if let analyses = await downloadLabData(with: ids) {
                         
                         FetchingManager.shared.saveLabData(forPatient: fetchedPatients[currentPatient], with: analyses)
                         currentPatient += 1
-                        double = Double(currentPatient + 1) / Double(fetchedPatients.count)
+                        double = Double(currentPatient + 1 / fetchedPatients.count)
                         completionHandler(double)
                     }
                 }

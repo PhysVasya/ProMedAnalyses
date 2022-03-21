@@ -22,7 +22,6 @@ struct Patient: Equatable {
     let analyses: [AnalysisType]?
     
     
-    
     init(name: String, dateOfAdmission: String, ward: Ward = Ward(wardNumber: 0, wardType: .fourMan), patientID: Int, birthday: String, sex: String, analyses: [AnalysisType]? = nil) {
         self.name = name
         self.dateOfAdmission = dateOfAdmission

@@ -106,8 +106,9 @@ class FetchingManager {
                            let value = managedAnalysis.value {
                             return Analysis(name: name, value: value) } else { return nil }
                     }
-                    if let date = labData.date?.getFormattedDate() {
-                        finalAnalysis.append(AnalysisViewModel(date: date, analysis: viewFormattedFetchedAnalyses))
+                    if let date = labData.date?.getFormattedDate(),
+                       let name = labData.name {
+                        finalAnalysis.append(AnalysisViewModel(name: name, date: date, analysis: viewFormattedFetchedAnalyses))
                     }
                 }
             })
@@ -217,37 +218,48 @@ class FetchingManager {
         }
         
         analysisType.forEach { analysis in
-            let managedLabData = ManagedLabData(context: context)
-            managedLabData.evnXMLID = Int64(exactly: analysis.evnXMLID)!
-            managedLabData.evnUslugaID = Int64(exactly: analysis.evnUslugaID)!
-            managedLabData.date = analysis.date
-            managedLabData.name = analysis.name
-            managedLabData.patient = sharedPatient
-
-            let analysisNames = analysis.analysis.data.map { eachAnalysis in
-                return eachAnalysis[0]
-            }
-            let analysisValues = analysis.analysis.data.map { eachAnalysis in
-                return eachAnalysis[2]
-            }
             
-            let nameValuePair = Dictionary(uniqueKeysWithValues: zip(analysisNames, analysisValues))
+            let managedLabDataFetch : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
+            managedLabDataFetch.predicate = NSPredicate(format: "evnUslugaID == \(analysis.evnUslugaID)")
             
-            for (name, value) in nameValuePair {
-                print(name, value)
-                let managedAnalysis = ManagedAnalysis(context: context)
-                managedAnalysis.name = name
-                managedAnalysis.value = value
-                managedAnalysis.patient = sharedPatient
-                managedLabData.addToAnalyses(managedAnalysis)
-            }
-            
-            if context.hasChanges {
-                do {
-                    try self.context.save()
-                } catch let error {
-                    print("\(SavingError.unableToSaveAnalysis.rawValue): \(error)")
+            do {
+                let results1 = try context.fetch(managedLabDataFetch)
+                if results1.count == 0 {
+                    let managedLabData = ManagedLabData(context: context)
+                    managedLabData.evnXMLID = Int64(exactly: analysis.evnXMLID)!
+                    managedLabData.evnUslugaID = Int64(exactly: analysis.evnUslugaID)!
+                    managedLabData.date = analysis.date
+                    managedLabData.name = analysis.name
+                    managedLabData.patient = sharedPatient
+                    
+                    let analysisNames = analysis.analysis.data.map { eachAnalysis in
+                        return eachAnalysis[0]
+                    }
+                    let analysisValues = analysis.analysis.data.map { eachAnalysis in
+                        return eachAnalysis[2]
+                    }
+                    
+                    let nameValuePair = Dictionary(uniqueKeysWithValues: zip(analysisNames, analysisValues))
+                    
+                    for (name, value) in nameValuePair {
+                        let managedAnalysis = ManagedAnalysis(context: context)
+                        managedAnalysis.name = name
+                        managedAnalysis.value = value
+                        managedAnalysis.patient = sharedPatient
+                        managedLabData.addToAnalyses(managedAnalysis)
+                    }
+                    
+                    if context.hasChanges {
+                        do {
+                            try self.context.save()
+                        } catch let error {
+                            print("\(SavingError.unableToSaveAnalysis.rawValue): \(error)")
+                        }
+                    }
                 }
+                
+            } catch let error as NSError {
+                print(error)
             }
         }
     }

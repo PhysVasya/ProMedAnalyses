@@ -24,7 +24,7 @@ class ResultsViewController: UIViewController {
                     alert.dismiss(animated: true) {
                         self?.filterVC.selectedDate = nil
                         self?.filterVC.selectedFilter = nil
-                        self?.filter()
+                        self?.presentFilterVC()
                     }
                 }
                 alert.addAction(action)
@@ -35,16 +35,11 @@ class ResultsViewController: UIViewController {
         }
     }
     var fetchedAnalysesDates : [String]? {
-        didSet {
-            fetchedAnalysesDates?.sort(by: {$0 < $1})
-        }
+        return reassembledAnalyses.compactMap({$0.date}).sorted(by: {$0 < $1})
     }
     
-    var reassembledAnalysesCopy = [AnalysisViewModel]() {
-        didSet {
-            tableView.reloadData()
-        }
-    }
+    var reassembledAnalysesCopy = [AnalysisViewModel]()
+    
     let tableView : UITableView = {
         let tableView = UITableView()
         tableView.register(UINib(nibName: "ResultsReusableCell", bundle: nil), forCellReuseIdentifier: ResultsCellViewController.identifier)
@@ -62,18 +57,27 @@ class ResultsViewController: UIViewController {
         }
         
         filterVC.sendFilters = { [weak self] passedFilter in
+
             
             guard let passedFilter = passedFilter else {
                 self?.reassembledAnalyses = self!.reassembledAnalysesCopy
+                self?.tableView.reloadData()
                 return
             }
             
             if let dateFilter = passedFilter.dateFilter {
-                self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({$0.date == dateFilter ? $0 : nil})
-            } else if let typeFilter = passedFilter.typeFilter {
+                self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({$0.date < dateFilter ? $0 : nil})
+                self?.tableView.reloadData()
+            }
+            if let typeFilter = passedFilter.typeFilter {
+                if typeFilter != "" {
+                    self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({$0.name.lowercased().contains(typeFilter.lowercased()) ? $0 : nil})
+                    self?.tableView.reloadData()
+                }
+            }
+            
+            if let pathologicalFilter = passedFilter.pathologicalFilter {
                 
-            } else if let pathologicalFilter = passedFilter.pathologicalFilter {
-
             }
             
         }
@@ -81,7 +85,6 @@ class ResultsViewController: UIViewController {
         getReferences()
         setupTableView()
         setupNavBarRightItems()
-        reassembledAnalysesCopy = reassembledAnalyses
     }
     
     private func setupTableView () {
@@ -92,7 +95,7 @@ class ResultsViewController: UIViewController {
     }
     
     private func setupNavBarRightItems () {
-        let filterButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"), style: .plain, target: self, action: #selector(filter))
+        let filterButton = UIBarButtonItem(image: UIImage(systemName: "list.dash"), style: .plain, target: self, action: #selector(presentFilterVC))
         let createPDFButton = UIBarButtonItem(image: UIImage(systemName: "doc.badge.plus"), style: .plain, target: self, action: #selector(createPDF))
         navigationItem.setRightBarButtonItems([filterButton, createPDFButton], animated: false)
     }
@@ -107,7 +110,7 @@ class ResultsViewController: UIViewController {
                         })
                     } else {
                         self.reassembledAnalyses = labData
-                        self.fetchedAnalysesDates = labData.compactMap({$0.date})
+                        self.reassembledAnalysesCopy = labData
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                             visually.stopAnimating()
@@ -127,7 +130,7 @@ class ResultsViewController: UIViewController {
                     })
                 } else {
                     self.reassembledAnalyses = labData
-                    self.fetchedAnalysesDates = labData.compactMap({$0.date})
+                    self.reassembledAnalysesCopy = self.reassembledAnalyses
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         visually.stopAnimating()
@@ -144,15 +147,20 @@ class ResultsViewController: UIViewController {
         //        navigationController?.present(navController, animated: true, completion: nil)
     }
     
-    @objc func filter () {
-        let nav = UINavigationController(rootViewController: filterVC)
-        nav.sheetPresentationController?.detents = [.medium()]
-        nav.sheetPresentationController?.selectedDetentIdentifier = .medium
+    @objc func presentFilterVC () {
         
-        filterVC.configureFilterVC(send: fetchedAnalysesDates?.uniqued())
-        
-        
-        present(nav, animated: true, completion: nil)
+        if reassembledAnalyses.isEmpty {
+            print("reassembeldanalyses is empty")
+        } else {
+            
+            let nav = UINavigationController(rootViewController: filterVC)
+            nav.sheetPresentationController?.detents = [.medium()]
+            nav.sheetPresentationController?.selectedDetentIdentifier = .medium
+            
+            filterVC.configureFilterVC(send: fetchedAnalysesDates?.uniqued())
+            
+            present(nav, animated: true, completion: nil)
+        }
     }
     
     

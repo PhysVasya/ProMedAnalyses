@@ -10,25 +10,29 @@ import Network
 
 struct CheckNetwork {
     
-    static let shared = CheckNetwork(requiredInterfaceType: .wifi)
-    private let monitor: NWPathMonitor
-    private let queue = DispatchQueue(label: "Monitor")
+    static let shared = CheckNetwork()
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue.global(qos: .background)
     
-    private init(requiredInterfaceType: NWInterface.InterfaceType) {
-        monitor = NWPathMonitor(requiredInterfaceType: requiredInterfaceType)
-    }
+    private init() {}
     
     public func startMonitoring (_ completionHandler: @escaping (_ isSatisfied: Bool, _ receivedPhpSessIdCookie: String?)->Void) {
-        monitor.start(queue: queue)
-        monitor.pathUpdateHandler = { _ in
-            
-            checkConnection { result in
-                switch result {
-                case .success(let phpSessionID):
-                    completionHandler(true, phpSessionID)
-                case .failure(let error):
-                    completionHandler(false, error.localizedDescription)
+        DispatchQueue.main.async {
+            monitor.start(queue: queue)
+            monitor.pathUpdateHandler = { path in
+                if path.usesInterfaceType(.wifi) {
+                    checkConnection { result in
+                        switch result {
+                        case .success(let phpSessionID):
+                            completionHandler(true, phpSessionID)
+                        case .failure(let error):
+                            completionHandler(false, error.localizedDescription)
+                        }
+                    }
+                } else {
+                    completionHandler(false, nil)
                 }
+                
             }
         }
     }

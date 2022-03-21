@@ -83,7 +83,7 @@ class AuthorizationViewController: UIViewController {
         if !isConnected {
             FetchingManager.shared.fetchPatientsFromCoreData { [weak self] patients in
                 if patients.isEmpty {
-                    self?.showErrorToTheUser(with: "Unfortunately there is no saved patients on your device. Please connect to the working wifi at work.")
+                    self?.showErrorToTheUser(with: "На вашем устройстве отсутсвуют сохраненные пациенты. \n Пожалуйста, подключитесь к рабочей сети.")
                 } else {
                     self?.showErrorToTheUser(with: "Отсутствует подключение к защищенной рабочей сети. \n\n Загрузить сохраненные данные?", addOKButton: true, completionHanlderOnSuccess: {
                         self?.presentPatients()

@@ -18,7 +18,7 @@ class FilterViewController: UIViewController {
     private let formatter = DateFormatter()
     
     private let filterTypes = ["Дата", "Тип услуги", "Только патологические"]
-    private let servicesTypefilter = ["","Общий анализ крови", "Биохимический анализ крови", "Ферритин", "С-реактивный белок"]
+    private let servicesTypefilter = ["","Общий анализ крови", "Биохимический анализ крови", "Ферритин", "Д-димер"]
     
     private var selectedTypeFilter: String?
     private var selectedPathologicalFilter: String?
@@ -61,7 +61,6 @@ class FilterViewController: UIViewController {
     }
     
     @objc private func dismissSelf() {
-        selectedFilter = nil
         self.sendFilters?(nil)
         self.dismiss(animated: true)
     }

@@ -246,41 +246,52 @@ class PatientsViewController: UIViewController {
             return
         }
         if isConnected {
-            APICallManager.shared.getPatientsAndEvnIds { success in
+            APICallManager.shared.getPatientsAndEvnIds { [weak self] success in
                 switch success {
                 case true:
                     FetchingManager.shared.fetchPatientsFromCoreData { receivedPatients in
-                        self.patients = receivedPatients
+                        self?.patients = receivedPatients
+                        DispatchQueue.main.async {
+                            self?.patientsTableView.reloadData()
+                            self?.refresh.endRefreshing()
+                        }
                     }
                 case false:
                     print("FALSE")
                 }
             }
         } else {
-            FetchingManager.shared.fetchPatientsFromCoreData { receivedPatients in
-                self.patients = receivedPatients
+            FetchingManager.shared.fetchPatientsFromCoreData { [weak self] receivedPatients in
+                self?.patients = receivedPatients
+                DispatchQueue.main.async {
+                    self?.patientsTableView.reloadData()
+                    self?.refresh.endRefreshing()
+                }
             }
         }
-        patientsTableView.reloadData()
-        refresh.endRefreshing()
+        
     }
     
     private func sortPatients (with filter: PatientFilter) {
-        switch filter {
-        case .date:
-            patients = patients.sorted { n1, n2 in
-                ascending ? n1.dateOfAdmission.getFormattedDateFromString()! > n2.dateOfAdmission.getFormattedDateFromString()! :
-                n1.dateOfAdmission.getFormattedDateFromString()! < n2.dateOfAdmission.getFormattedDateFromString()!
+        if patients.isEmpty {
+            print("patients is empty")
+        } else {
+            switch filter {
+            case .date:
+                patients = patients.sorted { n1, n2 in
+                    ascending ? n1.dateOfAdmission.getFormattedDateFromString()! > n2.dateOfAdmission.getFormattedDateFromString()! :
+                    n1.dateOfAdmission.getFormattedDateFromString()! < n2.dateOfAdmission.getFormattedDateFromString()!
+                }
+                patientsTableView.reloadData()
+                ascending = !ascending
+                
+            case .name:
+                patients = patients.sorted { n1, n2 in
+                    ascending ? n1.name.first! > n2.name.first! : n1.name.first! < n2.name.first!
+                }
+                patientsTableView.reloadData()
+                ascending = !ascending
             }
-            patientsTableView.reloadData()
-            ascending = !ascending
-            
-        case .name:
-            patients = patients.sorted { n1, n2 in
-                ascending ? n1.name.first! > n2.name.first! : n1.name.first! < n2.name.first!
-            }
-            patientsTableView.reloadData()
-            ascending = !ascending
         }
     }
     
