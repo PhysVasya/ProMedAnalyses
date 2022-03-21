@@ -64,8 +64,8 @@ struct APICallManager {
         urlRequest.httpBody = requestBody.data(using: .utf8)
         
         let urlConfig = URLSessionConfiguration.default
-        urlConfig.timeoutIntervalForResource = 5
-        urlConfig.timeoutIntervalForRequest = 5
+        urlConfig.timeoutIntervalForResource = 10
+        urlConfig.timeoutIntervalForRequest = 10
         let urlSession = URLSession(configuration: urlConfig)
         
         
@@ -88,7 +88,7 @@ struct APICallManager {
                            let patientBirthday = person.birthday,
                            let patientSex = person.sex
                         {
-                            let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: patientDateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: patientID, birthday: patientBirthday, sex: patientSex)
+                            let patient = Patient(name: try patientNames[0].text().capitalized, dateOfAdmission: patientDateOfAdmission, ward: Ward(wardNumber: 0, wardType: .fourMan), patientID: Int(patientID)!, birthday: patientBirthday, sex: patientSex)
                             FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient)
                         }
                     }
@@ -149,6 +149,7 @@ struct APICallManager {
         return await withCheckedContinuation { continuation in
             URLSession.shared.dataTask(with: urlRequest) { data1, response, error in
                 guard error == nil, let receivedData = data1 else {
+                    continuation.resume(throwing: error as! Never)
                     print("\(APICallErrors.errorDownloadingLabIDs.rawValue): \(String(describing: error))")
                     return
                 }
@@ -166,16 +167,18 @@ struct APICallManager {
                     
                     let decodedData = try JSONDecoder().decode(FetchedListOfLabIDs.self, from: receivedData)
                     guard let items = decodedData.map?.evnPS.item[0].children.evnSection.item[1].children.evnUslugaStac.item else {
+                        continuation.resume(returning: [])
                         return
                     }
                     
                     for item in items  {
-                        let analysisID = FetchedLabIDs(evnXMLID: item.data.evnXMLID, evnUslugaID: item.data.evnUslugaID, uslugaName: item.data.uslugaName, evnUslugaDate: item.data.evnUslugaDate)
+                        let analysisID = FetchedLabIDs(evnXMLID: Int(item.data.evnXMLID)!, evnUslugaID: Int(item.data.evnUslugaID)!, uslugaName: item.data.uslugaName, evnUslugaDate: item.data.evnUslugaDate.getFormattedDateFromString()!)
                         analysesIds.append(analysisID)
                     }
                     continuation.resume(returning: analysesIds)
                 } catch let error {
                     print("\(APICallErrors.errorDownloadingLabIDs.rawValue) : \(error)")
+                    return
                 }
             }.resume()
         }
@@ -272,49 +275,42 @@ struct APICallManager {
         }
     }
     
-//    public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping (_ labData: [AnalysisType]) -> Void) {
-//        downloadLabIDs(for: patient) { ids in
-//            guard let ids = ids else {
-//        return
-//            }
-//            downloadLabData(with: ids) { analyses in
-//
-//                print(analyses[0].name)
-//                FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
-//
-//                completionHanlder(analyses)
-//            }
-//        }
-//    }
+    public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping () -> Void) {
+        Task.init {
+            if let ids = await downloadLabIDs(for: patient) {
+                if let analyses = await downloadLabData(with: ids) {
+                    FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
+                    completionHanlder()
+                }
+            }
+        }
+    }
+
     
-    
-    
-    public func downloadAll () async -> Double? {
+    public func downloadAll (completionHandler : @escaping (Double?) -> Void) async {
         
         var fetchedPatients : [Patient]?
         var double: Double?
+        var currentPatient : Int = 0
         
         FetchingManager.shared.fetchPatientsFromCoreData { patients in
-           fetchedPatients = patients
+            fetchedPatients = patients
         }
         
         if let fetchedPatients = fetchedPatients {
-            for patient in fetchedPatients {
+            for  patient in fetchedPatients {
+                
                 if let ids = await downloadLabIDs(for: patient) {
                     if let analyses = await downloadLabData(with: ids) {
-                        double = Double(fetchedPatients.count) / Double(analyses.count)
-                        print(analyses)
-                        print(double)
+                        
+                        FetchingManager.shared.saveLabData(forPatient: fetchedPatients[currentPatient], with: analyses)
+                        currentPatient += 1
+                        double = Double(currentPatient + 1) / Double(fetchedPatients.count)
+                        completionHandler(double)
                     }
                 }
             }
         }
-
-        
-        return double
     }
-    
-   
-    
 }
 

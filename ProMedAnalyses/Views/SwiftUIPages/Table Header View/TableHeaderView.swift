@@ -26,7 +26,7 @@ struct TableHeaderView: View {
                 
             }
              }
-        .padding(EdgeInsets(top: 0, leading: width / 25, bottom: 0, trailing: width / 25))
+        .padding(EdgeInsets(top: 0, leading: width / 20, bottom: 0, trailing: width / 20))
         .frame(width: width, height: 40)
     }
 }

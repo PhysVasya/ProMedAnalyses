@@ -44,16 +44,19 @@ struct LoadingAllDataAlert: View {
         .frame(width: UIScreen.main.bounds.width - 50, height: 200, alignment: .center)
         .onAppear {
             Task.init {
-//                APICallManager.shared.downloadAll() { status in
-//                    loadingStatus = status
-//                    if loadingStatus != 1.0 {
-//                        shouldDisappear = false
-//                    } else {
-//                        shouldDisappear = true
-//                    }
-//                }
-               let double = await APICallManager.shared.downloadAll()
-                print(double)
+                await APICallManager.shared.downloadAll() { double in
+                    guard let double = double else {
+                        return
+                    }
+                    
+                    loadingStatus = double
+                    print(double)
+                    if loadingStatus != 1.0 {
+                        shouldDisappear = false
+                    } else {
+                        shouldDisappear = true
+                    }
+                }
             }
         }
         .onChange(of: shouldDisappear) { newValue in

@@ -11,7 +11,6 @@ import SwiftUI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
-
    
     var window: UIWindow?
     
@@ -23,12 +22,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
         self.window = window
         
         UserDefaults.standard.set(false, forKey: "showAuthorizationVC")
-        
+//        
 //        print("Documents folder is here : \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
         
 //        CoreDataStack.init(modelName: "ProMedAnalyses").clearDatabase()
-        
-        
         return true
     }
     

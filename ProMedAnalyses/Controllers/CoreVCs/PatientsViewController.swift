@@ -47,6 +47,7 @@ class PatientsViewController: UIViewController {
         let vc = UIHostingController(rootView: LoadingAllDataAlert(shouldStayOnScreen: downloadingViewShouldStayPresented))
         vc.sheetPresentationController?.detents = [.medium()]
         vc.sheetPresentationController?.selectedDetentIdentifier = .medium
+        vc.isModalInPresentation = true
         return vc
     }
     
@@ -59,12 +60,12 @@ class PatientsViewController: UIViewController {
             self?.manageFetchingPatients(visually: indicator)
         }
         
-        onlyPatientsWithAnalysesPressed = { [weak self] success in
-            self?.manageOnlyPatientsWithAnalysesButtonPressed(buttonPressed: success)
+        onlyPatientsWithAnalysesPressed = { [weak self] pressed in
+            self?.manageOnlyPatientsWithAnalysesButtonPressed(buttonPressed: pressed)
         }
         
-        onlyHighCRPPressed = { [weak self] success in
-            self?.manageHightCRPOnlyButtonPressed(buttonPressed: success)
+        onlyHighCRPPressed = { [weak self] pressed in
+            self?.manageHightCRPOnlyButtonPressed(buttonPressed: pressed)
         }
         
         downloadingViewShouldStayPresented = { [weak self] boolean in
@@ -100,8 +101,8 @@ class PatientsViewController: UIViewController {
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
         let headerView = UIHostingController(rootView: TableHeaderView(onSavedButtonPressed: onlyPatientsWithAnalysesPressed, onHighCRPButtonPressed: onlyHighCRPPressed))
-        patientsTableView.tableHeaderView = headerView.view
         headerView.view.translatesAutoresizingMaskIntoConstraints = false
+        patientsTableView.tableHeaderView = headerView.view
     }
     
     private func configureNavigationBar () {
@@ -171,12 +172,21 @@ class PatientsViewController: UIViewController {
     
     private func manageFetchingPatients (visually: UIActivityIndicatorView) {
         if isConnected == true {
-            APICallManager.shared.getPatientsAndEvnIds { _ in
+            APICallManager.shared.getPatientsAndEvnIds { [weak self] _ in
                 FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                    self.patients = patients
+                    self?.patients = patients
                 }
                 DispatchQueue.main.async {
-                    self.patientsTableView.reloadData()
+                    self?.patientsTableView.reloadData()
+                    visually.stopAnimating()
+                }
+            }
+        } else {
+            FetchingManager.shared.fetchPatientsFromCoreData { [weak self] patients in
+                self?.patients = patients
+                
+                DispatchQueue.main.async {
+                    self?.patientsTableView.reloadData()
                     visually.stopAnimating()
                 }
             }
@@ -187,7 +197,7 @@ class PatientsViewController: UIViewController {
         switch buttonPressed {
         case true:
             patientsTableView.refreshControl = nil
-            applyFilter()
+            manageOnlyPatientsWithAnalyses()
         case false:
             patientsTableView.refreshControl = refresh
             FetchingManager.shared.fetchPatientsFromCoreData { patients in
@@ -224,7 +234,7 @@ class PatientsViewController: UIViewController {
         
     }
     
-    private func applyFilter () {
+    private func manageOnlyPatientsWithAnalyses () {
         FetchingManager.shared.fetchOnlyPatientsWithAnalyses { patients in
             self.patients = patients
             patientsTableView.reloadData()
@@ -273,28 +283,6 @@ class PatientsViewController: UIViewController {
             ascending = !ascending
         }
     }
-    
-    public func configure(with patients: [Patient]) {
-        self.patients = patients
-    }
-    
-//    private func configureResults (for patient: Patient) {
-//
-//        guard let connectionAvailiable = isConnected else {
-//            return
-//        }
-//        switch connectionAvailiable {
-//        case true:
-//            APICallManager.shared.downloadAndSaveLabData(for: patient) { [weak self] labData in
-//                let labDataFormatted = labData.compactMap{$0.formattedToViewModel}
-//                self?.presentResults(with: labDataFormatted)
-//            }
-//        case false:
-//            FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { [weak self] analyses in
-//                self?.presentResults(with: analyses)
-//            }
-//        }
-//    }
     
     private func presentResults (for patient: Patient) {
         DispatchQueue.main.async {

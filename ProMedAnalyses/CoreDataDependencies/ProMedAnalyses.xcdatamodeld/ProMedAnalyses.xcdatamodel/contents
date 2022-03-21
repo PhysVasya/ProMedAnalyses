@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="ManagedAnalysis" representedClassName=".ManagedAnalysis" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="value" optional="YES" attributeType="String"/>
-        <relationship name="labData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedLabData" inverseName="analysis" inverseEntity="ManagedLabData"/>
+        <relationship name="labData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedLabData" inverseName="analyses" inverseEntity="ManagedLabData"/>
+        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="patientsAnalyses" inverseEntity="ManagedPatient"/>
     </entity>
     <entity name="ManagedLabData" representedClassName=".ManagedLabData" syncable="YES">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="evnUslugaID" attributeType="String"/>
-        <attribute name="evnXMLID" attributeType="String"/>
+        <attribute name="evnUslugaID" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="evnXMLID" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="analysis" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedAnalysis" inverseName="labData" inverseEntity="ManagedAnalysis"/>
-        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="labData" inverseEntity="ManagedPatient"/>
+        <relationship name="analyses" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedAnalysis" inverseName="labData" inverseEntity="ManagedAnalysis"/>
+        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ManagedPatient" inverseName="labsData" inverseEntity="ManagedPatient"/>
     </entity>
     <entity name="ManagedPatient" representedClassName=".ManagedPatient" syncable="YES">
         <attribute name="birthday" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateOfAdmission" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="patientID" attributeType="String"/>
+        <attribute name="patientID" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="patientName" attributeType="String"/>
         <attribute name="sex" optional="YES" attributeType="String"/>
         <attribute name="wardNumber" optional="YES" attributeType="Integer 16" valueTransformerName="WardToDataTransformer" defaultValueString="0" usesScalarValueType="YES" customClassName=".Ward"/>
-        <relationship name="labData" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedLabData" inverseName="patient" inverseEntity="ManagedLabData"/>
+        <relationship name="labsData" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedLabData" inverseName="patient" inverseEntity="ManagedLabData"/>
+        <relationship name="patientsAnalyses" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ManagedAnalysis" inverseName="patient" inverseEntity="ManagedAnalysis"/>
     </entity>
     <elements>
-        <element name="ManagedLabData" positionX="169.63671875" positionY="-22.984375" width="128" height="119"/>
-        <element name="ManagedPatient" positionX="-63" positionY="-18" width="128" height="134"/>
-        <element name="ManagedAnalysis" positionX="54" positionY="27" width="128" height="74"/>
+        <element name="ManagedAnalysis" positionX="114.6484375" positionY="217.2578125" width="216.0390625" height="103"/>
+        <element name="ManagedLabData" positionX="-342.90625" positionY="251.40234375" width="189.10546875" height="133"/>
+        <element name="ManagedPatient" positionX="-576.17578125" positionY="-47.41015625" width="128" height="163"/>
     </elements>
 </model>

@@ -10,34 +10,42 @@ import UIKit
 
 class FilterViewController: UIViewController {
     
+    private let tableForProps = UITableView()
+    private let stackView = UIStackView()
+    private let pickerView = UIPickerView()
+    private let datePicker = UIDatePicker()
+    private let textField = UITextField()
+    private let formatter = DateFormatter()
     
-    let tableForProps = UITableView()
-    let stackView = UIStackView()
-    let pickerView = UIPickerView()
-    let datePicker = UIDatePicker()
-    let textField = UITextField()
-    let formatter = DateFormatter()
+    private let filterTypes = ["Дата", "Тип услуги", "Только патологические"]
+    private let servicesTypefilter = ["","Общий анализ крови", "Биохимический анализ крови", "Ферритин", "С-реактивный белок"]
     
-    let filterTypes = ["Дата", "Тип услуги", "Только патологические"]
-    let servicesTypefilter = ["", "Д-димер", "Ферритин", "Общий анализ крови", "Биохимический анализ крови", "Прокальцитонин", "Общий анализ мочи", "Коагулограмма", "ЗППП"]
-    var selectedTypeFilter: String?
-    var selectedPathologicalFilter: String?
-    var selectedFilter : Filter?
-    var selectedDates = [String]()
-    var availiableDates = [String]()
-    var selectedIndexPaths = Set<IndexPath>()
+    private var selectedTypeFilter: String?
+    private var selectedPathologicalFilter: String?
+    public var selectedFilter : Filter?
     public var sendFilters : ((Filter?) -> Void)?
+
+    public var selectedDate: String?
+    private var availiableDates = [String]()
+    private var selectedIndexPaths = Set<IndexPath>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Параметры фильтров"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissSelf))
-        setupFilterView()
         formatter.dateFormat = "dd.MM.yyyy"
-        
+        createStackView()
+
+
     }
     
-    func configure (with dates: [String]?) {
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        setupFilterView()
+
+    }
+    
+    public func configureFilterVC (send dates: [String]?) {
         guard let avDates = dates else {
             return
         }
@@ -45,19 +53,21 @@ class FilterViewController: UIViewController {
     }
     
     
-    @objc func applyFilters () {
-        dismissSelf()
-    }
-    
-    @objc func dismissSelf() {
-        selectedFilter = Filter(dateFilter: selectedDates, typeFilter: selectedTypeFilter, pathologicalFilter: selectedPathologicalFilter)
+    @objc private func applyFilters () {
+        selectedFilter = Filter(dateFilter: selectedDate, typeFilter: selectedTypeFilter, pathologicalFilter: selectedPathologicalFilter)
         self.dismiss(animated: true) {
             self.sendFilters?(self.selectedFilter)
         }
     }
     
-    func setupTableView () {
-        tableForProps.register(UINib(nibName: "FilterTableCell", bundle: nil), forCellReuseIdentifier: "filterTableCell")
+    @objc private func dismissSelf() {
+        selectedFilter = nil
+        self.sendFilters?(nil)
+        self.dismiss(animated: true)
+    }
+    
+    private func setupTableView () {
+        tableForProps.register(UINib(nibName: "FilterTableCell", bundle: nil), forCellReuseIdentifier: FilterCellViewController.identifier)
         tableForProps.delegate = self
         tableForProps.dataSource = self
         view.addSubview(tableForProps)
@@ -66,50 +76,35 @@ class FilterViewController: UIViewController {
         tableForProps.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableForProps.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         tableForProps.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        
     }
     
-    func setupPickerViewOnTextField () {
+    private func setupPickerViewOnTextField () {
         pickerView.dataSource = self
         pickerView.delegate = self
         textField.delegate = self
-        
+                
         let toolbar = UIToolbar()
         toolbar.barStyle = UIBarStyle.default
         toolbar.isTranslucent = true
         toolbar.sizeToFit()
         textField.inputAccessoryView = toolbar
         
-        let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(closePickerView))
+        let doneButton = UIBarButtonItem(title: "Выбрать", style: .plain, target: self, action: #selector(closePickerView))
         let dummyButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.setItems([dummyButton, doneButton], animated: false)
         toolbar.isUserInteractionEnabled = true
-        
     }
     
-    @objc func closePickerView () {
+    @objc private func closePickerView () {
         textField.resignFirstResponder()
-
     }
     
-    func createButton (with title: String, bgColor: UIColor, titleColor: UIColor, selector: Selector) -> UIButton {
-        
-        let button = UIButton()
-        button.configuration = .bordered()
-        button.backgroundColor = bgColor
-        button.setTitle(title, for: .normal)
-        button.layer.cornerRadius = 10
-        button.setTitleColor(titleColor, for: .normal)
-        button.addTarget(self, action: selector, for: .touchUpInside)
-        return button
-    }
-    
-    func createStackView () {
+    private func createStackView () {
         let applyButton = createButton(with: "Применить", bgColor: UIColor.systemOrange, titleColor: UIColor.systemBackground, selector: #selector(applyFilters))
         
         stackView.distribution = .fillProportionally
         stackView.axis = .horizontal
-        stackView.spacing = 0
+        stackView.spacing = 10
         view.addSubview(stackView)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -121,9 +116,8 @@ class FilterViewController: UIViewController {
         stackView.addArrangedSubview(applyButton)
     }
     
-    func setupFilterView ()  {
+    private func setupFilterView ()  {
         setupTableView()
-        createStackView()
         setupPickerViewOnTextField()
         stackView.topAnchor.constraint(equalTo: tableForProps.bottomAnchor).isActive = true
         tableForProps.bottomAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
@@ -131,20 +125,34 @@ class FilterViewController: UIViewController {
         
     }
     
-    @objc func printDatePickerValue (_ sender: UIDatePicker) {
+    @objc private func printDatePickerValue (_ sender: UIDatePicker) {
         
         let formattedDate = formatter.string(from: datePicker.date)
-        selectedDates.removeAll()
-        selectedDates.append(formattedDate)
+        selectedDate = formattedDate
         
     }
     
 }
 
+extension FilterViewController {
+    
+    private func createButton (with title: String, bgColor: UIColor, titleColor: UIColor, selector: Selector) -> UIButton {
+        
+        let button = UIButton()
+        button.configuration = .bordered()
+        button.backgroundColor = bgColor
+        button.setTitle(title, for: .normal)
+        button.layer.cornerRadius = 10
+        button.setTitleColor(titleColor, for: .normal)
+        button.addTarget(self, action: selector, for: .touchUpInside)
+        return button
+    }
+}
+
 extension FilterViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "filterTableCell") as! FilterCellViewController
+        let cell = tableView.dequeueReusableCell(withIdentifier: FilterCellViewController.identifier) as! FilterCellViewController
         if indexPath.row == 0 {
             cell.selectionStyle = .none
             datePicker.datePickerMode = .date
@@ -220,11 +228,7 @@ extension FilterViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 
 extension FilterViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        
-        //        selectedFilters.removeAll { filter in
-        //            filter.pathologicalFilter == textField.text
-        //        }
-        
+           
         UIView.animate(withDuration: 0, delay: 0) {
             textField.backgroundColor = .systemGray3
             textField.textColor = .systemBlue

@@ -2,7 +2,7 @@
 //  ManagedAnalysis+CoreDataProperties.swift
 //  
 //
-//  Created by Vasiliy Andreyev on 14.03.2022.
+//  Created by Vasiliy Andreyev on 21.03.2022.
 //
 //
 
@@ -19,5 +19,6 @@ extension ManagedAnalysis {
     @NSManaged public var name: String?
     @NSManaged public var value: String?
     @NSManaged public var labData: ManagedLabData?
+    @NSManaged public var patient: ManagedPatient?
 
 }

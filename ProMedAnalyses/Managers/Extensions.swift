@@ -29,15 +29,26 @@ extension UIViewController {
         }
     }
     
-    func showErrorToTheUser (with message: String?, completionHanlder: (() -> Void)? = nil) {
+    /// extension of UIViewController, manages showing errors
+    /// - Parameters:
+    ///   - message: Type the message to show in alert controller
+    ///   - addOKButton: Default value is false, therefore shows only "Cancel" button, completionHandler doesn't trigger.
+    ///   - completionHanlder: Can be used only if OK button added
+    func showErrorToTheUser (with message: String?, addOKButton: Bool = false, completionHanlderOnFailure: (() -> Void)? = nil, completionHanlderOnSuccess: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             let alertController = UIAlertController(title: "Произошла ошибка", message: message, preferredStyle: .alert)
-            let dismissAlertAction = UIAlertAction(title: "OK", style: .cancel) { _ in
+            let dismissAlertAction = UIAlertAction(title: "OK", style: .default) { _ in
                 alertController.dismiss(animated: true) {
-                    completionHanlder?()
+                    completionHanlderOnSuccess?()
                 }
             }
-            alertController.addAction(dismissAlertAction)
+            let cancelAlertAction = UIAlertAction(title: "Отмена", style: .cancel) { _ in
+                alertController.dismiss(animated: true) {
+                    completionHanlderOnFailure?()
+                }
+            }
+            alertController.addAction(cancelAlertAction)
+            addOKButton ? alertController.addAction(dismissAlertAction) : nil
             self.present(alertController, animated: true, completion: nil)
         }
     }

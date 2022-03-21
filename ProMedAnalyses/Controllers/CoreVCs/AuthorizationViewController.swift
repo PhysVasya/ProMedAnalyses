@@ -12,7 +12,7 @@ class AuthorizationViewController: UIViewController {
     
     var loginText: String?
     static let identifier = "AuthorizationViewController"
-    var loginCredentials : ((String, String) -> Void)?
+    var loginResult : ((Bool) -> Void)?
     var forgetPasswordPressed: ((Bool) -> Void)?
     var isConnected: Bool {
         UserDefaults.standard.bool(forKey: "isConnected")
@@ -21,13 +21,12 @@ class AuthorizationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        forgetPasswordPressed = { [weak self] success in
-            print(success)
+        forgetPasswordPressed = { [weak self] _ in
             self?.manageForgetPasswordPressed()
         }
         
-        loginCredentials = { [weak self] login, password in
-            self?.manageLogin(using: login, password: password)
+        loginResult = { [weak self] success in
+            self?.manageLogin(using: success)
         }
         setupLoginScreen()
         manageTextFieldSelection()
@@ -53,7 +52,7 @@ class AuthorizationViewController: UIViewController {
     }
     
     private func setupLoginScreen() {
-        let loginScreenSwiftUIView = UIHostingController(rootView: LoginViewSwiftUI(sendData: loginCredentials, forgetPasswordPressed: forgetPasswordPressed))
+        let loginScreenSwiftUIView = UIHostingController(rootView: LoginViewSwiftUI(sendAuthorizationResult: loginResult, forgetPasswordPressed: forgetPasswordPressed))
         addChild(loginScreenSwiftUIView)
         loginScreenSwiftUIView.view.frame = view.bounds
         view.addSubview(loginScreenSwiftUIView.view)
@@ -84,9 +83,9 @@ class AuthorizationViewController: UIViewController {
         if !isConnected {
             FetchingManager.shared.fetchPatientsFromCoreData { [weak self] patients in
                 if patients.isEmpty {
-                    self?.showErrorToTheUser(with: "Unfortunately there is no saved patients on your device. Please connect to the working wifi at work.", completionHanlder: nil)
+                    self?.showErrorToTheUser(with: "Unfortunately there is no saved patients on your device. Please connect to the working wifi at work.")
                 } else {
-                    self?.showErrorToTheUser(with: "Отсутствует подключение к защищенной рабочей сети. \n\n Производится попытка загрузки сохраненных данных", completionHanlder: {
+                    self?.showErrorToTheUser(with: "Отсутствует подключение к защищенной рабочей сети. \n\n Загрузить сохраненные данные?", addOKButton: true, completionHanlderOnSuccess: {
                         self?.presentPatients()
                     })
                 }
@@ -94,21 +93,11 @@ class AuthorizationViewController: UIViewController {
         }
     }
     
-    func manageLogin (using login: String, password: String) {
-        dataIsLoading(with: "") { [weak self] indicator in
-            AuthorizationManager.shared.authorize(login: login, password: password) { success in
-                switch success {
-                case true:
-                    HapticsManager.shared.vibrate(for: .success)
-                    self?.presentPatients()
-                case false:
-                    HapticsManager.shared.vibrate(for: .error)
-                    self?.unsuccessfulAuth()
-                }
-            }
-            DispatchQueue.main.async {
-                indicator.stopAnimating()
-            }
+    func manageLogin (using: Bool) {
+        if using {
+            presentPatients()
+        } else {
+            unsuccessfulAuth()
         }
     }
     

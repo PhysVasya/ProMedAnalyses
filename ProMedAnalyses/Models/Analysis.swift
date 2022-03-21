@@ -9,22 +9,41 @@ import Foundation
 
 struct AnalysisType {
     let analysis: AnalysisDataModel
-    let evnUslugaID: String
-    let evnXMLID: String
+    let evnUslugaID: Int
+    let evnXMLID: Int
     let name: String
-    let date: String
+    let date: Date
 }
 
 struct AnalysisDataModel {
   
     
     let data : [[String]]
-    let date : String
+    let date : Date
     
-    init(data: [[String]], date: String) {
+    init(data: [[String]], date: Date) {
         self.data = data
         self.date = date
     }
+}
+
+struct AnalysisViewModel {
+ 
+    let date: String
+    let analysis: [Analysis]
+    
+    public init (date: String, analysis: [Analysis]) {
+        
+        self.date = date
+        self.analysis = analysis
+    }
+    
+    
+}
+
+struct Analysis {
+    let name: String
+    let value: String
 }
 
 extension AnalysisType {
@@ -36,10 +55,10 @@ extension AnalysisType {
 }
 
 struct FetchedLabIDs {
-    let evnXMLID: String
-    let evnUslugaID: String
+    let evnXMLID: Int
+    let evnUslugaID: Int
     let uslugaName: String
-    let evnUslugaDate: String
+    let evnUslugaDate: Date
 }
 
 

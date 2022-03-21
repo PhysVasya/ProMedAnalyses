@@ -8,7 +8,7 @@
 import Foundation
 
 struct Filter {
-    let dateFilter: [String]?
+    let dateFilter: String?
     let typeFilter: String?
     var pathologicalFilter: String?
 }
