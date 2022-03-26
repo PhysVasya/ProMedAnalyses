@@ -46,7 +46,7 @@ struct PreviewSwiftUIView: View {
             }
             .frame(height: height / 2, alignment: .leading)
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0))
-   
+            
         }
         .frame(width: width - 20)
         

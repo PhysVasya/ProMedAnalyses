@@ -18,15 +18,16 @@ class FilterViewController: UIViewController {
     private let formatter = DateFormatter()
     
     private let filterTypes = ["Дата", "Тип услуги", "Только патологические"]
-    private let servicesTypefilter = ["","Общий анализ крови", "Биохимический анализ крови", "Ферритин", "Д-димер"]
+    private let servicesTypefilter = ["","Общий (клинический) анализ крови", "Анализ крови биохимический общетерапевтический", "Ферритин", "Д-димер"]
     
+    public var availiableDates = [String]()
+    public var delegate: ResultsViewControllerDelegate?
+    
+    private var selectedDate: String?
     private var selectedTypeFilter: String?
     private var selectedPathologicalFilter: String?
-    public var selectedFilter : Filter?
-    public var sendFilters : ((Filter?) -> Void)?
-
-    public var selectedDate: String?
-    private var availiableDates = [String]()
+    private var selectedFilter : Filter?
+    
     private var selectedIndexPaths = Set<IndexPath>()
     
     override func viewDidLoad() {
@@ -35,33 +36,22 @@ class FilterViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissSelf))
         formatter.dateFormat = "dd.MM.yyyy"
         createStackView()
-
-
+    
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         setupFilterView()
-
     }
-    
-    public func configureFilterVC (send dates: [String]?) {
-        guard let avDates = dates else {
-            return
-        }
-        availiableDates = avDates
-    }
-    
     
     @objc private func applyFilters () {
         selectedFilter = Filter(dateFilter: selectedDate, typeFilter: selectedTypeFilter, pathologicalFilter: selectedPathologicalFilter)
         self.dismiss(animated: true) {
-            self.sendFilters?(self.selectedFilter)
+            self.delegate?.applyFilters(using: self.selectedFilter!)
         }
     }
     
     @objc private func dismissSelf() {
-        self.sendFilters?(nil)
         self.dismiss(animated: true)
     }
     
@@ -81,7 +71,7 @@ class FilterViewController: UIViewController {
         pickerView.dataSource = self
         pickerView.delegate = self
         textField.delegate = self
-                
+        
         let toolbar = UIToolbar()
         toolbar.barStyle = UIBarStyle.default
         toolbar.isTranslucent = true
@@ -227,7 +217,7 @@ extension FilterViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 
 extension FilterViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-           
+        
         UIView.animate(withDuration: 0, delay: 0) {
             textField.backgroundColor = .systemGray3
             textField.textColor = .systemBlue
@@ -239,7 +229,7 @@ extension FilterViewController: UITextFieldDelegate {
         }
         
     }
-
+    
 }
 
 

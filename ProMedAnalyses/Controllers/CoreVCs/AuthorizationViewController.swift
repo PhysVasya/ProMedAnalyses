@@ -112,11 +112,9 @@ class AuthorizationViewController: UIViewController {
     
     func presentPatients () {
         DispatchQueue.main.async {
-            let patientVC = PatientsViewController()
-            let navigationController = UINavigationController(rootViewController: patientVC)
-            navigationController.modalPresentationStyle = .fullScreen
-            navigationController.navigationBar.prefersLargeTitles = true
-            self.present(navigationController, animated: true, completion: nil)
+            let patientsTabBarController = PatientsTabBarController()
+            patientsTabBarController.modalPresentationStyle = .fullScreen
+            self.present(patientsTabBarController, animated: true)
         }
     }
     

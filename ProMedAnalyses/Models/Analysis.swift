@@ -16,7 +16,7 @@ struct AnalysisType {
 }
 
 struct AnalysisDataModel {
-  
+    
     
     let data : [[String]]
     let date : Date
@@ -28,7 +28,7 @@ struct AnalysisDataModel {
 }
 
 struct AnalysisViewModel {
- 
+    
     let name: String
     let date: String
     let analysis: [Analysis]
@@ -42,7 +42,12 @@ struct AnalysisViewModel {
     
 }
 
-struct Analysis {
+struct Analysis: Equatable {
+    
+    static func == (lhs: Analysis, rhs: Analysis) -> Bool {
+        return lhs.name == rhs.name
+    }
+    
     let name: String
     let value: String
 }

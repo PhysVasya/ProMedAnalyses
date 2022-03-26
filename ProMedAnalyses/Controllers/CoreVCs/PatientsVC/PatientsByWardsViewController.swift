@@ -9,12 +9,12 @@ import UIKit
 import CoreData
 import SwiftUI
 
-class PatientsViewController: UIViewController {
+class PatientsByWardsViewController: UIViewController {
     
-    static let identifier = "PatientsViewController"
-    static let cellIdentifier = "PatientsCellController"
+    static let identifier = "PatientsByWardsViewController"
+    static let cellIdentifier = "PatientsByWardsCellController"
     
-    private var patients = [Patient]()
+    private var patients: [Patient]? 
     private var filteredPatients = [Patient]()
     private var analysesTypes = [AnalysisType]()
     
@@ -29,51 +29,22 @@ class PatientsViewController: UIViewController {
     private var isConnected : Bool? {
         UserDefaults.standard.bool(forKey: "isConnected")
     }
-    private var ascending: Bool = false
+ 
     
-    private var onlyPatientsWithAnalysesPressed : ((Bool) -> Void)?
-    private var onlyHighCRPPressed: ((Bool)->Void)?
-    private var downloadingViewShouldStayPresented: ((Bool) -> Void)?
-    
-    private let patientsTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .plain)
-        return tableView
-    }()
+    private let patientsTableView = UITableView(frame: .zero, style: .plain)
     
     private let search = UISearchController(searchResultsController: nil)
     private let refresh = UIRefreshControl()
-    
-    private var progressDownloadView : UIViewController {
-        let vc = UIHostingController(rootView: LoadingAllDataAlert(shouldStayOnScreen: downloadingViewShouldStayPresented))
-        vc.sheetPresentationController?.detents = [.medium()]
-        vc.sheetPresentationController?.selectedDetentIdentifier = .medium
-        vc.isModalInPresentation = true
-        return vc
-    }
+    private var onlyPatientsWithAnalysesPressed : ((Bool) -> Void)?
+    private var onlyHighCRPPressed: ((Bool)->Void)?
+  
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Список пациентов"
+        title = "Список по палатам"
         navigationController?.navigationBar.isHidden = false
-        
-        dataIsLoading(with: "Пожалуйста, подождите") { [weak self] indicator in
-            self?.manageFetchingPatients(visually: indicator)
-        }
-        
-        onlyPatientsWithAnalysesPressed = { [weak self] pressed in
-            self?.manageOnlyPatientsWithAnalysesButtonPressed(buttonPressed: pressed)
-        }
-        
-        onlyHighCRPPressed = { [weak self] pressed in
-            self?.manageHightCRPOnlyButtonPressed(buttonPressed: pressed)
-        }
-        
-        downloadingViewShouldStayPresented = { [weak self] boolean in
-            self?.manageDownloadAllVisualPresentation(shouldIt: boolean)
-        }
-        
+                
         configureTableView()
-        configureNavigationBar()
         
     }
     
@@ -95,60 +66,32 @@ class PatientsViewController: UIViewController {
         patientsTableView.tableHeaderView?.layoutIfNeeded()
     }
     
+    convenience init () {
+        self.init(patients: nil)
+    }
+    
+    public init (patients: [Patient]?) {
+        super.init(nibName: nil, bundle: nil)
+        self.patients = patients
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
     private func configureTableView () {
         view.addSubview(patientsTableView)
-        patientsTableView.register(UITableViewCell.self, forCellReuseIdentifier: PatientsViewController.cellIdentifier)
+        patientsTableView.register(UITableViewCell.self, forCellReuseIdentifier: PatientsByWardsViewController.cellIdentifier)
         patientsTableView.delegate = self
         patientsTableView.dataSource = self
         let headerView = UIHostingController(rootView: TableHeaderView(onSavedButtonPressed: onlyPatientsWithAnalysesPressed, onHighCRPButtonPressed: onlyHighCRPPressed))
         headerView.view.translatesAutoresizingMaskIntoConstraints = false
         patientsTableView.tableHeaderView = headerView.view
+        patientsTableView.contentInset.bottom = tabBarController?.tabBar.frame.height ?? 0
+
     }
     
-    private func configureNavigationBar () {
-        let menuElement1 = UIAction(title: "Загрузить все данные", image: UIImage(systemName: "arrow.down.circle")?.withTintColor(.label, renderingMode: .alwaysOriginal))
-        { [weak self] action in
-            
-            let alertOnConnection = UIAlertController(title: "Загрузить все данные?", message: "Вы уверены, что хотите загрузить данные всех пациентов? \n Это займёт некоторое время", preferredStyle: .alert)
-            let processAction = UIAlertAction(title: "Загрузить", style: .default, handler: { action in
-                self?.navigationController?.present(self!.progressDownloadView, animated: true, completion: nil)
-            })
-            let dismissAction = UIAlertAction(title: "Отмена", style: .cancel) { action in
-                alertOnConnection.dismiss(animated: true, completion: nil)
-            }
-            
-            alertOnConnection.addAction(processAction)
-            alertOnConnection.addAction(dismissAction)
-            
-            let alertOffConnection = UIAlertController(title: "Ошибка", message: "Данное действие невозможно, ввиду отсутствия должного интернет подключения.", preferredStyle: .alert)
-            let offConnectionDismiss = UIAlertAction(title: "Отмена", style: .cancel) { action in
-                alertOffConnection.dismiss(animated: true, completion: nil)
-            }
-            alertOffConnection.addAction(offConnectionDismiss)
-            
-            if self?.isConnected == true {
-                self?.present(alertOnConnection, animated: true, completion: nil)
-                
-            } else {
-                self?.present(alertOffConnection, animated: true, completion: nil)
-            }
-            
-        }
-        
-        let navBarButton1 = UIBarButtonItem(systemItem: .action, primaryAction: nil, menu: UIMenu(title: "", children: [menuElement1]))
-        navBarButton1.tintColor = UIColor(named: "ColorOrange")
-        
-        let menuElement2 = UIAction(title: "По имени", image: UIImage(systemName: "person")) { [weak self] action in
-            self?.sortPatients(with: .name)
-        }
-        let menuElement3 = UIAction(title: "По дате поступления", image: UIImage(systemName: "calendar")) { [weak self] action in
-            self?.sortPatients(with: .date)
-        }
-        
-        let navBarButton2 = UIBarButtonItem(image: UIImage(systemName: "list.dash"), menu: UIMenu(title: "Сортировать", children: [menuElement2, menuElement3]))
-        navBarButton2.tintColor = UIColor(named: "ColorOrange")
-        navigationItem.setRightBarButtonItems([navBarButton1, navBarButton2], animated: false)
-    }
+    
     
     private func setupSearchController () {
         search.searchResultsUpdater = self
@@ -160,15 +103,12 @@ class PatientsViewController: UIViewController {
     }
     
     private func setupRefreshControl () {
-        refresh.addTarget(self, action: #selector(PatientsViewController.refreshData(sender:)), for: .valueChanged)
+        refresh.addTarget(self, action: #selector(refreshData(sender:)), for: .valueChanged)
         refresh.attributedTitle = NSAttributedString(string: "Обновление данных...")
         patientsTableView.refreshControl = refresh
     }
     
-    private func filterContentForSearchTextField (_ textToSearch: String) {
-        filteredPatients = patients.filter {$0.name.lowercased().contains(textToSearch.lowercased()) || $0.dateOfAdmission.lowercased().contains(textToSearch.lowercased())}
-        patientsTableView.reloadData()
-    }
+    
     
     private func manageFetchingPatients (visually: UIActivityIndicatorView) {
         if isConnected == true {
@@ -193,53 +133,8 @@ class PatientsViewController: UIViewController {
         }
     }
     
-    private func manageOnlyPatientsWithAnalysesButtonPressed (buttonPressed: Bool) {
-        switch buttonPressed {
-        case true:
-            patientsTableView.refreshControl = nil
-            manageOnlyPatientsWithAnalyses()
-        case false:
-            patientsTableView.refreshControl = refresh
-            FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                self.patients = patients
-                self.patientsTableView.reloadData()
-            }
-        }
-    }
+  
     
-    private func manageHightCRPOnlyButtonPressed (buttonPressed: Bool) {
-            switch buttonPressed {
-            case true:
-                patientsTableView.refreshControl = nil
-                FetchingManager.shared.fetchPatientsWithHighCRP { patients in
-                    self.patients = patients
-                    patientsTableView.reloadData()
-                }
-            case false:
-                patientsTableView.refreshControl = refresh
-                FetchingManager.shared.fetchPatientsFromCoreData { patients in
-                    self.patients = patients
-                    patientsTableView.reloadData()
-                }
-            }
-    }
-    
-    private func manageDownloadAllVisualPresentation (shouldIt: Bool) {
-            switch shouldIt {
-            case true:
-                print(shouldIt)
-            case false:
-                navigationController?.dismiss(animated: true, completion: nil)
-            }
-        
-    }
-    
-    private func manageOnlyPatientsWithAnalyses () {
-        FetchingManager.shared.fetchOnlyPatientsWithAnalyses { patients in
-            self.patients = patients
-            patientsTableView.reloadData()
-        }
-    }
     
     @objc private func refreshData (sender: UIRefreshControl) {
         guard let isConnected = isConnected else {
@@ -272,50 +167,22 @@ class PatientsViewController: UIViewController {
         
     }
     
-    private func sortPatients (with filter: PatientFilter) {
-        if patients.isEmpty {
-            print("patients is empty")
-        } else {
-            switch filter {
-            case .date:
-                patients = patients.sorted { n1, n2 in
-                    ascending ? n1.dateOfAdmission.getFormattedDateFromString()! > n2.dateOfAdmission.getFormattedDateFromString()! :
-                    n1.dateOfAdmission.getFormattedDateFromString()! < n2.dateOfAdmission.getFormattedDateFromString()!
-                }
-                patientsTableView.reloadData()
-                ascending = !ascending
-                
-            case .name:
-                patients = patients.sorted { n1, n2 in
-                    ascending ? n1.name.first! > n2.name.first! : n1.name.first! < n2.name.first!
-                }
-                patientsTableView.reloadData()
-                ascending = !ascending
-            }
-        }
-    }
+
     
     private func presentResults (for patient: Patient) {
         DispatchQueue.main.async {
-//            if analyses.isEmpty {
-//                let alertCont = UIAlertController(title: "Ошибка", message: "К сожалению, данных для отображения нет.", preferredStyle: .alert)
-//                let dismissAlertAction = UIAlertAction(title: "ОК", style: .cancel) { act in
-//                    alertCont.dismiss(animated: true, completion: nil)
-//                }
-//                alertCont.addAction(dismissAlertAction)
-//                self.present(alertCont, animated: true, completion: nil)
-//            } else {
-                let destinationVC = ResultsViewController()
+            let destinationVC = ResultsViewController()
             destinationVC.patient = patient
-                destinationVC.modalPresentationStyle = .fullScreen
-                self.navigationController?.pushViewController(destinationVC, animated: true)
-//            }
+            destinationVC.title = patient.name
+            destinationVC.navigationItem.largeTitleDisplayMode = .never
+            destinationVC.modalPresentationStyle = .fullScreen
+            self.navigationController?.pushViewController(destinationVC, animated: true)
         }
     }
 }
 
 //MARK: - PatientsTableView delegate methods and custom Table methods
-extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
+extension PatientsByWardsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 27
@@ -325,12 +192,12 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         if searchFieldIsEditing {
             return filteredPatients.filter { $0.ward.wardNumber == section}.count
         } else {
-            return patients.filter{ $0.ward.wardNumber == section }.count
+            return patients!.filter{ $0.ward.wardNumber == section }.count
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: PatientsViewController.cellIdentifier, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: PatientsByWardsViewController.cellIdentifier, for: indexPath)
         cell.accessoryType = .disclosureIndicator
         var content = cell.defaultContentConfiguration()
         
@@ -340,7 +207,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
             let filteredPatientsWardEqualSection = filteredPatients.filter { $0.ward.wardNumber == indexPath.section }
             patient = filteredPatientsWardEqualSection[indexPath.row]
         } else {
-            let patientsWardEqualSection = patients.filter { $0.ward.wardNumber == indexPath.section }
+            let patientsWardEqualSection = patients!.filter { $0.ward.wardNumber == indexPath.section }
             patient = patientsWardEqualSection[indexPath.row]
         }
         content.textProperties.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
@@ -353,7 +220,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
-        let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == section }
+        let filteredPatientsByWard = patients!.filter{ $0.ward.wardNumber == section }
         if filteredPatientsByWard.isEmpty {
             return nil
         } else if section == 0 {
@@ -369,14 +236,12 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         return nil
     }
     
-    
-    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return patients.filter { $0.ward.wardNumber == section }.isEmpty ? CGFloat.leastNonzeroMagnitude : 20
+        return patients?.filter { $0.ward.wardNumber == section }.isEmpty ?? true ? CGFloat.leastNonzeroMagnitude : 20
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return patients.filter{ $0.ward.wardNumber == section}.isEmpty ? CGFloat.leastNonzeroMagnitude : 20
+        return patients?.filter{ $0.ward.wardNumber == section}.isEmpty ?? true ? CGFloat.leastNonzeroMagnitude : 20
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -386,16 +251,16 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         if searchFieldIsEditing {
             presentResults(for: filteredPatients[indexPath.row])
         } else {
-            let filteredPatientsByWard = patients.filter{ $0.ward.wardNumber == indexPath.section }
-            presentResults(for: filteredPatientsByWard[indexPath.row])
+            let filteredPatientsByWard = patients?.filter{ $0.ward.wardNumber == indexPath.section }
+            presentResults(for: (filteredPatientsByWard?[indexPath.row])!)
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return patients.filter { $0.ward.wardNumber == indexPath.section}.isEmpty ? CGFloat.leastNonzeroMagnitude : 60
+        return patients?.filter { $0.ward.wardNumber == indexPath.section}.isEmpty ?? true ? CGFloat.leastNonzeroMagnitude : 60
     }
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return searchFieldIsEditing ? false : true
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -417,14 +282,14 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
     func removePatientFromWard(with style: UIContextualAction.Style, on: IndexPath, table: UITableView) -> UIContextualAction {
         let delete = UIContextualAction(style: style, title: "Перевести из палаты") { [weak self] action, view, completionHandler in
             view.backgroundColor = .systemRed
-            let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+            let groupedPatientsByWard = self?.patients?.filter{ $0.ward.wardNumber == on.section }
             if var patientToBeDeleted = groupedPatientsByWard?[on.row] {
-                if self?.patients.contains(patientToBeDeleted) != nil {
-                    self?.patients.removeAll { $0.patientID == patientToBeDeleted.patientID}
+                if self?.patients?.contains(patientToBeDeleted) != nil {
+                    self?.patients?.removeAll { $0.patientID == patientToBeDeleted.patientID}
                     FetchingManager.shared.changeWardAndSavePatient(patient: patientToBeDeleted, moveTo: 0)
                     let indexPathToMoveTo = IndexPath(row: 0, section: 0)
                     patientToBeDeleted.ward.wardNumber = 0
-                    self?.patients.append(patientToBeDeleted)
+                    self?.patients?.append(patientToBeDeleted)
                     table.moveRow(at: on, to: indexPathToMoveTo)
                     
                 } else {
@@ -451,14 +316,14 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
         }()
         
         let action = UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
-            let groupedPatientsByWard = self?.patients.filter{ $0.ward.wardNumber == on.section }
+            let groupedPatientsByWard = self?.patients?.filter{ $0.ward.wardNumber == on.section }
             if var patientToBeMoved = groupedPatientsByWard?[on.row] {
-                if self?.patients.contains(patientToBeMoved) != nil {
-                    self?.patients.removeAll(where: {$0.patientID == patientToBeMoved.patientID})
+                if self?.patients?.contains(patientToBeMoved) != nil {
+                    self?.patients?.removeAll(where: {$0.patientID == patientToBeMoved.patientID})
                     FetchingManager.shared.changeWardAndSavePatient(patient: patientToBeMoved, moveTo: Int(self!.wardNumberToMoveTo)!)
                     let indexPathToMoveTo = IndexPath(row: 0, section: Int(self!.wardNumberToMoveTo)!)
                     patientToBeMoved.ward.wardNumber = Int(self!.wardNumberToMoveTo)!
-                    self?.patients.append(patientToBeMoved)
+                    self?.patients?.append(patientToBeMoved)
                     table.moveRow(at: on, to: indexPathToMoveTo)
                 }
             }
@@ -485,7 +350,7 @@ extension PatientsViewController: UITableViewDelegate, UITableViewDataSource {
 
 
 //MARK: - TextField delegate methods
-extension PatientsViewController : UITextFieldDelegate {
+extension PatientsByWardsViewController : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         if textField.text != "" {
@@ -506,11 +371,16 @@ extension PatientsViewController : UITextFieldDelegate {
 
 
 //MARK: - searchController delegate
-extension PatientsViewController : UISearchResultsUpdating {
+extension PatientsByWardsViewController : UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterContentForSearchTextField(searchBar.text!)
+    }
+    
+    private func filterContentForSearchTextField (_ textToSearch: String) {
+        filteredPatients = (patients?.filter {$0.name.lowercased().contains(textToSearch.lowercased()) || $0.dateOfAdmission.lowercased().contains(textToSearch.lowercased())})!
+        patientsTableView.reloadData()
     }
 }
 

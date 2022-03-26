@@ -1,6 +1,6 @@
 //
-//  TableForData.swift
-//  getCRPfromProMed
+//  ResultsViewController.swift
+//  ProMedAnalyses
 //
 //  Created by Vasiliy Andreyev on 14.12.2021.
 //
@@ -8,97 +8,35 @@
 import UIKit
 import SwiftUI
 
-class ResultsViewController: UIViewController {
+protocol ResultsViewControllerDelegate {
+    func applyFilters(using: Filter)
+}
+
+class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
     
-    static let identifier = "resultsTableCell"
-    public var patient: Patient?
-    private var isConnected : Bool {
-        return UserDefaults.standard.bool(forKey: "isConnected")
-    }
-    
-    var reassembledAnalyses = [AnalysisViewModel]() {
-        didSet {
-            if reassembledAnalyses.isEmpty {
-                let alert = UIAlertController(title: "Ошибка", message: "Анализов с примененными фильтрами нет", preferredStyle: .alert)
-                let action = UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
-                    alert.dismiss(animated: true) {
-                        self?.filterVC.selectedDate = nil
-                        self?.filterVC.selectedFilter = nil
-                        self?.presentFilterVC()
-                    }
-                }
-                alert.addAction(action)
-                navigationController?.present(alert, animated: true, completion: nil)
-            } else {
-                reassembledAnalyses.sort(by: {$0.date < $1.date})
-            }
-        }
-    }
-    var fetchedAnalysesDates : [String]? {
-        return reassembledAnalyses.compactMap({$0.date}).sorted(by: {$0 < $1})
-    }
-    
-    var reassembledAnalysesCopy = [AnalysisViewModel]()
-    
-    let tableView : UITableView = {
+    public var patient: Patient!
+    private var references: [ReferenceForAnalysis]!
+    private var reassembledAnalyses = [AnalysisViewModel]() { didSet { reassembledAnalyses.sort(by: {$0.date < $1.date}) } }
+    private var reassembledAnalysesCopy = [AnalysisViewModel]()
+    private var fetchedAnalysesDates : [String] { reassembledAnalyses.compactMap({$0.date}).sorted(by: {$0 < $1}) }
+    private var isConnected = UserDefaults.standard.bool(forKey: "isConnected")
+    private let tableView : UITableView = {
         let tableView = UITableView()
-        tableView.register(UINib(nibName: "ResultsReusableCell", bundle: nil), forCellReuseIdentifier: ResultsCellViewController.identifier)
+        tableView.register(ResultsCellViewController.self, forCellReuseIdentifier: ResultsCellViewController.identifier)
         return tableView
     }()
-    let filterVC = FilterViewController()
-    var references: [ReferenceForAnalysis]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Результаты анализов"
         
-        dataIsLoading(with: "Пожалуйста, подождите") { [weak self] indicator in
-            self?.manageLoadingLabData(visually: indicator)
-        }
-        
-        filterVC.sendFilters = { [weak self] passedFilter in
-
-            
-            guard let passedFilter = passedFilter else {
-                self?.reassembledAnalyses = self!.reassembledAnalysesCopy
-                self?.tableView.reloadData()
-                return
-            }
-            
-            if let dateFilter = passedFilter.dateFilter {
-                self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({$0.date < dateFilter ? $0 : nil})
-                self?.tableView.reloadData()
-            }
-            if let typeFilter = passedFilter.typeFilter {
-                if typeFilter != "" {
-                    self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({$0.name.lowercased().contains(typeFilter.lowercased()) ? $0 : nil})
-                    self?.tableView.reloadData()
-                }
-            }
-            
-            if let pathologicalFilter = passedFilter.pathologicalFilter {
-                self?.reassembledAnalyses = self!.reassembledAnalyses.compactMap({ eachAnalysis in
-                    var filteredAnalysis: AnalysisViewModel?
-                    eachAnalysis.analysis.forEach { el in
-                        if el.value.contains("▲") || el.value.contains(pathologicalFilter) {
-                            var pathologicalAnalyses = [Analysis]()
-                            pathologicalAnalyses.append(Analysis(name: el.name, value: el.value))
-                            let flt = AnalysisViewModel(name: eachAnalysis.name, date: eachAnalysis.date, analysis: pathologicalAnalyses)
-                            filteredAnalysis = flt
-                        }
-                    }
-                    return filteredAnalysis
-                })
-                self?.tableView.reloadData()
-            }
-            
-        }
-        
-        getReferences()
-        setupTableView()
         setupNavBarRightItems()
+        setupTableView()
+        showLoadingData(label: "Пожалуйста, подождите") { [weak self] indicator in
+            self?.manageLoadingLabData(showing: indicator)
+        }
+        getReferences()
     }
-    
+        
     private func setupTableView () {
         view.addSubview(tableView)
         tableView.frame = view.bounds
@@ -112,42 +50,30 @@ class ResultsViewController: UIViewController {
         navigationItem.setRightBarButtonItems([filterButton, createPDFButton], animated: false)
     }
     
-    private func manageLoadingLabData (visually: UIActivityIndicatorView) {
-        if isConnected == true, let patient = patient {
-            APICallManager.shared.downloadAndSaveLabData(for: patient) {
-                FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { labData in
-                    if labData.count < 1 {
-                        self.showErrorToTheUser(with: "К сожалению, данных для отображения нет", completionHanlderOnFailure: {
-                            self.navigationController?.popToRootViewController(animated: true)
-                        })
-                    } else {
-                        self.reassembledAnalyses = labData
-                        self.reassembledAnalysesCopy = labData
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                            visually.stopAnimating()
-                        }
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    visually.stopAnimating()
-                }
+    private func manageLoadingLabData (showing: UIActivityIndicatorView) {
+        if isConnected == true {
+            APICallManager.shared.downloadAndSaveLabData(for: patient) { [weak self] labData in
+                self?.manageEmptyLabResults(labData: labData)
+                showing.stopAnimating()
             }
-        } else if isConnected == false, let patient = patient {
-            FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { labData in
-                if labData.count < 1 {
-                    self.showErrorToTheUser(with: "К сожалению, данных для отображения нет", completionHanlderOnFailure: {
-                        self.navigationController?.popToRootViewController(animated: true)
-                    })
-                } else {
-                    self.reassembledAnalyses = labData
-                    self.reassembledAnalysesCopy = self.reassembledAnalyses
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                        visually.stopAnimating()
-                    }
-                }
+        } else if isConnected == false {
+            FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { [weak self] labData in
+                self?.manageEmptyLabResults(labData: labData)
+                showing.stopAnimating()
+            }
+        }
+    }
+    
+    private func manageEmptyLabResults (labData: [AnalysisViewModel]) {
+        if labData.isEmpty {
+            showErrorToTheUser(with: "К сожалению, данных для отображения нет", completionHanlderOnFailure: { [weak self] in
+                 self?.navigationController?.popToRootViewController(animated: true)
+            })
+        } else {
+            reassembledAnalyses = labData
+            reassembledAnalysesCopy = self.reassembledAnalyses
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
             }
         }
     }
@@ -160,19 +86,41 @@ class ResultsViewController: UIViewController {
     }
     
     @objc func presentFilterVC () {
+        let filterVC = FilterViewController()
+        let filterInNavVC = UINavigationController(rootViewController: filterVC)
+        filterInNavVC.sheetPresentationController?.detents = [.medium()]
+        filterInNavVC.sheetPresentationController?.selectedDetentIdentifier = .medium
+        filterVC.delegate = self
+        filterVC.availiableDates = fetchedAnalysesDates.uniqued()
+        present(filterInNavVC, animated: true, completion: nil)
         
-        if reassembledAnalyses.isEmpty {
-            print("reassembeldanalyses is empty")
-        } else {
-            
-            let nav = UINavigationController(rootViewController: filterVC)
-            nav.sheetPresentationController?.detents = [.medium()]
-            nav.sheetPresentationController?.selectedDetentIdentifier = .medium
-            
-            filterVC.configureFilterVC(send: fetchedAnalysesDates?.uniqued())
-            
-            present(nav, animated: true, completion: nil)
+    }
+    
+    func applyFilters(using: Filter) {
+        print(using)
+        if using.dateFilter != nil {
+            reassembledAnalyses = reassembledAnalysesCopy.compactMap { $0.date == using.dateFilter ? $0 : nil }
         }
+        if using.typeFilter != nil && using.typeFilter != "" {
+            reassembledAnalyses = reassembledAnalyses.compactMap { $0.name.lowercased().contains(using.typeFilter!.lowercased()) ? $0 : nil}
+        }
+        if using.pathologicalFilter != nil {
+            reassembledAnalyses = reassembledAnalyses.compactMap({ model in
+                var filtered = [Analysis]()
+                model.analysis.forEach { an in
+                    if an.value.contains("▲") || an.value.contains("▼") {
+                        let analysis = Analysis(name: an.name, value: an.value)
+                        filtered.append(analysis)
+                    }
+                }
+                return AnalysisViewModel(name: model.name, date: model.date, analysis: filtered)
+            })
+        }
+        if using.typeFilter == nil && using.dateFilter == nil && using.pathologicalFilter == nil {
+            reassembledAnalyses = reassembledAnalysesCopy
+        }
+        tableView.reloadData()
+        
     }
     
     
@@ -182,13 +130,10 @@ class ResultsViewController: UIViewController {
         }
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: path))
-            let decoder = JSONDecoder()
-            let responseData = try decoder.decode([ReferenceForAnalysis].self, from: data)
-            references = responseData
+            references = try JSONDecoder().decode([ReferenceForAnalysis].self, from: data)
         } catch {
-            print(error)
+            print("Error getting References from local DB: \(error)")
         }
-        
     }
     
     func createPDFFromTableView () {
@@ -230,43 +175,37 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return reassembledAnalyses[section].analysis.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: ResultsViewController.identifier, for: indexPath) as! ResultsCellViewController
+        let cell = tableView.dequeueReusableCell(withIdentifier: ResultsCellViewController.identifier, for: indexPath) as! ResultsCellViewController
         let rowData = reassembledAnalyses[indexPath.section].analysis[indexPath.row]
+        
         var ref: ReferenceForAnalysis?
-        references?.forEach({ reference in
+        references.forEach({ reference in
             if rowData.name.lowercased().contains(reference.name.lowercased()) {
                 ref = reference
             }
         })
-        cell.configure(labName: rowData.name, labValue: String(rowData.value), labReference: ref)
+        cell.configure(labName: rowData.name, labValue: rowData.value, labReference: (ref?.threshold) ?? "", refDescription: (ref?.description) ?? "")
         return cell
     }
     
     func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        guard let dates = fetchedAnalysesDates else {
-            return nil
-        }
-        return dates.compactMap{$0.prefix(_:5)}.map(String.init).uniqued()
-        
+        return fetchedAnalysesDates.compactMap{$0.prefix(_:5)}.map(String.init).uniqued()
     }
     
     func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
-        
-        guard let firstIndexOfSection = fetchedAnalysesDates?.compactMap({$0.prefix(_:5)}).map(String.init).firstIndex(of: title) else {
+        guard let firstIndexOfSection = fetchedAnalysesDates.compactMap({$0.prefix(_:5)}).map(String.init).firstIndex(of: title) else {
             return 0
         }
-        
         return firstIndexOfSection
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 44
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
@@ -274,13 +213,13 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
         return UIContextMenuConfiguration(identifier: nil) {
             HapticsManager.shared.vibrate(for: .success)
             var valueBGColor : UIColor? {
-                if selectedCell.analysisValue.backgroundColor == .systemBackground {
+                if selectedCell.valueLabel.backgroundColor == .systemBackground {
                     return .systemGray.withAlphaComponent(0.1)
                 } else {
-                    return selectedCell.analysisValue.backgroundColor
+                    return selectedCell.valueLabel.backgroundColor
                 }
             }
-            let previewVC = UIHostingController(rootView: PreviewSwiftUIView(value: selectedCell.analysisValue.text!, normalValue: selectedCell.threshold.text!, description: selectedCell.referenceDescription!, color: valueBGColor!))
+            let previewVC = UIHostingController(rootView: PreviewSwiftUIView(value: selectedCell.valueLabel.text!, normalValue: selectedCell.referenceValue!, description: selectedCell.referenceDescription!, color: valueBGColor!))
             return previewVC
             
             
@@ -291,14 +230,7 @@ extension ResultsViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 
-extension Sequence where Element: Hashable {
-    
-    func uniqued () -> [Element] {
-        var set = Set<Element>()
-        return filter {set.insert($0).inserted}
-    }
-    
-}
+
 
 
 

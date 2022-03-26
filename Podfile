@@ -7,6 +7,6 @@ target 'ProMedAnalyses' do
 
   # Pods for ProMedAnalyses
 
-pod 'SwiftSoup' 
+pod 'SwiftSoup'
 
 end

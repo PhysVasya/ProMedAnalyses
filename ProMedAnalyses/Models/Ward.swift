@@ -8,7 +8,7 @@
 import Foundation
 
 struct Ward: Equatable {
- 
+    
     public static func == (lhs: Ward, rhs: Ward) -> Bool {
         return lhs.wardType == rhs.wardType && lhs.wardNumber == rhs.wardNumber
     }

@@ -40,9 +40,9 @@ struct APICallManager {
               let io = AuthorizationManager.shared.ioCookie,
               let jSessionID = AuthorizationManager.shared.jSessionID,
               let phpSessionID = AuthorizationManager.shared.sessionID else {
-                  completion(false)
-                  return
-              }
+            completion(false)
+            return
+        }
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
@@ -82,7 +82,7 @@ struct APICallManager {
                     let dataForPatientsTableView = try SwiftSoup.parse(person.name!)
                     let patientNames = try dataForPatientsTableView.getElementsByTag("span")
                     if !patientNames.isEmpty() {
-                    
+                        
                         if let patientID = person.patientID,
                            let patientDateOfAdmission = person.dateOfAdmission,
                            let patientBirthday = person.birthday,
@@ -156,14 +156,16 @@ struct APICallManager {
                 
                 do{
                     
-                    FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient) { result in
-                        switch result {
-                        case .success(let patientExists):
-                            FetchingManager.shared.sharedPatient = patientExists
-                        case .failure(let error):
-                            print("Error checking patient \(error)")
-                        }
-                    }
+                    FetchingManager.shared.checkPatientAndSaveIfNeeded(patient: patient)
+                    
+//                    { result in
+//                        switch result {
+//                        case .success(let patientExists):
+//                            FetchingManager.shared.sharedPatient = patientExists
+//                        case .failure(let error):
+//                            print("Error checking patient \(error)")
+//                        }
+//                    }
                     
                     let decodedData = try JSONDecoder().decode(FetchedListOfLabIDs.self, from: receivedData)
                     guard let items = decodedData.map?.evnPS.item[0].children.evnSection.item[1].children.evnUslugaStac.item else {
@@ -275,17 +277,19 @@ struct APICallManager {
         }
     }
     
-    public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping () -> Void) {
+    public func downloadAndSaveLabData (for patient: Patient, completionHanlder: @escaping ([AnalysisViewModel]) -> Void) {
         Task.init {
             if let ids = await downloadLabIDs(for: patient) {
                 if let analyses = await downloadLabData(with: ids) {
                     FetchingManager.shared.saveLabData(forPatient: patient, with: analyses)
-                    completionHanlder()
+                    FetchingManager.shared.fetchLabDataFromCoreData(for: patient) { analyses in
+                        completionHanlder(analyses)
+                    }
                 }
             }
         }
     }
-
+    
     
     public func downloadAll (completionHandler : @escaping (Double?) -> Void) async {
         

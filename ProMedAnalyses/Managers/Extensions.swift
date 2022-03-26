@@ -10,7 +10,8 @@ import UIKit
 
 extension UIViewController {
     
-    func dataIsLoading (with message: String?, onTaskCompletion: @escaping ((UIActivityIndicatorView)) -> Void) {
+    //The following method provides UIActivityIndicatorView with a string below it, offseted by 20. Escaping closure provides an ability to stop it later after any of the functions complete.
+    func showLoadingData (label message: String?, onTaskCompletion: @escaping ((UIActivityIndicatorView)) -> Void) {
         DispatchQueue.main.async {
             let loadingIndicator = UIActivityIndicatorView(style: .medium)
             let loadingTextLabel = UILabel()
@@ -29,11 +30,12 @@ extension UIViewController {
         }
     }
     
-    /// extension of UIViewController, manages showing errors
+    ///   The following method basically shows an error to the user in form of alert controller with style .alert. It has one button "Cancel" by default
     /// - Parameters:
-    ///   - message: Type the message to show in alert controller
-    ///   - addOKButton: Default value is false, therefore shows only "Cancel" button, completionHandler doesn't trigger.
-    ///   - completionHanlder: Can be used only if OK button added
+    ///   - message: The error message to provide to the user.
+    ///   - addOKButton: Adds an "OK" button to the alert controller.
+    ///   - completionHanlderOnFailure: Can be used after pressing "Cancel"
+    ///   - completionHanlderOnSuccess: Can be used after pressing "OK"
     func showErrorToTheUser (with message: String?, addOKButton: Bool = false, completionHanlderOnFailure: (() -> Void)? = nil, completionHanlderOnSuccess: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             let alertController = UIAlertController(title: "Произошла ошибка", message: message, preferredStyle: .alert)
@@ -57,7 +59,7 @@ extension UIViewController {
 }
 
 extension Date {
-    
+    //The date saved in CoreData with the type Date. This formatter converts it to string in preferred way.
     func getFormattedDate() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
@@ -66,7 +68,7 @@ extension Date {
 }
 
 extension String {
-    
+    //In the recieving data from requests which is sometimes JSON, sometimes HTML code, the following method returns formatted Date for better visual presentation.
     func getFormattedDateFromString () -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
@@ -74,4 +76,47 @@ extension String {
     }
 }
 
+extension URLResponse {
+    
+    enum GettingCookieError: LocalizedError {
+        case gotNil
+        
+        var errorDescription: String? {
+            switch self {
+            case .gotNil:
+                return "Got nil from response"
+            }
+        }
+    }
+    
+    // All of the methods in AuthorizationManages aim to collect Response header field "Set-Cookie". Extension is made to lessen the amount of repetative code.
+    func getCookie (completion: (String) -> Void) throws {
+        
+        guard let urlResponse = self.url,
+              let httpResponse = self as? HTTPURLResponse,
+              let fields = httpResponse.allHeaderFields as? [String : String] else {
+            throw GettingCookieError.gotNil
+            
+        }
+        let cookies = HTTPCookie.cookies(withResponseHeaderFields: fields, for: urlResponse)
+        for cookie in cookies {
+            var cookieProps = [HTTPCookiePropertyKey : Any]()
+            cookieProps[.value] = cookie.value
+            if let jSessionID = cookieProps[.value] as? String {
+                completion(jSessionID)
+            }
+        }
+    }
+    
+    
+}
+
+extension Sequence where Element: Hashable {
+    
+    func uniqued () -> [Element] {
+        var set = Set<Element>()
+        return filter {set.insert($0).inserted}
+    }
+    
+}
 

@@ -9,42 +9,65 @@ import Foundation
 import CoreData
 
 
-class FetchingManager {
+struct FetchingManager {
     
-    static let shared = FetchingManager()
+    static var shared = FetchingManager()
     static let managedPatient = "ManagedPatient"
     static let managedLabData = "ManagedLabData"
-    
-    public var sharedPatient: ManagedPatient?
-    
+        
     private let context = CoreDataStack(modelName: "ProMedAnalyses").managedContext
     
     private init () { }
     
-    enum FetchingError: LocalizedError {
-        case unableToFetchPatientFromCoreData
-        case unableToFetchAnalysisDataFromCoreData
+    enum FetchingError: Error, LocalizedError {
+        
+        case unableToFetchPatientFromCoreData(Error)
+        case unableToFetchAnalysisDataFromCoreData(Error)
         case thereIsNoSuchPatient
+        case thereAreNoAlanysesInPatient(Error)
         
         var errorDescription: String? {
             switch self {
-            case .unableToFetchPatientFromCoreData:
-                return "Unable to fetch patient from CoreData"
-            case .unableToFetchAnalysisDataFromCoreData:
-                return "Unable to fetch analysis data from CoreData"
+            case .unableToFetchPatientFromCoreData(let error):
+                return "Unable to fetch patient from CoreData : \(error)"
+            case .unableToFetchAnalysisDataFromCoreData(let error):
+                return "Unable to fetch analysis data from CoreData : \(error)"
             case .thereIsNoSuchPatient:
                 return "There patient is already saved locally"
+            case .thereAreNoAlanysesInPatient(let error):
+                return "There are no saved analysis in this patient: \(error)"
             }
         }
     }
     
-    enum SavingError: String, Error {
-        case unableToSavePatient = "Unable to save patient"
-        case unableToProperlyDeletePatient = "Unable to properly delete patient"
-        case unableToSaveAnalysis = "Unable to save analysis"
+    enum SavingError: Error, LocalizedError {
+        
+        case unableToSavePatient(Error)
+        case unableToProperlyDeletePatient(Error)
+        case unableToSaveAnalysis(Error)
+        case unableToMovePatient(Error)
+        case errorSavingLabData(Error)
+        
+        public var errorDescription: String? {
+            switch self {
+            case .unableToSavePatient(let error):
+                return "Unable to save patient : \(error)"
+            case .unableToProperlyDeletePatient(let error):
+                return "Unable to properly delete patient : \(error)"
+            case .unableToSaveAnalysis(let error):
+                return "Unable to save analysis : \(error)"
+            case .unableToMovePatient(let error):
+                return "Unable to move and save patients correctly : \(error)"
+            case .errorSavingLabData(let error):
+                return "Error saving LabData : \(error)"
+            }
+        }
     }
     
     public func checkPatientAndSaveIfNeeded (patient: Patient, completionHanlder: ((Result<ManagedPatient?, Error>) -> Void)? = nil) {
+        
+        //Classic FIND or CREATE pattern
+        
         let patientFetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         let predicate = NSPredicate(format: "patientID == \(patient.patientID)")
         patientFetch.predicate = predicate
@@ -58,13 +81,11 @@ class FetchingManager {
             } else {
                 completionHanlder?(.failure(FetchingError.thereIsNoSuchPatient))
                 savePatient(patient: patient)
-                
             }
             
         } catch let error as NSError {
-            print("\(FetchingError.unableToFetchPatientFromCoreData): \(error)")
+            print(FetchingError.unableToFetchPatientFromCoreData(error).localizedDescription)
         }
-        
     }
     
     public func fetchPatientsFromCoreData (completionHandler: (_ : [Patient])->Void) {
@@ -74,17 +95,13 @@ class FetchingManager {
         do {
             let fetchedPatientsFromCoreData = try self.context.fetch(request)
             for fetchedPatient in fetchedPatientsFromCoreData {
-    
                 let patient = Patient(name: fetchedPatient.patientName!, dateOfAdmission: fetchedPatient.dateOfAdmission!.getFormattedDate(), ward: Ward(wardNumber: Int(fetchedPatient.wardNumber), wardType: .fourMan), patientID: Int(fetchedPatient.patientID), birthday: (fetchedPatient.birthday?.getFormattedDate())!, sex: fetchedPatient.sex!)
                 fetchedPatients.append(patient)
-                
             }
             completionHandler(fetchedPatients)
-            
         } catch let error {
-            print("\(FetchingError.unableToFetchPatientFromCoreData): \(error)")
+            print(FetchingError.unableToFetchPatientFromCoreData(error).localizedDescription)
         }
-        
     }
     
     
@@ -98,7 +115,7 @@ class FetchingManager {
             let fetchedPatient = try context.fetch(patientsRequest)
             let fetchedLabData = fetchedPatient.first?.labsData?.compactMap({$0}) as? [ManagedLabData]
             var finalAnalysis = [AnalysisViewModel]()
-         
+            
             fetchedLabData?.forEach({ labData in
                 if let fetchedAnalyses = labData.analyses?.compactMap({$0}) as? [ManagedAnalysis] {
                     let viewFormattedFetchedAnalyses = fetchedAnalyses.compactMap { managedAnalysis -> Analysis? in
@@ -114,11 +131,12 @@ class FetchingManager {
             })
             completionHandler(finalAnalysis)
         } catch let error {
-            print("\(FetchingError.unableToFetchAnalysisDataFromCoreData.localizedDescription): \(error.localizedDescription)")
+            print(FetchingError.unableToFetchAnalysisDataFromCoreData(error).localizedDescription)
         }
     }
     
     public func fetchOnlyPatientsWithAnalyses (completion: ([Patient]) -> Void) {
+        
         let request : NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         
         do {
@@ -134,20 +152,20 @@ class FetchingManager {
             completion(patients)
             
         } catch let error as NSError {
-            print("Error fetching only patients wit analyses. \(error)")
+            print(FetchingError.thereAreNoAlanysesInPatient(error).localizedDescription)
         }
     }
     
     public func fetchPatientsWithHighCRP (completion: ([Patient]) -> Void) {
         let request: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
-    
+        
     }
     
     
     public func changeWardAndSavePatient (patient: Patient, moveTo: Int) {
         
         let fetch: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
-        let predicate: NSPredicate = NSPredicate(format: "%K == %@", #keyPath(ManagedPatient.patientID), patient.patientID)
+        let predicate: NSPredicate = NSPredicate(format: "patientID == \(patient.patientID)")
         fetch.predicate = predicate
         
         do {
@@ -157,13 +175,13 @@ class FetchingManager {
                     return
                 }
                 existingPatient.wardNumber = Int16(moveTo)
-               
+                
                 if context.hasChanges {
                     try context.save()
                 }
             }
         } catch let error as NSError {
-            print("Error moving and  saving patient \(error)")
+            print(SavingError.unableToMovePatient(error).localizedDescription)
         }
     }
     
@@ -177,34 +195,35 @@ class FetchingManager {
         managedPatient.patientName = patient.name
         managedPatient.wardNumber = Int16(patient.ward.wardNumber)
         
-            if self.context.hasChanges {
+        if self.context.hasChanges {
             do {
                 try self.context.save()
             } catch let error as NSError {
-                print("\(SavingError.unableToSavePatient) : \(error)")
+                print(SavingError.unableToSavePatient(error).localizedDescription)
             }
         }
         
         
     }
     
-    func deletePatient (patient: Patient) {
+    public func deletePatient (patient: Patient) {
         
         let patientToDelete = ManagedPatient(context: context)
         patientToDelete.patientID = Int64(patient.patientID)
-                    
         context.delete(patientToDelete)
         
         if context.hasChanges {
             do {
                 try context.save()
             } catch let error {
-                print("\(SavingError.unableToProperlyDeletePatient.rawValue): \(error)")
+                print(SavingError.unableToProperlyDeletePatient(error).localizedDescription)
             }
         }
     }
     
-    func saveLabData (forPatient: Patient, with analysisType: [AnalysisType]) {
+    public func saveLabData (forPatient: Patient, with analysisType: [AnalysisType]) {
+        
+        var sharedPatient: ManagedPatient?
         
         let fetchPatient: NSFetchRequest<ManagedPatient> = ManagedPatient.fetchRequest()
         fetchPatient.predicate = NSPredicate(format: "patientID == \(forPatient.patientID)")
@@ -214,11 +233,10 @@ class FetchingManager {
                 sharedPatient = results.first
             }
         } catch let error {
-            print("Error fetching patient and saing labs \(error)")
+            print(SavingError.errorSavingLabData(error).localizedDescription)
         }
         
         analysisType.forEach { analysis in
-            
             let managedLabDataFetch : NSFetchRequest<ManagedLabData> = ManagedLabData.fetchRequest()
             managedLabDataFetch.predicate = NSPredicate(format: "evnUslugaID == \(analysis.evnUslugaID)")
             
@@ -253,24 +271,20 @@ class FetchingManager {
                         do {
                             try self.context.save()
                         } catch let error {
-                            print("\(SavingError.unableToSaveAnalysis.rawValue): \(error)")
+                            print(SavingError.unableToSaveAnalysis(error).localizedDescription)
                         }
                     }
                 }
                 
             } catch let error as NSError {
-                print(error)
+                print(SavingError.unableToSaveAnalysis(error).localizedDescription)
             }
         }
     }
-    
-    
-    
-    
 }
 
 extension String {
-
+    
     var getPatientDateFormatted : String {
         var date = self.lowercased().components(separatedBy: .letters).joined()
         date.removeLast(1)
@@ -284,6 +298,6 @@ extension String {
         date.removeFirst(4)
         return date
     }
-        
+    
 }
 

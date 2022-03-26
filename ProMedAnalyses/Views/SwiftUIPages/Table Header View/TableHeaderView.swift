@@ -14,7 +14,7 @@ struct TableHeaderView: View {
     var onHighCRPButtonPressed: ((Bool)->Void)?
     
     @State private var width = UIScreen.main.bounds.width
-     
+    
     var body: some View {
         ZStack(alignment: .center) {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -25,7 +25,7 @@ struct TableHeaderView: View {
                 .frame(height: 36)
                 
             }
-             }
+        }
         .padding(EdgeInsets(top: 0, leading: width / 20, bottom: 0, trailing: width / 20))
         .frame(width: width, height: 40)
     }

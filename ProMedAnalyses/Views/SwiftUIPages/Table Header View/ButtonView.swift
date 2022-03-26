@@ -16,7 +16,7 @@ struct ButtonView: View {
     @State private var isButtonPressed: Bool = false
     private var buttonColor: UIColor? {
         isButtonPressed ? UIColor(named: "ColorOrange") : UIColor.systemBackground
-   }
+    }
     private var fontWeight: Font.Weight {
         isButtonPressed ? .bold : .regular
     }
@@ -30,7 +30,7 @@ struct ButtonView: View {
             }
             .font(.system(size: 14, weight: fontWeight, design: .default))
             .foregroundColor(isButtonPressed ? Color(.white) : Color(.label))
-
+            
         }
         .frame(width: 200, height: 30, alignment: .center)
         .cornerRadius(15)

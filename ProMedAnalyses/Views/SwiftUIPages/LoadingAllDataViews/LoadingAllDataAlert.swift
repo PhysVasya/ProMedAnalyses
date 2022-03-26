@@ -63,7 +63,7 @@ struct LoadingAllDataAlert: View {
             HapticsManager.shared.vibrate(for: .success)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 shouldStayOnScreen?(!newValue)
-
+                
             }
         }
     }
