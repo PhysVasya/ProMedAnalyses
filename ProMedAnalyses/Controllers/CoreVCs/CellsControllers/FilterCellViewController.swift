@@ -21,7 +21,8 @@ class FilterCellViewController: UITableViewCell {
     
     
     func configure (with text: String, view: UIView? = nil) {
-        self.label.text = text
+        label.text = text
+        label.textColor = .label
         guard let v = view else {
             customView.isHidden = true
             return

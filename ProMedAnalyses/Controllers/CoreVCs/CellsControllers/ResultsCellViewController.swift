@@ -21,8 +21,9 @@ class ResultsCellViewController: UITableViewCell {
     
     public var valueLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .regular)
         label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = .label
         return label
     }()
     
@@ -32,7 +33,8 @@ class ResultsCellViewController: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-       
+        valueLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        valueLabel.textColor = .label
         
     }
     
@@ -66,9 +68,7 @@ class ResultsCellViewController: UITableViewCell {
     }
     
     public func configure (labName: String, labValue: String, labReference: String, refDescription: String) {
-        
-        
-        
+                
         self.nameLabel.attributedText = labName.formatToStylizedAttributed()
         self.nameLabel.backgroundColor = .systemGray6
         self.referenceValue = "Норма: \(labReference)"
@@ -77,6 +77,7 @@ class ResultsCellViewController: UITableViewCell {
         if labValue.contains("▲") {
              valueLabel.backgroundColor = UIColor(named: "ColorOrange")
              valueLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+             valueLabel.textColor = UIColor(red: 0.91, green: 0.30, blue: 0.24, alpha: 1.00)
         } else if labValue.contains("▼") {
              valueLabel.backgroundColor = UIColor(named: "ColorBlue")
         } else {

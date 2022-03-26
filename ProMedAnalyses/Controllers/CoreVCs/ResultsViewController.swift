@@ -97,7 +97,6 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
     }
     
     func applyFilters(using: Filter) {
-        print(using)
         if using.dateFilter != nil {
             reassembledAnalyses = reassembledAnalysesCopy.compactMap { $0.date == using.dateFilter ? $0 : nil }
         }
@@ -116,6 +115,7 @@ class ResultsViewController: UIViewController, ResultsViewControllerDelegate {
                 return AnalysisViewModel(name: model.name, date: model.date, analysis: filtered)
             })
         }
+        
         if using.typeFilter == nil && using.dateFilter == nil && using.pathologicalFilter == nil {
             reassembledAnalyses = reassembledAnalysesCopy
         }

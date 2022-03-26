@@ -8,6 +8,7 @@
 import Foundation
 
 struct AnalysisType {
+    
     let analysis: AnalysisDataModel
     let evnUslugaID: Int
     let evnXMLID: Int
@@ -16,7 +17,6 @@ struct AnalysisType {
 }
 
 struct AnalysisDataModel {
-    
     
     let data : [[String]]
     let date : Date
@@ -38,18 +38,16 @@ struct AnalysisViewModel {
         self.date = date
         self.analysis = analysis
     }
-    
-    
 }
 
 struct Analysis: Equatable {
     
+    let name: String
+    let value: String
+    
     static func == (lhs: Analysis, rhs: Analysis) -> Bool {
         return lhs.name == rhs.name
     }
-    
-    let name: String
-    let value: String
 }
 
 extension AnalysisType {
@@ -57,7 +55,6 @@ extension AnalysisType {
     var formattedToViewModel: AnalysisDataModel {
         return self.analysis
     }
-    
 }
 
 struct FetchedLabIDs {

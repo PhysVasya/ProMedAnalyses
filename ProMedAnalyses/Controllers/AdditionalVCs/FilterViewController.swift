@@ -52,7 +52,9 @@ class FilterViewController: UIViewController {
     }
     
     @objc private func dismissSelf() {
-        self.dismiss(animated: true)
+        self.dismiss(animated: true) {
+            self.delegate?.applyFilters(using: Filter(dateFilter: nil, typeFilter: nil, pathologicalFilter: nil))
+        }
     }
     
     private func setupTableView () {

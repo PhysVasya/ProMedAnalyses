@@ -23,11 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
         
         UserDefaults.standard.set(false, forKey: "showAuthorizationVC")
         CheckNetwork.shared.startMonitoring()
-
-        //        
-                print("Documents folder is here : \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
         
+        //        print("Documents folder is here : \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
         //        CoreDataStack.init(modelName: "ProMedAnalyses").clearDatabase()
+        
         return true
     }
     
